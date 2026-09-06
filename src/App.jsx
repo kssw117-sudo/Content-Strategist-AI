@@ -234,7 +234,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
       <div
         style={{
           position: 'fixed', top: '50%', left: '50%', width: '150vmax', height: '150vmax',
-          transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: -1,
+          transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: 0,
         }}
       >
         <svg
@@ -265,6 +265,9 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
         })()}
       </svg>
       </div>
+
+      {/* Оборачиваем весь видимый контент в слой с z-index выше фона-созвездия */}
+      <div style={{ position: 'relative', zIndex: 1 }}>
 
       {/* ---------- HERO: тёмный фон, фото в дуотоне, крупная serif-типографика ---------- */}
       <div style={{ position: 'relative', padding: '24px 24px 0', textAlign: 'center', overflow: 'hidden' }}>
@@ -547,6 +550,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
             <a href="mailto:kssw117@gmail.com" style={{ fontSize: 10.5, color: GOLD }}>kssw117@gmail.com</a>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
