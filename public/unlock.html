@@ -5,45 +5,97 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Enter your code — Content Strategist AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  body { margin: 0; background: #FFFFFF; color: #1F1F1F; font-family: -apple-system, sans-serif; line-height: 1.6; position: relative; overflow-x: hidden; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  body {
+    margin: 0; background: #0A0908; color: #F5F1E8; font-family: 'Inter', sans-serif;
+    font-weight: 300; line-height: 1.6; min-height: 100vh; display: flex; align-items: center;
+    justify-content: center; position: relative; overflow: hidden;
+  }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes floatCell { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-14px) rotate(2deg); } }
-  .floating-cell { position: absolute; border-radius: 12px; pointer-events: none; animation: floatCell 7s ease-in-out infinite; }
-  .fc1 { top: 8%; right: 7%; width: 56px; height: 80px; background: #D97757; opacity: 0.12; animation-duration: 8s; }
-  .fc2 { bottom: 10%; left: 6%; width: 40px; height: 60px; background: #4285F4; opacity: 0.1; animation-duration: 6s; animation-delay: -3s; }
+  @keyframes floatMark {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    50%  { transform: translate(10px, -18px) rotate(8deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+  .mark { position: fixed; opacity: 0.28; pointer-events: none; animation: floatMark 8s ease-in-out infinite; }
+  .m1 { top: 15%; left: 4%; width: 80px; animation-duration: 9s; }
+  .m2 { bottom: 12%; right: 5%; width: 60px; animation-duration: 7s; animation-delay: -3s; }
 
-  .wrap { max-width: 400px; width: 100%; margin: 0 auto; padding: 24px; position: relative; z-index: 1; }
-  .eyebrow { text-align: center; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #BD5D3A; margin-bottom: 14px; animation: fadeUp 0.5s ease both; }
-  h1 { font-family: 'Fraunces', serif; font-size: 28px; text-align: center; margin: 0 0 10px; line-height: 1.2; animation: fadeUp 0.5s ease both; animation-delay: 0.05s; }
-  .sub { text-align: center; color: #5F6368; font-size: 14px; max-width: 340px; margin: 0 auto 32px; animation: fadeUp 0.5s ease both; animation-delay: 0.1s; }
-  .card { background: #FAFAFA; border: 1px solid #E8EAED; border-radius: 16px; padding: 28px; animation: fadeUp 0.5s ease both; animation-delay: 0.15s; }
-  input { width: 100%; box-sizing: border-box; border-radius: 10px; padding: 12px 14px; font-size: 15px; background: #FFFFFF; border: 1px solid #E8EAED; color: #1F1F1F; margin-bottom: 12px; outline: none; }
-  button { width: 100%; border: none; cursor: pointer; border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 600; background: linear-gradient(90deg, #D97757, #BD5D3A); color: #FFFFFF; transition: transform 0.15s ease; }
-  button:hover { transform: translateY(-1px); }
-  button:disabled { opacity: 0.6; cursor: default; }
-  .error { color: #C0392B; font-size: 13px; margin-top: 10px; text-align: center; }
-  .back-link { text-align: center; margin-top: 16px; }
-  .back-link a { color: #BD5D3A; font-size: 13px; text-decoration: underline; }
+  .wrap { max-width: 380px; width: 100%; padding: 24px; text-align: center; position: relative; z-index: 1; animation: fadeUp 0.6s ease both; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #C9A968; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 300; font-size: 30px; margin: 16px 0 10px; }
+  .sub { font-size: 13.5px; color: rgba(245,241,232,0.6); margin: 0 0 32px; }
+  input {
+    width: 100%; box-sizing: border-box; background: none; border: none; border-bottom: 1px solid rgba(245,241,232,0.15);
+    color: #F5F1E8; font-size: 15px; padding: 10px 0; margin-bottom: 24px; outline: none; text-align: center;
+    font-family: 'Inter', sans-serif;
+  }
+  input:focus { border-bottom-color: #C9A968; }
+  button {
+    width: 100%; border: 1px solid #C9A968; background: none; color: #C9A968; cursor: pointer;
+    border-radius: 2px; padding: 13px; font-size: 12px; letter-spacing: 0.08em; font-weight: 500;
+    transition: all 0.2s ease; font-family: 'Inter', sans-serif;
+  }
+  button:hover { background: #C9A968; color: #0A0908; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .error { color: #D98E7F; font-size: 12.5px; margin-top: 14px; }
+  .back-link { margin-top: 22px; }
+  .back-link a { color: rgba(245,241,232,0.5); font-size: 12px; text-decoration: underline; }
 </style>
 </head>
 <body>
 
-<div class="floating-cell fc1"></div>
-<div class="floating-cell fc2"></div>
+<svg class="mark m1" viewBox="0 0 100 100">
+  <line x1="25" y1="30" x2="50" y2="30" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="50" y1="30" x2="75" y2="30" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="10" y1="50" x2="30" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="30" y1="50" x2="50" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="50" y1="50" x2="70" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="70" y1="50" x2="90" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="25" y1="70" x2="50" y2="70" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="50" y1="70" x2="75" y2="70" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="25" y1="30" x2="30" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="75" y1="30" x2="70" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="25" y1="70" x2="30" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="75" y1="70" x2="70" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="50" y1="30" x2="50" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="50" y1="50" x2="50" y2="70" stroke="#C9A968" stroke-width="0.8"/>
+  <circle cx="50" cy="50" r="3" fill="#C9A968"/>
+  <circle cx="25" cy="30" r="2" fill="#F5F1E8"/><circle cx="50" cy="30" r="2" fill="#F5F1E8"/><circle cx="75" cy="30" r="2" fill="#F5F1E8"/>
+  <circle cx="10" cy="50" r="2" fill="#F5F1E8"/><circle cx="30" cy="50" r="2" fill="#F5F1E8"/><circle cx="70" cy="50" r="2" fill="#F5F1E8"/><circle cx="90" cy="50" r="2" fill="#F5F1E8"/>
+  <circle cx="25" cy="70" r="2" fill="#F5F1E8"/><circle cx="50" cy="70" r="2" fill="#F5F1E8"/><circle cx="75" cy="70" r="2" fill="#F5F1E8"/>
+</svg>
+<svg class="mark m2" viewBox="0 0 100 100">
+  <line x1="25" y1="30" x2="50" y2="30" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="50" y1="30" x2="75" y2="30" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="10" y1="50" x2="30" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="30" y1="50" x2="50" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="50" y1="50" x2="70" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="70" y1="50" x2="90" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="25" y1="70" x2="50" y2="70" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="50" y1="70" x2="75" y2="70" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="25" y1="30" x2="30" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="75" y1="30" x2="70" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="25" y1="70" x2="30" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="75" y1="70" x2="70" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="50" y1="30" x2="50" y2="50" stroke="#C9A968" stroke-width="0.8"/>
+  <line x1="50" y1="50" x2="50" y2="70" stroke="#C9A968" stroke-width="0.8"/>
+  <circle cx="50" cy="50" r="3" fill="#C9A968"/>
+  <circle cx="25" cy="30" r="2" fill="#F5F1E8"/><circle cx="50" cy="30" r="2" fill="#F5F1E8"/><circle cx="75" cy="30" r="2" fill="#F5F1E8"/>
+  <circle cx="10" cy="50" r="2" fill="#F5F1E8"/><circle cx="30" cy="50" r="2" fill="#F5F1E8"/><circle cx="70" cy="50" r="2" fill="#F5F1E8"/><circle cx="90" cy="50" r="2" fill="#F5F1E8"/>
+  <circle cx="25" cy="70" r="2" fill="#F5F1E8"/><circle cx="50" cy="70" r="2" fill="#F5F1E8"/><circle cx="75" cy="70" r="2" fill="#F5F1E8"/>
+</svg>
 
 <div class="wrap">
   <div class="eyebrow">Content Strategist AI</div>
   <h1>Enter your code</h1>
   <p class="sub">Unlock unlimited generations.</p>
 
-  <div class="card">
-    <input type="text" id="codeInput" placeholder="Your access code" />
-    <button id="unlockBtn" onclick="unlock()">Unlock</button>
-    <p class="error" id="errorMsg" style="display:none;"></p>
-    <div class="back-link"><a href="/">← Back without unlocking</a></div>
-  </div>
+  <input type="text" id="codeInput" placeholder="Your access code" />
+  <button id="unlockBtn" onclick="unlock()">UNLOCK</button>
+  <p class="error" id="errorMsg" style="display:none;"></p>
+  <div class="back-link"><a href="/">&larr; Back without unlocking</a></div>
 </div>
 
 <script>
@@ -55,7 +107,7 @@
     if (!code) return;
 
     btn.disabled = true;
-    btn.textContent = 'Checking...';
+    btn.textContent = 'CHECKING...';
 
     try {
       if (code.toUpperCase().startsWith('CSA-')) {
@@ -76,7 +128,7 @@
       errorMsg.textContent = err.message || 'Something went wrong.';
       errorMsg.style.display = 'block';
       btn.disabled = false;
-      btn.textContent = 'Unlock';
+      btn.textContent = 'UNLOCK';
     }
   }
 
