@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Content Strategist AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #FFFFFF; color: #1F1F1F; font-family: -apple-system, sans-serif; line-height: 1.6; position: relative; overflow-x: hidden; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes floatCell { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-14px) rotate(2deg); } }
+  .floating-cell { position: absolute; border-radius: 14px; pointer-events: none; animation: floatCell 7s ease-in-out infinite; }
+  .fc1 { top: 6%; right: 6%; width: 70px; height: 100px; background: #D97757; opacity: 0.12; animation-duration: 8s; }
+  .fc2 { bottom: 10%; left: 5%; width: 50px; height: 76px; background: #4285F4; opacity: 0.1; animation-duration: 6s; animation-delay: -3s; }
+  .fc3 { top: 45%; right: 4%; width: 36px; height: 54px; background: #34A853; opacity: 0.1; animation-duration: 9s; animation-delay: -1.5s; }
+
+  .wrap { max-width: 640px; margin: 0 auto; padding: 60px 24px 100px; position: relative; z-index: 1; }
+  .eyebrow { text-align: center; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #BD5D3A; margin-bottom: 14px; animation: fadeUp 0.5s ease both; }
+  h1 { font-family: 'Fraunces', serif; font-size: 34px; text-align: center; margin: 0 0 16px; line-height: 1.2; animation: fadeUp 0.5s ease both; animation-delay: 0.05s; }
+  .sub { text-align: center; color: #5F6368; font-size: 16px; max-width: 460px; margin: 0 auto 36px; animation: fadeUp 0.5s ease both; animation-delay: 0.1s; }
+  .price-box { background: #FAFAFA; border: 1px solid #E8EAED; border-radius: 16px; padding: 32px; text-align: center; margin-bottom: 40px; animation: fadeUp 0.5s ease both; animation-delay: 0.15s; }
+  .price { font-size: 42px; font-weight: 700; margin-bottom: 4px; }
+  .price-note { color: #5F6368; font-size: 13px; margin-bottom: 24px; }
+  .widget-wrap { display: flex; justify-content: center; }
+  .widget-wrap iframe { transition: transform 0.15s ease, box-shadow 0.15s ease; border-radius: 10px; }
+  .widget-wrap iframe:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(217,119,87,0.3); }
+  .features { margin: 40px 0; }
+  .feature { display: flex; gap: 14px; margin-bottom: 20px; align-items: flex-start; opacity: 0; animation: fadeUp 0.5s ease both; }
+  .feature:nth-child(1) { animation-delay: 0.2s; }
+  .feature:nth-child(2) { animation-delay: 0.26s; }
+  .feature:nth-child(3) { animation-delay: 0.32s; }
+  .feature:nth-child(4) { animation-delay: 0.38s; }
+  .feature .dot { width: 6px; height: 6px; border-radius: 50%; background: #D97757; margin-top: 8px; flex-shrink: 0; }
+  .feature p { margin: 0; }
+  .feature strong { display: block; margin-bottom: 2px; }
+  footer { text-align: center; color: #5F6368; font-size: 12px; margin-top: 60px; }
+  .back-link { text-align: center; margin-top: 16px; }
+  .back-link a { color: #BD5D3A; font-size: 13px; text-decoration: underline; }
+  .hero-photo { width: 100%; border-radius: 16px; margin-bottom: 32px; display: block; animation: fadeUp 0.6s ease both; box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+
+<div class="floating-cell fc1"></div>
+<div class="floating-cell fc2"></div>
+<div class="floating-cell fc3"></div>
+
+<div class="wrap">
+  <img class="hero-photo" src="/images/hero-team.jpg" alt="Team planning content strategy together" />
+  <div class="eyebrow">AI-powered &middot; Instant access</div>
+  <h1>Content Strategist AI</h1>
+  <p class="sub">A week of post ideas, tailored to the platform you're actually posting on -- plus a competitor gap analysis, so you always know your angle.</p>
+
+  <div class="price-box">
+    <div class="price">$69</div>
+    <div class="price-note">one-time payment &middot; lifetime access &middot; secure card payment</div>
+    <div class="widget-wrap">
+      <!-- ЗАМЕНИ src на реальную ссылку виджета из Lava.top после создания товара -->
+      <iframe title="lava.top" style="border: none" width="250" height="80" src="https://widget.lava.top/ВСТАВЬ_ID_ВИДЖЕТА"></iframe>
+    </div>
+    <div class="note" style="font-size:12px;color:#BD5D3A;margin-top:16px;">Instant delivery -- your access code arrives right after payment.</div>
+    <div class="back-link"><a href="/">Already have a code? Enter it here</a></div>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="dot"></div>
+      <p><strong>Platform-specific ideas, not generic ones</strong>Instagram gets visual lifestyle angles, TikTok gets trend-driven hooks, LinkedIn gets thought-leadership, Reddit gets genuine non-promotional value -- each platform, done right.</p>
+    </div>
+    <div class="feature">
+      <div class="dot"></div>
+      <p><strong>7 platforms supported</strong>Instagram, TikTok, LinkedIn, Facebook, Telegram, X, and Reddit.</p>
+    </div>
+    <div class="feature">
+      <div class="dot"></div>
+      <p><strong>Content pillars, balanced automatically</strong>Educational, behind-the-scenes, social proof, promotional, entertaining -- spread across your week so it never feels one-note.</p>
+    </div>
+    <div class="feature">
+      <div class="dot"></div>
+      <p><strong>Competitor gap analysis</strong>Paste a competitor's post -- find out what they're missing, and get your unique angle to fill it.</p>
+    </div>
+  </div>
+
+  <footer>Plainwork &middot; a tool by Ksenia</footer>
+</div>
+
+</body>
+</html>

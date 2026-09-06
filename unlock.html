@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Enter your code — Content Strategist AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #FFFFFF; color: #1F1F1F; font-family: -apple-system, sans-serif; line-height: 1.6; position: relative; overflow-x: hidden; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes floatCell { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-14px) rotate(2deg); } }
+  .floating-cell { position: absolute; border-radius: 12px; pointer-events: none; animation: floatCell 7s ease-in-out infinite; }
+  .fc1 { top: 8%; right: 7%; width: 56px; height: 80px; background: #D97757; opacity: 0.12; animation-duration: 8s; }
+  .fc2 { bottom: 10%; left: 6%; width: 40px; height: 60px; background: #4285F4; opacity: 0.1; animation-duration: 6s; animation-delay: -3s; }
+
+  .wrap { max-width: 400px; width: 100%; margin: 0 auto; padding: 24px; position: relative; z-index: 1; }
+  .eyebrow { text-align: center; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #BD5D3A; margin-bottom: 14px; animation: fadeUp 0.5s ease both; }
+  h1 { font-family: 'Fraunces', serif; font-size: 28px; text-align: center; margin: 0 0 10px; line-height: 1.2; animation: fadeUp 0.5s ease both; animation-delay: 0.05s; }
+  .sub { text-align: center; color: #5F6368; font-size: 14px; max-width: 340px; margin: 0 auto 32px; animation: fadeUp 0.5s ease both; animation-delay: 0.1s; }
+  .card { background: #FAFAFA; border: 1px solid #E8EAED; border-radius: 16px; padding: 28px; animation: fadeUp 0.5s ease both; animation-delay: 0.15s; }
+  input { width: 100%; box-sizing: border-box; border-radius: 10px; padding: 12px 14px; font-size: 15px; background: #FFFFFF; border: 1px solid #E8EAED; color: #1F1F1F; margin-bottom: 12px; outline: none; }
+  button { width: 100%; border: none; cursor: pointer; border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 600; background: linear-gradient(90deg, #D97757, #BD5D3A); color: #FFFFFF; transition: transform 0.15s ease; }
+  button:hover { transform: translateY(-1px); }
+  button:disabled { opacity: 0.6; cursor: default; }
+  .error { color: #C0392B; font-size: 13px; margin-top: 10px; text-align: center; }
+  .back-link { text-align: center; margin-top: 16px; }
+  .back-link a { color: #BD5D3A; font-size: 13px; text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="floating-cell fc1"></div>
+<div class="floating-cell fc2"></div>
+
+<div class="wrap">
+  <div class="eyebrow">Content Strategist AI</div>
+  <h1>Enter your code</h1>
+  <p class="sub">Unlock unlimited generations.</p>
+
+  <div class="card">
+    <input type="text" id="codeInput" placeholder="Your access code" />
+    <button id="unlockBtn" onclick="unlock()">Unlock</button>
+    <p class="error" id="errorMsg" style="display:none;"></p>
+    <div class="back-link"><a href="/">← Back without unlocking</a></div>
+  </div>
+</div>
+
+<script>
+  async function unlock() {
+    const code = document.getElementById('codeInput').value.trim();
+    const btn = document.getElementById('unlockBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    errorMsg.style.display = 'none';
+    if (!code) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Checking...';
+
+    try {
+      if (code.toUpperCase().startsWith('CSA-')) {
+        const res = await fetch('/api/redeem-appsumo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code })
+        });
+        const data = await res.json();
+        if (!data.success) {
+          throw new Error(data.error || 'Code not recognized.');
+        }
+      }
+      localStorage.setItem('cs_unlocked', 'true');
+      localStorage.setItem('cs_licenseCode', code);
+      window.location.href = '/?welcome=1';
+    } catch (err) {
+      errorMsg.textContent = err.message || 'Something went wrong.';
+      errorMsg.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Unlock';
+    }
+  }
+
+  document.getElementById('codeInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') unlock();
+  });
+</script>
+
+</body>
+</html>
