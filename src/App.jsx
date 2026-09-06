@@ -1,30 +1,26 @@
 import React, { useState, useEffect } from 'react';
 
-const BG = '#FFFFFF';
-const CARD = '#FAFAFA';
-const LINE = '#E8EAED';
-const INK = '#1F1F1F';
-const INK_SOFT = '#5F6368';
-const BLUE_MAIN = '#4285F4';
-const BLUE_DEEP = '#1A56C4';
+const BG = '#0A0908';
+const CREAM = '#F5F1E8';
+const CARD = '#151412';
+const LINE = 'rgba(245,241,232,0.12)';
+const INK = '#F5F1E8';
+const INK_SOFT = 'rgba(245,241,232,0.6)';
+const GOLD = '#C9A968';
+const GOLD_DEEP = '#A6863F';
 
 const PILLAR_COLORS = {
-  'Educational': { bg: '#E6F1FB', text: '#0C447C', dot: '#4285F4' },
-  'Behind-the-scenes': { bg: '#F1EBFB', text: '#5B2E8C', dot: '#8B5CF6' },
-  'Social proof': { bg: '#EAF3DE', text: '#27500A', dot: '#34A853' },
-  'Promotional': { bg: '#FBEFEA', text: '#8A3D22', dot: BLUE_MAIN },
-  'Entertaining': { bg: '#FCF3DC', text: '#7A5200', dot: '#F5A623' },
+  'Educational': { text: '#F5F1E8', dot: '#7A8B99' },
+  'Behind-the-scenes': { text: '#F5F1E8', dot: '#9B8AA8' },
+  'Social proof': { text: '#F5F1E8', dot: '#7FA88A' },
+  'Promotional': { text: '#0A0908', dot: GOLD },
+  'Entertaining': { text: '#F5F1E8', dot: '#B98A6B' },
 };
 const PILLARS = Object.keys(PILLAR_COLORS);
 
 const BEST_TIMES = {
-  instagram: '11am\u20132pm or 7\u20139pm',
-  tiktok: '6\u20139am or 7\u201310pm',
-  linkedin: 'Tue\u2013Thu, 8\u201310am',
-  facebook: '1\u20134pm',
-  telegram: '9\u201311am or 6\u20138pm',
-  x: '8\u20139am or 6\u20139pm',
-  reddit: 'weekday mornings (varies by subreddit)',
+  instagram: '11am\u20132pm or 7\u20139pm', tiktok: '6\u20139am or 7\u201310pm', linkedin: 'Tue\u2013Thu, 8\u201310am',
+  facebook: '1\u20134pm', telegram: '9\u201311am or 6\u20138pm', x: '8\u20139am or 6\u20139pm', reddit: 'weekday mornings',
 };
 
 const DAILY_LIMIT = 50;
@@ -49,39 +45,39 @@ function checkAndUseDailyLimit() {
 }
 
 const PLATFORMS = [
-  { code: 'instagram', label: 'Instagram', color: '#D62976' },
-  { code: 'tiktok', label: 'TikTok', color: '#111111' },
-  { code: 'linkedin', label: 'LinkedIn', color: '#0A66C2' },
-  { code: 'facebook', label: 'Facebook', color: '#1877F2' },
-  { code: 'telegram', label: 'Telegram', color: '#26A5E4' },
-  { code: 'x', label: 'X', color: '#111111' },
-  { code: 'reddit', label: 'Reddit', color: '#FF4500' },
+  { code: 'instagram', label: 'Instagram' }, { code: 'tiktok', label: 'TikTok' },
+  { code: 'linkedin', label: 'LinkedIn' }, { code: 'facebook', label: 'Facebook' },
+  { code: 'telegram', label: 'Telegram' }, { code: 'x', label: 'X' }, { code: 'reddit', label: 'Reddit' },
 ];
 
 const MODES = [
   { value: 'single', label: 'Single platform' },
-  { value: 'cross', label: 'Cross-platform calendar' },
+  { value: 'cross', label: 'Cross-platform' },
   { value: 'competitor', label: 'Competitor gap' },
+];
+
+const LANGS = [
+  { code: 'en', label: 'English' }, { code: 'ru', label: '\u0420\u0443\u0441\u0441\u043a\u0438\u0439' }, { code: 'es', label: 'Espa\u00f1ol' },
+  { code: 'zh', label: '\u4e2d\u6587' }, { code: 'ar', label: '\u0627\u0644\u0639\u0631\u0628\u064a\u0629' }, { code: 'pt', label: 'Portugu\u00eas' },
+  { code: 'hi', label: '\u0939\u093f\u0928\u094d\u0926\u0940' }, { code: 'fr', label: 'Fran\u00e7ais' }, { code: 'vi', label: 'Ti\u1ebfng Vi\u1ec7t' },
+  { code: 'ko', label: '\ud55c\uad6d\uc5b4' }, { code: 'tr', label: 'T\u00fcrk\u00e7e' }, { code: 'de', label: 'Deutsch' },
+  { code: 'ja', label: '\u65e5\u672c\u8a9e' }, { code: 'it', label: 'Italiano' }, { code: 'pl', label: 'Polski' },
+  { code: 'fa', label: '\u0641\u0627\u0631\u0633\u06cc' }, { code: 'uk', label: '\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430' }, { code: 'nl', label: 'Nederlands' },
+  { code: 'th', label: '\u0e44\u0e17\u0e22' }, { code: 'id', label: 'Bahasa Indonesia' },
 ];
 
 const UI_TEXT = {
   en: {
-    title: 'Content Strategist AI',
-    subtitle: 'A week of ideas, tailored per platform -- built for teams who actually plan together.',
-    tapHint: 'Tap a platform to select it',
-    statPlatforms: 'platforms', statPillars: 'content pillars', statIdeas: 'ideas, unlimited',
+    subtitle: 'A week of ideas, considered per platform. For teams who plan with intention.',
+    about: 'Content Strategist AI builds a week of post ideas at a time -- not captions, but the underlying topic for each day, matched to what actually works on that specific platform. Choose one platform, or plan across several at once. Paste a competitor\u2019s post to find the gap you can fill.',
   },
   ru: {
-    title: 'Content Strategist AI',
-    subtitle: 'Неделя идей, адаптированных под платформу — для команд, которые реально планируют вместе.',
-    tapHint: 'Нажми на платформу, чтобы выбрать её',
-    statPlatforms: 'платформ', statPillars: 'категорий контента', statIdeas: 'идей, без ограничений',
+    subtitle: 'Неделя идей, продуманных под платформу. Для команд, которые планируют осознанно.',
+    about: 'Content Strategist AI строит неделю идей для постов за раз — не подписи, а саму тему на каждый день, подобранную под то, что реально работает именно на этой платформе. Выбери одну платформу или планируй сразу по нескольким. Вставь пост конкурента, чтобы найти пробел, который можно занять.',
   },
   es: {
-    title: 'Content Strategist AI',
-    subtitle: 'Una semana de ideas, adaptadas por plataforma -- para equipos que realmente planifican juntos.',
-    tapHint: 'Toca una plataforma para seleccionarla',
-    statPlatforms: 'plataformas', statPillars: 'pilares de contenido', statIdeas: 'ideas, ilimitadas',
+    subtitle: 'Una semana de ideas, pensadas por plataforma. Para equipos que planifican con intenci\u00f3n.',
+    about: 'Content Strategist AI construye una semana de ideas de publicaciones a la vez -- no subt\u00edtulos, sino el tema de cada d\u00eda, ajustado a lo que realmente funciona en esa plataforma. Elige una plataforma, o planifica varias a la vez. Pega el post de un competidor para encontrar el hueco que puedes llenar.',
   },
 };
 
@@ -93,13 +89,12 @@ export default function App() {
   const [showSupportEmail, setShowSupportEmail] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [uiLang, setUiLang] = useState('en');
-  const [audience, setAudience] = useState('');
   const [regeneratingDay, setRegeneratingDay] = useState(null);
-  const [history, setHistory] = useState([]);
   const [copiedAll, setCopiedAll] = useState(false);
 
   const [businessType, setBusinessType] = useState('');
   const [occasion, setOccasion] = useState('');
+  const [audience, setAudience] = useState('');
   const [platform, setPlatform] = useState('instagram');
   const [selectedPlatforms, setSelectedPlatforms] = useState(['instagram', 'tiktok']);
   const [mode, setMode] = useState('single');
@@ -118,9 +113,7 @@ export default function App() {
   }, []);
 
   function togglePlatform(code) {
-    setSelectedPlatforms(prev =>
-      prev.includes(code) ? prev.filter(p => p !== code) : [...prev, code]
-    );
+    setSelectedPlatforms(prev => prev.includes(code) ? prev.filter(p => p !== code) : [...prev, code]);
   }
 
   function copyAllIdeas() {
@@ -131,138 +124,75 @@ export default function App() {
     setTimeout(() => setCopiedAll(false), 1800);
   }
 
-  // Сводка баланса content pillars за неделю — сколько раз встретилась
-  // каждая категория, в виде мини-полосок
-  function pillarSummary(ideas) {
-    const counts = {};
-    PILLARS.forEach(p => counts[p] = 0);
-    ideas.forEach(it => { if (counts[it.pillar] !== undefined) counts[it.pillar]++; });
-    return counts;
-  }
-
   async function regenerateDay(index) {
-    if (!unlocked) return; // перегенерация одного дня — только для разблокированных, не тратит пробную попытку
-    if (!checkAndUseDailyLimit()) {
-      setDailyCount(DAILY_LIMIT);
-      return;
-    }
+    if (!unlocked) return;
+    if (!checkAndUseDailyLimit()) { setDailyCount(DAILY_LIMIT); return; }
     setDailyCount(getDailyCount());
     setRegeneratingDay(index);
     const oldIdea = result.ideas[index];
-    const prompt = `You are a social media content strategist. Give ONE new alternative post idea for ${oldIdea.day}, for the platform "${oldIdea.platform}", different from this previous idea: "${oldIdea.idea}". Keep the same content pillar: ${oldIdea.pillar}. Business type: ${businessType}.
-
-Respond ONLY with valid JSON, no markdown, no code fences:
-{"day": "${oldIdea.day}", "platform": "${oldIdea.platform}", "pillar": "${oldIdea.pillar}", "idea": "...", "hashtags": ["...", "...", "..."]}`;
+    const prompt = `Give ONE new alternative post idea for ${oldIdea.day}, platform "${oldIdea.platform}", different from: "${oldIdea.idea}". Same content pillar: ${oldIdea.pillar}. Business: ${businessType}.
+Respond ONLY with valid JSON: {"day": "${oldIdea.day}", "platform": "${oldIdea.platform}", "pillar": "${oldIdea.pillar}", "idea": "...", "hashtags": ["...", "...", "..."]}`;
     try {
       const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ licenseCode, prompt, trial: false }),
       });
       const data = await res.json();
       const text = data.content?.map(b => b.text || '').join('') || '';
-      const clean = text.replace(/```json|```/g, '').trim();
-      const newIdea = JSON.parse(clean);
-      setResult(r => {
-        const next = { ...r, ideas: [...r.ideas] };
-        next.ideas[index] = newIdea;
-        return next;
-      });
+      const newIdea = JSON.parse(text.replace(/```json|```/g, '').trim());
+      setResult(r => { const next = { ...r, ideas: [...r.ideas] }; next.ideas[index] = newIdea; return next; });
     } catch (err) {
-      setError('Could not regenerate that day. Try again.');
+      setError('Could not regenerate that day.');
     } finally {
       setRegeneratingDay(null);
     }
   }
 
   async function handleGenerate() {
-    if ((mode === 'single' || mode === 'cross') && !businessType.trim()) {
-      setError('Tell us what your business does first.');
-      return;
-    }
-    if (mode === 'cross' && selectedPlatforms.length < 2) {
-      setError('Pick at least 2 platforms for a cross-platform calendar.');
-      return;
-    }
-    if (mode === 'competitor' && !competitorText.trim()) {
-      setError('Paste a competitor\u2019s post or description first.');
-      return;
-    }
+    if ((mode === 'single' || mode === 'cross') && !businessType.trim()) { setError('Tell us what your business does first.'); return; }
+    if (mode === 'cross' && selectedPlatforms.length < 2) { setError('Pick at least 2 platforms.'); return; }
+    if (mode === 'competitor' && !competitorText.trim()) { setError('Paste a competitor\u2019s post first.'); return; }
     const isTrial = !unlocked && !freeTrialUsed;
-    if (!unlocked && freeTrialUsed) {
-      setError('Free preview used. Enter your access code to continue.');
-      return;
-    }
+    if (!unlocked && freeTrialUsed) { setError('Free preview used. Enter your access code to continue.'); return; }
     if (!isTrial) {
-      if (!checkAndUseDailyLimit()) {
-        setDailyCount(DAILY_LIMIT);
-        return;
-      }
+      if (!checkAndUseDailyLimit()) { setDailyCount(DAILY_LIMIT); return; }
       setDailyCount(getDailyCount());
     }
-    setError('');
-    setLoading(true);
-    setResult(null);
+    setError(''); setLoading(true); setResult(null);
 
     const platformLabel = PLATFORMS.find(p => p.code === platform)?.label || platform;
     const selectedLabels = selectedPlatforms.map(c => PLATFORMS.find(p => p.code === c)?.label || c);
 
     let prompt;
     if (mode === 'single') {
-      prompt = `You are a social media content strategist. A small business owner needs a week of post IDEAS (topics, not captions) for ${platformLabel}, plus 2-3 relevant hashtags for each.
-
-Business type: ${businessType}
-Occasion/season: ${occasion || 'no specific occasion, just a normal week'}
-Target audience: ${audience || 'general audience for this business type'}
-
-Give exactly 7 post ideas, one per day, tailored to what actually performs well on ${platformLabel} specifically.
-For each idea, assign one content pillar from this exact list: ${PILLARS.join(', ')}. Spread the 7 ideas across different pillars -- don't repeat the same pillar more than twice.
-
-Respond ONLY with valid JSON, no markdown, no code fences:
-{"ideas": [{"day": "Monday", "platform": "${platformLabel}", "pillar": "...", "idea": "...", "hashtags": ["...", "...", "..."]}, ...7 total]}`;
+      prompt = `You are a social media content strategist. Give a week of post IDEAS (topics, not captions) for ${platformLabel}.
+Business: ${businessType}. Occasion: ${occasion || 'none specific'}. Audience: ${audience || 'general'}.
+Give exactly 7 ideas, one per day, tailored to ${platformLabel}. Assign a content pillar from: ${PILLARS.join(', ')} to each, don't repeat more than twice, include 2-3 hashtags each.
+Respond ONLY with valid JSON: {"ideas": [{"day": "Monday", "platform": "${platformLabel}", "pillar": "...", "idea": "...", "hashtags": ["...","...","..."]}, ...7 total]}`;
     } else if (mode === 'cross') {
-      prompt = `You are a social media content strategist building a cross-platform content calendar for a small business.
-
-Business type: ${businessType}
-Occasion/season: ${occasion || 'no specific occasion, just a normal week'}
-Target audience: ${audience || 'general audience for this business type'}
-Platforms in use: ${selectedLabels.join(', ')}
-
-Build exactly 7 post ideas, one per day, and for EACH day pick the single best platform from the list for that specific idea. For each idea, assign one content pillar from this exact list: ${PILLARS.join(', ')}, don't repeat the same pillar more than twice, and give 2-3 relevant hashtags.
-
-Respond ONLY with valid JSON, no markdown, no code fences:
-{"ideas": [{"day": "Monday", "platform": "one of: ${selectedLabels.join(', ')}", "pillar": "...", "idea": "...", "hashtags": ["...", "...", "..."]}, ...7 total]}`;
+      prompt = `You are a social media content strategist building a cross-platform calendar.
+Business: ${businessType}. Occasion: ${occasion || 'none specific'}. Audience: ${audience || 'general'}. Platforms: ${selectedLabels.join(', ')}.
+Give exactly 7 ideas, one per day, picking the best platform per idea from the list. Assign a content pillar from: ${PILLARS.join(', ')}, don't repeat more than twice, include 2-3 hashtags each.
+Respond ONLY with valid JSON: {"ideas": [{"day": "Monday", "platform": "one of: ${selectedLabels.join(', ')}", "pillar": "...", "idea": "...", "hashtags": ["...","...","..."]}, ...7 total]}`;
     } else {
-      prompt = `You are a competitive social media strategist. A small business owner pasted a competitor's post or profile description for ${platformLabel}. Find what the competitor is missing and suggest a unique angle.
-
-Business type: ${businessType || 'a small business (type not specified)'}
-Competitor's content: "${competitorText}"
-
-Respond ONLY with valid JSON, no markdown, no code fences:
-{"gap": "what the competitor is missing, 1-2 sentences", "angle": "the specific unique angle to use instead, 1-2 sentences", "ideaExample": "one concrete post idea example using this angle"}`;
+      prompt = `Find what a competitor is missing on ${platformLabel} and suggest a unique angle.
+Business: ${businessType || 'small business'}. Competitor content: "${competitorText}".
+Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "..."}`;
     }
 
     try {
       const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ licenseCode, prompt, trial: isTrial }),
       });
       if (res.status === 403) throw new Error('Invalid or expired access code.');
       const data = await res.json();
       const text = data.content?.map(b => b.text || '').join('') || '';
-      const clean = text.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(clean);
-      if (isTrial) {
-        localStorage.setItem('cs_free_trial_used', 'true');
-        setFreeTrialUsed(true);
-      }
+      const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+      if (isTrial) { localStorage.setItem('cs_free_trial_used', 'true'); setFreeTrialUsed(true); }
       setResult(parsed);
-      if (parsed.ideas) {
-        setHistory(h => [{ mode, time: Date.now(), count: parsed.ideas.length }, ...h].slice(0, 5));
-      }
     } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.');
+      setError(err.message || 'Something went wrong.');
     } finally {
       setLoading(false);
     }
@@ -271,368 +201,295 @@ Respond ONLY with valid JSON, no markdown, no code fences:
   return (
     <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: "'Inter', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
-        @keyframes heroReveal { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: scale(1); } }
-        .hero-photo { animation: heroReveal 0.9s cubic-bezier(0.22,1,0.36,1) both; }
-        @keyframes titleSlide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-        .hero-title { animation: titleSlide 0.6s ease both; }
-        @keyframes barGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-        .pillar-bar-fill { transform-origin: left; animation: barGrow 0.7s ease both; }
-        @keyframes cardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .idea-card { animation: cardIn 0.4s ease both; }
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .gold-line { background: linear-gradient(90deg, transparent, ${GOLD}, transparent); background-size: 200% 100%; animation: shimmer 4s linear infinite; }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .idea-row { animation: cardIn 0.5s ease both; }
         @keyframes welcomeFadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes welcomeFadeOut { to { opacity: 0; } }
         @keyframes checkDraw { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
-        @keyframes ringPop { 0% { transform: scale(0.4); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes floatIcon {
-          0%   { transform: translate(0, 0) rotate(-6deg); }
-          50%  { transform: translate(6px, -12px) rotate(4deg); }
-          100% { transform: translate(0, 0) rotate(-6deg); }
-        }
-        .float-icon { animation: floatIcon 4.5s ease-in-out infinite; }
-        .icon-blue { animation-duration: 4.2s; }
-        .icon-red { animation-duration: 3.8s; animation-delay: -1s; }
-        .icon-yellow { animation-duration: 5s; animation-delay: -2s; }
-        .icon-green { animation-duration: 4s; animation-delay: -0.5s; }
-        @keyframes floatDot { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .float-dot { animation: floatDot 3.6s ease-in-out infinite; }
-        .dot-1 { animation-delay: -0.3s; } .dot-2 { animation-delay: -1.2s; } .dot-3 { animation-delay: -2s; }
+        button { transition: all 0.2s ease; }
+        button:hover:not(:disabled) { transform: translateY(-1px); }
+        .platform-pill:hover { border-color: ${GOLD} !important; color: ${GOLD} !important; }
+        @keyframes allowanceFill { from { width: 0; } }
+        .allowance-fill { animation: allowanceFill 0.8s ease both; }
       `}</style>
 
-      {/* ---------- HERO: светлый фон, кликабельные значки-платформы, языки ---------- */}
-      <div style={{ background: '#FFFFFF', padding: '48px 24px 0', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ maxWidth: 780, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-            <select
-              value={uiLang}
-              onChange={(e) => setUiLang(e.target.value)}
-              style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, color: BLUE_DEEP, background: 'rgba(66,133,244,0.08)', border: '1px solid rgba(66,133,244,0.25)', borderRadius: 999, padding: '3px 10px' }}
-            >
-              <option value="en">EN</option>
-              <option value="ru">RU</option>
-              <option value="es">ES</option>
-            </select>
+      {/* ---------- HERO: тёмный фон, фото в дуотоне, крупная serif-типографика ---------- */}
+      <div style={{ position: 'relative', padding: '24px 24px 0', textAlign: 'center', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', maxWidth: 640, margin: '0 auto 40px' }}>
+          <select
+            value={uiLang}
+            onChange={(e) => setUiLang(e.target.value)}
+            style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, letterSpacing: '0.08em', color: GOLD, background: 'none', border: `1px solid ${LINE}`, borderRadius: 2, padding: '4px 10px' }}
+          >
+            {LANGS.map(l => <option key={l.code} value={l.code} style={{ background: BG }}>{l.label}</option>)}
+          </select>
+        </div>
+        <div className="fade-in" style={{ maxWidth: 640, margin: '0 auto' }}>
+          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD }}>Plainwork Studio</span>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: 'clamp(38px, 6vw, 58px)', margin: '18px 0 20px', lineHeight: 1.08, letterSpacing: '-0.01em' }}>
+            Content Strategist
+          </h1>
+          <div className="gold-line" style={{ height: 1, width: 70, margin: '0 auto 22px' }} />
+          <p style={{ fontSize: 16, color: INK_SOFT, fontWeight: 300, lineHeight: 1.6, maxWidth: 420, margin: '0 auto' }}>
+            {(UI_TEXT[uiLang] || UI_TEXT.en).subtitle}
+          </p>
+        </div>
+
+        <div className="fade-in" style={{ animationDelay: '0.15s', maxWidth: 680, margin: '48px auto 0', position: 'relative' }}>
+          <div style={{ borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
+            <img
+              src="/images/hero-team.jpg" alt="Team planning content strategy together"
+              style={{ width: '100%', height: 'auto', display: 'block', filter: 'grayscale(0.45) contrast(1.08) brightness(0.92)' }}
+            />
+            <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, transparent 40%, ${BG} 100%)` }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(201,169,104,0.06)', mixBlendMode: 'overlay' }} />
           </div>
+        </div>
 
-          <div className="hero-title" style={{ textAlign: 'center', marginBottom: 28 }}>
-            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, letterSpacing: '0.12em', textTransform: 'uppercase', color: BLUE_DEEP }}>Plainwork &middot; AI-Powered</span>
-            <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 38, margin: '10px 0 12px', color: INK, letterSpacing: '-0.01em' }}>{UI_TEXT[uiLang].title}</h1>
-            <p style={{ fontSize: 15, color: INK_SOFT, margin: '0 auto', maxWidth: 460, lineHeight: 1.5 }}>{UI_TEXT[uiLang].subtitle}</p>
-          </div>
-
-          <div style={{ position: 'relative', maxWidth: 620, margin: '0 auto' }}>
-            <div style={{
-              borderRadius: 20, overflow: 'hidden', border: `1px solid ${LINE}`,
-              boxShadow: '0 24px 60px rgba(66,133,244,0.12), 0 12px 30px rgba(0,0,0,0.08)',
-            }}>
-              <img src="/images/hero-team.jpg" alt="Team planning content strategy together" style={{ width: '100%', height: 'auto', display: 'block' }} />
-            </div>
-
-            {PLATFORMS.map((p, i) => {
-              const positions = [
-                { top: '-8%', left: '-4%' }, { top: '4%', right: '-6%' }, { top: '50%', left: '-8%' },
-                { top: '55%', right: '-8%' }, { bottom: '-6%', left: '8%' }, { bottom: '-8%', right: '14%' },
-                { top: '20%', right: '10%' },
-              ];
-              const isActive = mode === 'cross' ? selectedPlatforms.includes(p.code) : platform === p.code;
-              const pos = positions[i] || {};
-              return (
-                <button
-                  key={p.code}
-                  className={`float-icon icon-orbit-${i}`}
-                  onClick={() => mode === 'cross' ? togglePlatform(p.code) : setPlatform(p.code)}
-                  title={p.label}
-                  style={{
-                    position: 'absolute', ...pos, width: 46, height: 46, borderRadius: '50%',
-                    background: isActive ? p.color : '#FFFFFF', border: `2.5px solid ${isActive ? p.color : LINE}`,
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 10, fontWeight: 700, color: isActive ? '#FFFFFF' : INK_SOFT,
-                    boxShadow: isActive ? `0 6px 18px ${p.color}55` : '0 4px 12px rgba(0,0,0,0.08)',
-                    transition: 'background 0.2s, box-shadow 0.2s', zIndex: 2,
-                  }}
-                >
-                  {p.label.slice(0, 2).toUpperCase()}
-                </button>
-              );
-            })}
-          </div>
-          <p style={{ textAlign: 'center', fontSize: 11.5, color: INK_SOFT, margin: '18px 0 0' }}>{UI_TEXT[uiLang].tapHint}</p>
-
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 36, padding: '26px 0 8px', flexWrap: 'wrap' }}>
-            {[['7', UI_TEXT[uiLang].statPlatforms], ['5', UI_TEXT[uiLang].statPillars], ['\u221E', UI_TEXT[uiLang].statIdeas]].map(([n, l]) => (
-              <div key={l} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, color: BLUE_MAIN, fontWeight: 600 }}>{n}</div>
-                <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: INK_SOFT, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{l}</div>
+        <div className="fade-in" style={{ animationDelay: '0.3s', maxWidth: 460, margin: '0 auto', padding: '8px 0 40px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            {[
+              ['07', 'Platforms'], ['05', 'Pillars'], ['20', 'Languages'],
+              ['50', 'Daily Limit'], ['1', 'Free Trial'], ['Once', 'Payment'],
+            ].map(([n, l]) => (
+              <div key={l} style={{
+                textAlign: 'center', border: `1px solid ${LINE}`, borderRadius: 3, padding: '16px 6px',
+                background: 'rgba(201,169,104,0.03)',
+              }}>
+                <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: 22, color: GOLD }}>{n}</div>
+                <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: INK_SOFT, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4 }}>{l}</div>
               </div>
             ))}
           </div>
         </div>
+
+        <div className="fade-in" style={{ animationDelay: '0.4s', maxWidth: 560, margin: '0 auto', padding: '32px 0 60px', borderTop: `1px solid ${LINE}` }}>
+          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: GOLD }}>About</span>
+          <p style={{ fontSize: 14.5, color: INK_SOFT, fontWeight: 300, lineHeight: 1.7, margin: '14px 0 0' }}>
+            {(UI_TEXT[uiLang] || UI_TEXT.en).about}
+          </p>
+        </div>
       </div>
 
-      <div style={{ maxWidth: 700, margin: '0 auto', padding: '40px 24px 80px' }}>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 24px 100px' }}>
 
         {!unlocked && (
-          <div style={{ background: freeTrialUsed ? '#FDECEC' : '#F5F9FF', border: `1px solid ${freeTrialUsed ? '#F3C4C4' : '#D5E5FC'}`, borderRadius: 10, padding: 14, marginBottom: 20 }}>
+          <div style={{ border: `1px solid ${freeTrialUsed ? 'rgba(201,120,104,0.4)' : LINE}`, borderRadius: 4, padding: 18, marginBottom: 32 }}>
             {freeTrialUsed ? (
               <div>
-                <p style={{ fontSize: 13.5, color: '#8A4A38', margin: '0 0 10px', fontWeight: 600 }}>Your free preview is over. Enter your code whenever you're ready to keep going.</p>
-                <a href="/unlock.html" style={{ display: 'inline-block', background: BLUE_MAIN, color: '#FFFFFF', padding: '8px 16px', borderRadius: 8, fontSize: 13.5, fontWeight: 600, textDecoration: 'none' }}>
-                  Enter your code &rarr;
+                <p style={{ fontSize: 13.5, color: INK, margin: '0 0 12px', fontWeight: 400 }}>Your complimentary preview has been used. Enter your code to continue.</p>
+                <a href="/unlock.html" style={{ display: 'inline-block', border: `1px solid ${GOLD}`, color: GOLD, padding: '9px 20px', borderRadius: 2, fontSize: 12.5, fontWeight: 500, textDecoration: 'none', letterSpacing: '0.04em' }}>
+                  ENTER YOUR CODE
                 </a>
-                <a href="/buy.html" style={{ display: 'block', fontSize: 12, color: BLUE_DEEP, marginTop: 8 }}>No code? Get access</a>
+                <a href="/buy.html" style={{ display: 'block', fontSize: 12, color: INK_SOFT, marginTop: 10 }}>No code? Get access</a>
               </div>
             ) : (
-              <p style={{ fontSize: 13.5, color: '#1B5FC4', margin: 0 }}>Try it free -- your first generation is on us. No code needed.</p>
+              <p style={{ fontSize: 13.5, color: INK_SOFT, margin: 0 }}>Your first generation is complimentary. No code required.</p>
             )}
           </div>
         )}
 
-        <div style={{ background: CARD, border: `1px solid ${LINE}`, borderRadius: 14, padding: 20 }}>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-            {MODES.map(m => (
-              <button
-                key={m.value}
-                onClick={() => setMode(m.value)}
-                style={{
-                  flex: 1, padding: '9px 8px', borderRadius: 8, fontSize: 11.5, fontWeight: 500, cursor: 'pointer',
-                  background: mode === m.value ? BLUE_MAIN : '#FFFFFF', color: mode === m.value ? '#FFFFFF' : INK_SOFT,
-                  border: `1px solid ${mode === m.value ? BLUE_MAIN : LINE}`,
-                }}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-
-          {mode !== 'competitor' && (
-            <>
-              <label style={{ fontSize: 12, color: INK_SOFT, fontWeight: 500, display: 'block', marginBottom: 4 }}>What does your business do?</label>
-              <input
-                type="text"
-                value={businessType}
-                onChange={(e) => setBusinessType(e.target.value)}
-                placeholder="e.g. neighborhood coffee shop"
-                style={{ width: '100%', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#FFFFFF', border: `1px solid ${LINE}`, color: INK, marginBottom: 14, boxSizing: 'border-box' }}
-              />
-              <label style={{ fontSize: 12, color: INK_SOFT, fontWeight: 500, display: 'block', marginBottom: 4 }}>Season or occasion (optional)</label>
-              <input
-                type="text"
-                value={occasion}
-                onChange={(e) => setOccasion(e.target.value)}
-                placeholder="e.g. back to school, holiday season"
-                style={{ width: '100%', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#FFFFFF', border: `1px solid ${LINE}`, color: INK, marginBottom: 14, boxSizing: 'border-box' }}
-              />
-              <label style={{ fontSize: 12, color: INK_SOFT, fontWeight: 500, display: 'block', marginBottom: 4 }}>Who's your audience? (optional)</label>
-              <input
-                type="text"
-                value={audience}
-                onChange={(e) => setAudience(e.target.value)}
-                placeholder="e.g. busy parents in their 30s-40s"
-                style={{ width: '100%', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#FFFFFF', border: `1px solid ${LINE}`, color: INK, marginBottom: 14, boxSizing: 'border-box' }}
-              />
-            </>
-          )}
-
-          {mode === 'single' && (
-            <>
-              <label style={{ fontSize: 12, color: INK_SOFT, fontWeight: 500, display: 'block', marginBottom: 4 }}>Platform</label>
-              <select
-                value={platform}
-                onChange={(e) => setPlatform(e.target.value)}
-                style={{ width: '100%', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#FFFFFF', border: `1px solid ${LINE}`, color: INK, marginBottom: 14 }}
-              >
-                {PLATFORMS.map(p => <option key={p.code} value={p.code}>{p.label}</option>)}
-              </select>
-            </>
-          )}
-
-          {mode === 'cross' && (
-            <>
-              <label style={{ fontSize: 12, color: INK_SOFT, fontWeight: 500, display: 'block', marginBottom: 6 }}>Which platforms do you post to? (pick 2 or more)</label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
-                {PLATFORMS.map(p => (
-                  <button
-                    key={p.code}
-                    onClick={() => togglePlatform(p.code)}
-                    style={{
-                      padding: '6px 12px', borderRadius: 999, fontSize: 12.5, fontWeight: 500, cursor: 'pointer',
-                      background: selectedPlatforms.includes(p.code) ? p.color : '#FFFFFF',
-                      color: selectedPlatforms.includes(p.code) ? '#FFFFFF' : INK_SOFT,
-                      border: `1px solid ${selectedPlatforms.includes(p.code) ? p.color : LINE}`,
-                    }}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-
-          {mode === 'competitor' && (
-            <>
-              <label style={{ fontSize: 12, color: INK_SOFT, fontWeight: 500, display: 'block', marginBottom: 4 }}>What does your business do? (optional)</label>
-              <input
-                type="text"
-                value={businessType}
-                onChange={(e) => setBusinessType(e.target.value)}
-                placeholder="e.g. neighborhood coffee shop"
-                style={{ width: '100%', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#FFFFFF', border: `1px solid ${LINE}`, color: INK, marginBottom: 14, boxSizing: 'border-box' }}
-              />
-              <label style={{ fontSize: 12, color: INK_SOFT, fontWeight: 500, display: 'block', marginBottom: 4 }}>Platform</label>
-              <select
-                value={platform}
-                onChange={(e) => setPlatform(e.target.value)}
-                style={{ width: '100%', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#FFFFFF', border: `1px solid ${LINE}`, color: INK, marginBottom: 14 }}
-              >
-                {PLATFORMS.map(p => <option key={p.code} value={p.code}>{p.label}</option>)}
-              </select>
-              <label style={{ fontSize: 12, color: INK_SOFT, fontWeight: 500, display: 'block', marginBottom: 4 }}>Paste competitor's post or profile description</label>
-              <textarea
-                value={competitorText}
-                onChange={(e) => setCompetitorText(e.target.value)}
-                rows={4}
-                placeholder="Paste it here..."
-                style={{ width: '100%', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#FFFFFF', border: `1px solid ${LINE}`, color: INK, marginBottom: 14, boxSizing: 'border-box', resize: 'vertical' }}
-              />
-            </>
-          )}
-
-          {error && <p style={{ fontSize: 13, color: '#C0392B', margin: '0 0 12px' }}>{error}</p>}
-
-          {dailyCount >= DAILY_LIMIT ? (
-            <div style={{ textAlign: 'center', padding: 12, background: '#FDECEC', borderRadius: 8 }}>
-              <p style={{ fontSize: 13, color: '#8A4A38', margin: 0, fontWeight: 600 }}>Today's limit reached</p>
-              <p style={{ fontSize: 12, color: INK_SOFT, margin: '4px 0 0' }}>Come back tomorrow for 50 more free generations.</p>
-            </div>
-          ) : (
+        <div style={{ display: 'flex', gap: 0, marginBottom: 28, borderBottom: `1px solid ${LINE}` }}>
+          {MODES.map(m => (
             <button
-              onClick={handleGenerate}
-              disabled={loading}
+              key={m.value}
+              onClick={() => setMode(m.value)}
               style={{
-                width: '100%', padding: '12px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                background: BLUE_MAIN, color: '#FFFFFF', border: 'none', opacity: loading ? 0.7 : 1,
+                flex: 1, padding: '12px 8px', fontSize: 12, fontWeight: 500, letterSpacing: '0.03em', cursor: 'pointer',
+                background: 'none', color: mode === m.value ? GOLD : INK_SOFT,
+                border: 'none', borderBottom: mode === m.value ? `1px solid ${GOLD}` : '1px solid transparent',
+                marginBottom: -1, transition: 'color 0.2s',
               }}
             >
-              {loading ? 'Thinking...' : mode === 'competitor' ? 'Find the gap' : 'Build this week\u2019s calendar'}
+              {m.label.toUpperCase()}
             </button>
-          )}
+          ))}
+        </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}>
-            <span style={{ fontSize: 10.5, color: INK_SOFT }}>Today's free generations</span>
-            <span style={{ fontSize: 10.5, color: INK_SOFT, fontWeight: 600 }}>{DAILY_LIMIT - dailyCount}/{DAILY_LIMIT} left</span>
+        {mode !== 'competitor' && (
+          <>
+            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>WHAT DOES YOUR BUSINESS DO</label>
+            <input type="text" value={businessType} onChange={(e) => setBusinessType(e.target.value)} placeholder="Neighborhood coffee shop"
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }} />
+
+            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>SEASON OR OCCASION <span style={{ opacity: 0.5 }}>(OPTIONAL)</span></label>
+            <input type="text" value={occasion} onChange={(e) => setOccasion(e.target.value)} placeholder="Holiday season"
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }} />
+
+            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>YOUR AUDIENCE <span style={{ opacity: 0.5 }}>(OPTIONAL)</span></label>
+            <input type="text" value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="Busy parents, 30s-40s"
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 26, boxSizing: 'border-box', outline: 'none' }} />
+          </>
+        )}
+
+        {mode === 'single' && (
+          <>
+            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>PLATFORM</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 26 }}>
+              {PLATFORMS.map(p => (
+                <button key={p.code} onClick={() => setPlatform(p.code)} className="platform-pill"
+                  style={{
+                    padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s ease',
+                    background: platform === p.code ? GOLD : 'none',
+                    color: platform === p.code ? BG : INK_SOFT,
+                    border: `1px solid ${platform === p.code ? GOLD : LINE}`,
+                  }}>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {mode === 'cross' && (
+          <>
+            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>PLATFORMS <span style={{ opacity: 0.5 }}>(PICK 2 OR MORE)</span></label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 26 }}>
+              {PLATFORMS.map(p => (
+                <button key={p.code} onClick={() => togglePlatform(p.code)}
+                  style={{
+                    padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer',
+                    background: selectedPlatforms.includes(p.code) ? GOLD : 'none',
+                    color: selectedPlatforms.includes(p.code) ? BG : INK_SOFT,
+                    border: `1px solid ${selectedPlatforms.includes(p.code) ? GOLD : LINE}`,
+                  }}>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {mode === 'competitor' && (
+          <>
+            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>YOUR BUSINESS <span style={{ opacity: 0.5 }}>(OPTIONAL)</span></label>
+            <input type="text" value={businessType} onChange={(e) => setBusinessType(e.target.value)} placeholder="Neighborhood coffee shop"
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }} />
+            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>PLATFORM</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 22 }}>
+              {PLATFORMS.map(p => (
+                <button key={p.code} onClick={() => setPlatform(p.code)}
+                  style={{
+                    padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s ease',
+                    background: platform === p.code ? GOLD : 'none',
+                    color: platform === p.code ? BG : INK_SOFT,
+                    border: `1px solid ${platform === p.code ? GOLD : LINE}`,
+                  }}>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>COMPETITOR'S POST OR PROFILE</label>
+            <textarea value={competitorText} onChange={(e) => setCompetitorText(e.target.value)} rows={4} placeholder="Paste it here..."
+              style={{ width: '100%', background: 'none', border: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '10px 12px', marginBottom: 26, boxSizing: 'border-box', outline: 'none', resize: 'vertical' }} />
+          </>
+        )}
+
+        {error && <p style={{ fontSize: 13, color: '#D98E7F', margin: '0 0 16px' }}>{error}</p>}
+
+        {dailyCount >= DAILY_LIMIT ? (
+          <div style={{ textAlign: 'center', padding: 16, border: `1px solid ${LINE}` }}>
+            <p style={{ fontSize: 13, color: INK, margin: 0 }}>Today's allowance is complete.</p>
+            <p style={{ fontSize: 12, color: INK_SOFT, margin: '4px 0 0' }}>Fifty more await tomorrow.</p>
           </div>
-          <div style={{ height: 4, borderRadius: 999, background: LINE, overflow: 'hidden', marginTop: 4 }}>
-            <div style={{ height: '100%', width: `${(dailyCount / DAILY_LIMIT) * 100}%`, background: dailyCount >= DAILY_LIMIT ? '#C0392B' : BLUE_MAIN, borderRadius: 999 }} />
-          </div>
+        ) : (
+          <button onClick={handleGenerate} disabled={loading}
+            style={{
+              width: '100%', padding: '15px', fontSize: 13, letterSpacing: '0.08em', fontWeight: 500, cursor: 'pointer',
+              background: GOLD, color: BG, border: 'none', borderRadius: 2, opacity: loading ? 0.6 : 1,
+            }}>
+            {loading ? 'CONSIDERING...' : mode === 'competitor' ? 'FIND THE GAP' : 'BUILD THE WEEK'}
+          </button>
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14 }}>
+          <span style={{ fontSize: 10, color: INK_SOFT, letterSpacing: '0.03em' }}>DAILY ALLOWANCE</span>
+          <span style={{ fontSize: 10, color: INK_SOFT }}>{DAILY_LIMIT - dailyCount} / {DAILY_LIMIT}</span>
+        </div>
+        <div style={{ height: 1, background: LINE, marginTop: 6 }}>
+          <div className="allowance-fill" style={{ height: '100%', width: `${(dailyCount / DAILY_LIMIT) * 100}%`, background: GOLD, transition: 'width 0.5s ease' }} />
         </div>
 
         {result && result.ideas && (
-          <div style={{ marginTop: 20 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-              <span style={{ fontSize: 12, color: INK_SOFT, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>This week's calendar</span>
-              <button onClick={copyAllIdeas} style={{ fontSize: 11.5, color: BLUE_DEEP, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
-                {copiedAll ? '\u2713 Copied all' : 'Copy all'}
+          <div style={{ marginTop: 48 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 24 }}>
+              <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: 20, color: INK }}>The Week</span>
+              <button onClick={copyAllIdeas} style={{ fontSize: 11, color: GOLD, background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.04em' }}>
+                {copiedAll ? 'COPIED' : 'COPY ALL'}
               </button>
             </div>
 
-            {/* Баланс content pillars за неделю */}
-            <div style={{ display: 'flex', gap: 4, marginBottom: 14, height: 8, borderRadius: 999, overflow: 'hidden' }}>
-              {Object.entries(pillarSummary(result.ideas)).filter(([, c]) => c > 0).map(([p, c]) => (
-                <div key={p} className="pillar-bar-fill" style={{ flex: c, background: PILLAR_COLORS[p].dot, borderRadius: 999 }} title={`${p}: ${c}`} />
-              ))}
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10 }}>
-              {result.ideas.map((it, i) => {
-                const pc = PILLAR_COLORS[it.pillar] || PILLAR_COLORS['Educational'];
-                const plat = PLATFORMS.find(p => p.label === it.platform);
-                const bestTime = plat ? BEST_TIMES[plat.code] : null;
-                return (
-                  <div key={i} className="idea-card" style={{ animationDelay: `${i * 0.05}s`, background: CARD, border: `1px solid ${LINE}`, borderRadius: 12, padding: 12, borderTop: `3px solid ${pc.dot}` }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: INK_SOFT }}>{it.day}</span>
-                      {it.platform && (
-                        <span style={{ fontSize: 9.5, fontWeight: 600, color: '#FFFFFF', background: plat?.color || INK_SOFT, padding: '2px 6px', borderRadius: 999 }}>{it.platform}</span>
-                      )}
+            {result.ideas.map((it, i) => {
+              const pc = PILLAR_COLORS[it.pillar] || PILLAR_COLORS['Educational'];
+              const plat = PLATFORMS.find(p => p.label === it.platform);
+              const bestTime = plat ? BEST_TIMES[plat.code] : null;
+              return (
+                <div key={i} className="idea-row" style={{ animationDelay: `${i * 0.06}s`, padding: '20px 0', borderTop: `1px solid ${LINE}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: INK_SOFT, letterSpacing: '0.05em' }}>{it.day?.toUpperCase()}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {it.platform && <span style={{ fontSize: 10.5, color: INK_SOFT }}>{it.platform}</span>}
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: pc.dot, display: 'inline-block' }} />
+                      <span style={{ fontSize: 10.5, color: INK_SOFT }}>{it.pillar}</span>
                     </div>
-                    <span style={{ fontSize: 9.5, color: pc.text, background: pc.bg, padding: '2px 7px', borderRadius: 999, display: 'inline-block', marginBottom: 6 }}>{it.pillar}</span>
-                    <p style={{ fontSize: 13, color: INK, margin: '0 0 8px', lineHeight: 1.45 }}>{it.idea}</p>
-                    {it.hashtags && it.hashtags.length > 0 && (
-                      <p style={{ fontSize: 11, color: '#4285F4', margin: '0 0 6px' }}>{it.hashtags.map(h => `#${h.replace(/^#/, '')}`).join(' ')}</p>
-                    )}
-                    {bestTime && (
-                      <p style={{ fontSize: 10, color: INK_SOFT, margin: '0 0 6px' }}>Best time: {bestTime}</p>
-                    )}
+                  </div>
+                  <p style={{ fontSize: 16, color: INK, margin: '0 0 10px', lineHeight: 1.5, fontWeight: 300 }}>{it.idea}</p>
+                  {it.hashtags && it.hashtags.length > 0 && (
+                    <p style={{ fontSize: 12, color: GOLD, margin: '0 0 6px', opacity: 0.85 }}>{it.hashtags.map(h => `#${h.replace(/^#/, '')}`).join('  ')}</p>
+                  )}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {bestTime && <span style={{ fontSize: 10.5, color: INK_SOFT }}>Best time: {bestTime}</span>}
                     {unlocked && (
-                      <button
-                        onClick={() => regenerateDay(i)}
-                        disabled={regeneratingDay === i}
-                        style={{ fontSize: 10.5, color: BLUE_DEEP, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontWeight: 600 }}
-                      >
-                        {regeneratingDay === i ? 'Regenerating...' : '\u21bb Try a different idea'}
+                      <button onClick={() => regenerateDay(i)} disabled={regeneratingDay === i}
+                        style={{ fontSize: 10.5, color: GOLD, background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.02em' }}>
+                        {regeneratingDay === i ? 'REGENERATING...' : 'TRY ANOTHER'}
                       </button>
                     )}
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
         {result && result.gap && (
-          <div style={{ background: CARD, border: `1px solid ${LINE}`, borderRadius: 14, padding: 20, marginTop: 20 }}>
-            <div style={{ fontSize: 12, color: BLUE_DEEP, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>What they're missing</div>
-            <p style={{ fontSize: 14, color: INK, marginBottom: 16, lineHeight: 1.5 }}>{result.gap}</p>
-            <div style={{ fontSize: 12, color: BLUE_DEEP, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Your angle</div>
-            <p style={{ fontSize: 14, color: INK, marginBottom: 16, lineHeight: 1.5 }}>{result.angle}</p>
-            <div style={{ fontSize: 12, color: BLUE_DEEP, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Try this</div>
-            <p style={{ fontSize: 14, color: INK, margin: 0, lineHeight: 1.5 }}>{result.ideaExample}</p>
-          </div>
-        )}
-
-        {history.length > 0 && (
-          <div style={{ marginTop: 20 }}>
-            <div style={{ fontSize: 12, color: INK_SOFT, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Recent</div>
-            {history.map((h) => (
-              <div key={h.time} style={{ fontSize: 12.5, color: INK_SOFT, padding: '6px 0', borderTop: `1px solid ${LINE}` }}>
-                {new Date(h.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} &middot; {h.mode === 'competitor' ? 'Competitor gap analysis' : `${h.count}-day calendar`}
-              </div>
-            ))}
+          <div style={{ marginTop: 48 }}>
+            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: GOLD, letterSpacing: '0.08em', marginBottom: 10 }}>WHAT THEY'RE MISSING</div>
+            <p style={{ fontSize: 16, color: INK, marginBottom: 26, lineHeight: 1.6, fontWeight: 300 }}>{result.gap}</p>
+            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: GOLD, letterSpacing: '0.08em', marginBottom: 10 }}>YOUR ANGLE</div>
+            <p style={{ fontSize: 16, color: INK, marginBottom: 26, lineHeight: 1.6, fontWeight: 300 }}>{result.angle}</p>
+            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: GOLD, letterSpacing: '0.08em', marginBottom: 10 }}>TRY THIS</div>
+            <p style={{ fontSize: 16, color: INK, margin: 0, lineHeight: 1.6, fontWeight: 300 }}>{result.ideaExample}</p>
           </div>
         )}
 
         {showWelcome && (
-          <div style={{
-            position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(31,31,31,0.5)', backdropFilter: 'blur(4px)', animation: 'welcomeFadeIn 0.4s ease both',
-          }}>
-            <div style={{ position: 'relative', textAlign: 'center', animation: 'welcomeFadeOut 0.4s ease 3.4s both' }}>
-              <div style={{
-                width: 76, height: 76, borderRadius: '50%', margin: '0 auto 18px',
-                background: `linear-gradient(135deg, ${BLUE_MAIN}, ${BLUE_DEEP})`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 12px 32px rgba(217,119,87,0.4)', animation: 'ringPop 0.55s cubic-bezier(0.34,1.56,0.64,1) both',
-              }}>
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" style={{ strokeDasharray: 40, animation: 'checkDraw 0.5s ease 0.35s both' }} />
-                </svg>
-              </div>
-              <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 26, fontWeight: 600, color: '#FFFFFF', margin: '0 0 6px' }}>Welcome</h2>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)', margin: 0 }}>You're all set -- unlimited generations, let's go.</p>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)', animation: 'welcomeFadeIn 0.5s ease both' }}>
+            <div style={{ textAlign: 'center', animation: 'welcomeFadeOut 0.5s ease 3.3s both' }}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.2" style={{ marginBottom: 20 }}>
+                <polyline points="20 6 9 17 4 12" style={{ strokeDasharray: 40, animation: 'checkDraw 0.6s ease 0.4s both' }} />
+              </svg>
+              <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: 28, color: INK, margin: '0 0 8px' }}>Welcome</h2>
+              <p style={{ fontSize: 14, color: INK_SOFT, margin: 0, fontWeight: 300 }}>Unlimited generations, from here on.</p>
             </div>
           </div>
         )}
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginTop: 48, paddingTop: 20, borderTop: `1px solid ${LINE}` }}>
-          <span style={{ fontSize: 12, color: INK_SOFT }}>Powered by Claude &middot; Plainwork by Ksenia</span>
-          <div style={{ display: 'flex', gap: 14, marginTop: 4 }}>
-            <a href="/terms.html" style={{ fontSize: 11, color: INK_SOFT }}>Terms of Service</a>
-            <a href="/privacy.html" style={{ fontSize: 11, color: INK_SOFT }}>Privacy Policy</a>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: 80, paddingTop: 32, borderTop: `1px solid ${LINE}` }}>
+          <span style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.03em' }}>PLAINWORK &middot; BY KSENIA</span>
+          <div style={{ display: 'flex', gap: 18, marginTop: 4 }}>
+            <a href="/terms.html" style={{ fontSize: 10.5, color: INK_SOFT }}>Terms</a>
+            <a href="/privacy.html" style={{ fontSize: 10.5, color: INK_SOFT }}>Privacy</a>
           </div>
           {!showSupportEmail ? (
-            <button onClick={() => setShowSupportEmail(true)} style={{ fontSize: 11, color: BLUE_DEEP, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Support</button>
+            <button onClick={() => setShowSupportEmail(true)} style={{ fontSize: 10.5, color: GOLD, background: 'none', border: 'none', cursor: 'pointer' }}>Support</button>
           ) : (
-            <a href="mailto:kssw117@gmail.com" style={{ fontSize: 11, color: BLUE_DEEP }}>kssw117@gmail.com</a>
+            <a href="mailto:kssw117@gmail.com" style={{ fontSize: 10.5, color: GOLD }}>kssw117@gmail.com</a>
           )}
         </div>
       </div>
