@@ -220,7 +220,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
 
       {/* ---------- HERO: тёмный фон, фото в дуотоне, крупная serif-типографика ---------- */}
       <div style={{ position: 'relative', padding: '24px 24px 0', textAlign: 'center', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', maxWidth: 1100, margin: '0 auto 40px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', maxWidth: 900, margin: '0 auto 40px' }}>
           <select
             value={uiLang}
             onChange={(e) => setUiLang(e.target.value)}
@@ -240,7 +240,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
           </p>
         </div>
 
-        <div className="fade-in" style={{ animationDelay: '0.15s', maxWidth: 1100, margin: '48px auto 0', position: 'relative' }}>
+        <div className="fade-in" style={{ animationDelay: '0.15s', maxWidth: 900, margin: '48px auto 0', position: 'relative' }}>
           <div style={{ borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
             <img
               src="/images/hero-team.jpg" alt="Team planning content strategy together"
@@ -276,7 +276,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
         </div>
       </div>
 
-      <div style={{ maxWidth: 820, margin: '0 auto', padding: '0 24px 100px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px 100px' }}>
 
         {!unlocked && (
           <div style={{ border: `1px solid ${freeTrialUsed ? 'rgba(201,120,104,0.4)' : LINE}`, borderRadius: 4, padding: 18, marginBottom: 32 }}>
