@@ -222,7 +222,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
         @keyframes welcomeFadeOut { to { opacity: 0; } }
         @keyframes checkDraw { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
         @keyframes constellationSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .constellation-bg { animation: constellationSpin 90s linear infinite; }
+        .constellation-bg { animation: constellationSpin 22s linear infinite; transform-origin: center; }
         button { transition: all 0.2s ease; }
         button:hover:not(:disabled) { transform: translateY(-1px); }
         .platform-pill:hover { border-color: ${GOLD} !important; color: ${GOLD} !important; }
@@ -231,15 +231,17 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
       `}</style>
 
       {/* Вращающийся фон-созвездие на весь экран, в цветах сайта (золото/кремовый) */}
-      <svg
-        className="constellation-bg"
-        viewBox="0 0 400 400"
+      <div
         style={{
           position: 'fixed', top: '50%', left: '50%', width: '150vmax', height: '150vmax',
-          transform: 'translate(-50%, -50%)', transformOrigin: 'center', opacity: 0.06,
-          pointerEvents: 'none', zIndex: 0,
+          transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: 0,
         }}
       >
+        <svg
+          className="constellation-bg"
+          viewBox="0 0 400 400"
+          style={{ width: '100%', height: '100%', opacity: 0.14 }}
+        >
         {(() => {
           const pts = [
             [200, 60], [120, 130], [200, 130], [280, 130],
@@ -262,6 +264,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
           );
         })()}
       </svg>
+      </div>
 
       {/* ---------- HERO: тёмный фон, фото в дуотоне, крупная serif-типографика ---------- */}
       <div style={{ position: 'relative', padding: '24px 24px 0', textAlign: 'center', overflow: 'hidden' }}>
