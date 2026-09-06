@@ -21,6 +21,7 @@ const PILLARS = Object.keys(PILLAR_COLORS);
 const BEST_TIMES = {
   instagram: '11am\u20132pm or 7\u20139pm', tiktok: '6\u20139am or 7\u201310pm', linkedin: 'Tue\u2013Thu, 8\u201310am',
   facebook: '1\u20134pm', telegram: '9\u201311am or 6\u20138pm', x: '8\u20139am or 6\u20139pm', reddit: 'weekday mornings',
+  youtube: '2\u20134pm or 7\u20139pm',
 };
 
 const DAILY_LIMIT = 50;
@@ -48,6 +49,7 @@ const PLATFORMS = [
   { code: 'instagram', label: 'Instagram' }, { code: 'tiktok', label: 'TikTok' },
   { code: 'linkedin', label: 'LinkedIn' }, { code: 'facebook', label: 'Facebook' },
   { code: 'telegram', label: 'Telegram' }, { code: 'x', label: 'X' }, { code: 'reddit', label: 'Reddit' },
+  { code: 'youtube', label: 'YouTube' },
 ];
 
 const MODES = [
@@ -67,7 +69,7 @@ const LANGS = [
 ];
 
 const STAT_CUBES = [
-  { n: '07', label: 'Platforms', desc: 'Instagram, TikTok, LinkedIn, Facebook, Telegram, X, and Reddit -- each platform gets ideas tailored to what actually works there.' },
+  { n: '08', label: 'Platforms', desc: 'Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit, and YouTube -- each platform gets ideas tailored to what actually works there.' },
   { n: '05', label: 'Pillars', desc: 'Educational, Behind-the-scenes, Social proof, Promotional, and Entertaining -- automatically balanced across your week.' },
   { n: '20', label: 'Languages', desc: 'Explanations and ideas available in 20 languages, including right-to-left support for Arabic and Persian.' },
   { n: '50', label: 'Daily Limit', desc: 'Fifty generations per day -- enough for real, ongoing use, without opening the door to abuse.' },
