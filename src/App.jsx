@@ -68,6 +68,15 @@ const LANGS = [
   { code: 'th', label: '\u0e44\u0e17\u0e22' }, { code: 'id', label: 'Bahasa Indonesia' },
 ];
 
+// Английские названия языков — для промпта к Claude (модель точнее
+// понимает "Russian", чем кириллическое "Русский" в системной инструкции)
+const LANG_ENGLISH_NAMES = {
+  en: 'English', ru: 'Russian', es: 'Spanish', zh: 'Chinese', ar: 'Arabic',
+  pt: 'Portuguese', hi: 'Hindi', fr: 'French', vi: 'Vietnamese', ko: 'Korean',
+  tr: 'Turkish', de: 'German', ja: 'Japanese', it: 'Italian', pl: 'Polish',
+  fa: 'Persian', uk: 'Ukrainian', nl: 'Dutch', th: 'Thai', id: 'Indonesian',
+};
+
 const STAT_CUBES = [
   { n: '08', label: 'Platforms', desc: 'Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit, and YouTube -- each platform gets ideas tailored to what actually works there.' },
   { n: '05', label: 'Pillars', desc: 'Educational, Behind-the-scenes, Social proof, Promotional, and Entertaining -- automatically balanced across your week.' },
@@ -89,6 +98,74 @@ const UI_TEXT = {
   es: {
     subtitle: 'Una semana de ideas, pensadas por plataforma. Para equipos que planifican con intenci\u00f3n.',
     about: 'Content Strategist AI construye una semana de ideas de publicaciones a la vez -- no subt\u00edtulos, sino el tema de cada d\u00eda, ajustado a lo que realmente funciona en esa plataforma. Elige una plataforma, o planifica varias a la vez. Pega el post de un competidor para encontrar el hueco que puedes llenar.',
+  },
+  zh: {
+    subtitle: '\u6bcf\u5468\u7684\u5185\u5bb9\u60f3\u6cd5\uff0c\u6839\u636e\u5e73\u53f0\u91cf\u8eab\u5b9a\u5236\u3002\u4e3a\u771f\u6b63\u6709\u8ba1\u5212\u5730\u89c4\u5212\u7684\u56e2\u961f\u800c\u5efa\u3002',
+    about: 'Content Strategist AI \u4e00\u6b21\u6027\u6784\u5efa\u4e00\u5468\u7684\u5e16\u6587\u60f3\u6cd5\u2014\u2014\u4e0d\u662f\u6587\u6848\uff0c\u800c\u662f\u6bcf\u5929\u7684\u6838\u5fc3\u4e3b\u9898\uff0c\u5339\u914d\u8be5\u5e73\u53f0\u771f\u6b63\u6709\u6548\u7684\u5185\u5bb9\u3002\u9009\u62e9\u4e00\u4e2a\u5e73\u53f0\uff0c\u6216\u540c\u65f6\u89c4\u5212\u591a\u4e2a\u3002\u7c98\u8d34\u7ade\u4e89\u5bf9\u624b\u7684\u5e16\u5b50\uff0c\u627e\u5230\u4f60\u53ef\u4ee5\u586b\u8865\u7684\u7a7a\u767d\u3002',
+  },
+  ar: {
+    subtitle: '\u0623\u0633\u0628\u0648\u0639 \u0645\u0646 \u0627\u0644\u0623\u0641\u0643\u0627\u0631\u060c \u0645\u062f\u0631\u0648\u0633\u0629 \u0644\u0643\u0644 \u0645\u0646\u0635\u0629. \u0644\u0644\u0641\u0631\u0642 \u0627\u0644\u062a\u064a \u062a\u062e\u0637\u0637 \u0628\u0648\u0639\u064a.',
+    about: 'Content Strategist AI \u064a\u0628\u0646\u064a \u0623\u0633\u0628\u0648\u0639\u064b\u0627 \u0645\u0646 \u0623\u0641\u0643\u0627\u0631 \u0627\u0644\u0645\u0646\u0634\u0648\u0631\u0627\u062a \u0641\u064a \u0643\u0644 \u0645\u0631\u0629 -- \u0644\u064a\u0633 \u0627\u0644\u062a\u0633\u0645\u064a\u0627\u062a\u060c \u0628\u0644 \u0627\u0644\u0645\u0648\u0636\u0648\u0639 \u0627\u0644\u0623\u0633\u0627\u0633\u064a \u0644\u0643\u0644 \u064a\u0648\u0645\u060c \u0645\u0637\u0627\u0628\u0642\u064b\u0627 \u0644\u0645\u0627 \u064a\u0646\u062c\u062d \u0641\u0639\u0644\u064b\u0627 \u0639\u0644\u0649 \u062a\u0644\u0643 \u0627\u0644\u0645\u0646\u0635\u0629.',
+  },
+  pt: {
+    subtitle: 'Uma semana de ideias, pensadas por plataforma. Para equipes que planejam com inten\u00e7\u00e3o.',
+    about: 'Content Strategist AI constr\u00f3i uma semana de ideias de posts de cada vez -- n\u00e3o legendas, mas o tema central de cada dia, ajustado ao que realmente funciona naquela plataforma. Escolha uma plataforma, ou planeje v\u00e1rias de uma vez.',
+  },
+  hi: {
+    subtitle: '\u092a\u094d\u0932\u0947\u091f\u092b\u0949\u0930\u094d\u092e \u0915\u0947 \u0905\u0928\u0941\u0938\u093e\u0930 \u090f\u0915 \u0938\u092a\u094d\u0924\u093e\u0939 \u0915\u0947 \u0906\u0907\u0921\u093f\u092f\u093e\u0964 \u0909\u0928 \u091f\u0940\u092e\u094b\u0902 \u0915\u0947 \u0932\u093f\u090f \u091c\u094b \u0935\u093e\u0915\u0908 \u092f\u094b\u091c\u0928\u093e \u092c\u0928\u093e\u0924\u0947 \u0939\u0948\u0902\u0964',
+    about: 'Content Strategist AI \u090f\u0915 \u0938\u092e\u092f \u092e\u0947\u0902 \u090f\u0915 \u0938\u092a\u094d\u0924\u093e\u0939 \u0915\u0947 \u092a\u094b\u0938\u094d\u091f \u0906\u0907\u0921\u093f\u092f\u093e \u092c\u0928\u093e\u0924\u093e \u0939\u0948 -- \u0915\u0948\u092a\u094d\u0936\u0928 \u0928\u0939\u0940\u0902, \u092c\u0932\u094d\u0915\u093f \u0939\u0930 \u0926\u093f\u0928 \u0915\u093e \u092e\u0942\u0932 \u0935\u093f\u0937\u092f, \u091c\u094b \u0909\u0938 \u092a\u094d\u0932\u0947\u091f\u092b\u0949\u0930\u094d\u092e \u092a\u0930 \u0938\u091a\u092e\u0941\u091a \u0915\u093e\u092e \u0915\u0930\u0924\u093e \u0939\u0948\u0964',
+  },
+  fr: {
+    subtitle: 'Une semaine d\u2019id\u00e9es, pens\u00e9es par plateforme. Pour les \u00e9quipes qui planifient avec intention.',
+    about: 'Content Strategist AI construit une semaine d\u2019id\u00e9es de publication \u00e0 la fois -- pas des l\u00e9gendes, mais le sujet central de chaque jour, adapt\u00e9 \u00e0 ce qui fonctionne vraiment sur cette plateforme.',
+  },
+  vi: {
+    subtitle: 'M\u1ed9t tu\u1ea7n \u00fd t\u01b0\u1edfng, \u0111\u01b0\u1ee3c c\u00e2n nh\u1eafc theo t\u1eebng n\u1ec1n t\u1ea3ng. D\u00e0nh cho c\u00e1c nh\u00f3m l\u1eadp k\u1ebf ho\u1ea1ch c\u00f3 ch\u1ee7 \u0111\u00edch.',
+    about: 'Content Strategist AI x\u00e2y d\u1ef1ng m\u1ed9t tu\u1ea7n \u00fd t\u01b0\u1edfng b\u00e0i \u0111\u0103ng m\u1ed7i l\u1ea7n -- kh\u00f4ng ph\u1ea3i ch\u00fa th\u00edch, m\u00e0 l\u00e0 ch\u1ee7 \u0111\u1ec1 ch\u00ednh c\u1ee7a m\u1ed7i ng\u00e0y, ph\u00f9 h\u1ee3p v\u1edbi nh\u1eefng g\u00ec th\u1ef1c s\u1ef1 hi\u1ec7u qu\u1ea3 tr\u00ean n\u1ec1n t\u1ea3ng \u0111\u00f3.',
+  },
+  ko: {
+    subtitle: '\ud50c\ub7ab\ud3fc\ubcc4\ub85c \uace0\ub824\ub41c \uc77c\uc8fc\uc77c \uc544\uc774\ub514\uc5b4. \uc9c4\uc9c0\ud558\uac8c \uacc4\ud68d\ud558\ub294 \ud300\uc744 \uc704\ud574.',
+    about: 'Content Strategist AI\ub294 \ud55c \ubc88\uc5d0 \uc77c\uc8fc\uc77c\uce58 \uac8c\uc2dc\ubb3c \uc544\uc774\ub514\uc5b4\ub97c \ub9cc\ub4ed\ub2c8\ub2e4 -- \uce90\ud504\uc158\uc774 \uc544\ub2c8\ub77c \ud574\ub2f9 \ud50c\ub7ab\ud3fc\uc5d0\uc11c \uc2e4\uc81c\ub85c \ud6a8\uacfc\uc801\uc778 \ub0b4\uc6a9\uc5d0 \ub9de\ucd98 \ub9e4\uc77c\uc758 \ud575\uc2ec \uc8fc\uc81c\uc785\ub2c8\ub2e4.',
+  },
+  tr: {
+    subtitle: 'Platforma g\u00f6re d\u00fc\u015fun\u00fclm\u00fc\u015f bir haftal\u0131k fikirler. Kas\u0131tl\u0131 planlayan ekipler i\u00e7in.',
+    about: 'Content Strategist AI, bir seferde bir haftal\u0131k g\u00f6nderi fikri olu\u015fturur -- ba\u015fl\u0131k de\u011fil, o platformda ger\u00e7ekten i\u015fe yarayan her g\u00fcn\u00fcn ana konusu.',
+  },
+  de: {
+    subtitle: 'Eine Woche voller Ideen, durchdacht pro Plattform. F\u00fcr Teams, die mit Absicht planen.',
+    about: 'Content Strategist AI erstellt eine Woche Post-Ideen auf einmal -- keine Bildunterschriften, sondern das zentrale Thema jedes Tages, abgestimmt darauf, was auf dieser Plattform wirklich funktioniert.',
+  },
+  ja: {
+    subtitle: '\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0\u3054\u3068\u306b\u8003\u3048\u3089\u308c\u305f\u4e00\u9031\u9593\u5206\u306e\u30a2\u30a4\u30c7\u30a2\u3002\u610f\u56f3\u3092\u6301\u3063\u3066\u8a08\u753b\u3059\u308b\u30c1\u30fc\u30e0\u306e\u305f\u3081\u306b\u3002',
+    about: 'Content Strategist AI\u306f\u4e00\u5ea6\u306b\u4e00\u9031\u9593\u5206\u306e\u6295\u7a3f\u30a2\u30a4\u30c7\u30a2\u3092\u4f5c\u6210\u3057\u307e\u3059\u2014\u2014\u30ad\u30e3\u30d7\u30b7\u30e7\u30f3\u3067\u306f\u306a\u304f\u3001\u305d\u306e\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0\u3067\u5b9f\u969b\u306b\u6a5f\u80fd\u3059\u308b\u5185\u5bb9\u306b\u5408\u308f\u305b\u305f\u3001\u6bce\u65e5\u306e\u4e2d\u5fc3\u30c6\u30fc\u30de\u3067\u3059\u3002',
+  },
+  it: {
+    subtitle: 'Una settimana di idee, pensate per piattaforma. Per team che pianificano con intenzione.',
+    about: 'Content Strategist AI costruisce una settimana di idee per post alla volta -- non didascalie, ma l\u2019argomento centrale di ogni giorno, adattato a ci\u00f2 che funziona davvero su quella piattaforma.',
+  },
+  pl: {
+    subtitle: 'Tydzie\u0144 pomys\u0142\u00f3w, dopasowanych do platformy. Dla zespo\u0142\u00f3w, kt\u00f3re planuj\u0105 \u015bwiadomie.',
+    about: 'Content Strategist AI buduje tydzie\u0144 pomys\u0142\u00f3w na posty naraz -- nie podpisy, ale g\u0142\u00f3wny temat ka\u017cdego dnia, dopasowany do tego, co naprawd\u0119 dzia\u0142a na danej platformie.',
+  },
+  fa: {
+    subtitle: '\u06cc\u06a9 \u0647\u0641\u062a\u0647 \u0627\u06cc\u062f\u0647\u060c \u0645\u062a\u0646\u0627\u0633\u0628 \u0628\u0627 \u0647\u0631 \u067e\u0644\u062a\u0641\u0631\u0645. \u0628\u0631\u0627\u06cc \u062a\u06cc\u0645\u200c\u0647\u0627\u06cc\u06cc \u06a9\u0647 \u0628\u0627 \u0642\u0635\u062f \u0628\u0631\u0646\u0627\u0645\u0647\u200c\u0631\u06cc\u0632\u06cc \u0645\u06cc\u200c\u06a9\u0646\u0646\u062f.',
+    about: 'Content Strategist AI \u06cc\u06a9 \u0647\u0641\u062a\u0647 \u0627\u06cc\u062f\u0647 \u067e\u0633\u062a \u062f\u0631 \u06cc\u06a9 \u0632\u0645\u0627\u0646 \u0645\u06cc\u200c\u0633\u0627\u0632\u062f -- \u0646\u0647 \u0632\u06cc\u0631\u0646\u0648\u06cc\u0633\u060c \u0628\u0644\u06a9\u0647 \u0645\u0648\u0636\u0648\u0639 \u0627\u0635\u0644\u06cc \u0647\u0631 \u0631\u0648\u0632\u060c \u0645\u062a\u0646\u0627\u0633\u0628 \u0628\u0627 \u0622\u0646\u091b\u0647 \u0648\u0627\u0642\u0639\u0627\u064b \u062f\u0631 \u0622\u0646 \u067e\u0644\u062a\u0641\u0631\u0645 \u062c\u0648\u0627\u0628 \u0645\u06cc\u200c\u062f\u0647\u062f.',
+  },
+  uk: {
+    subtitle: '\u0422\u0438\u0436\u0434\u0435\u043d\u044c \u0456\u0434\u0435\u0439, \u043f\u0440\u043e\u0434\u0443\u043c\u0430\u043d\u0438\u0445 \u043f\u0456\u0434 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0443. \u0414\u043b\u044f \u043a\u043e\u043c\u0430\u043d\u0434, \u044f\u043a\u0456 \u043f\u043b\u0430\u043d\u0443\u044e\u0442\u044c \u0437\u0430 \u0437\u0430\u0434\u0443\u043c\u043e\u043c.',
+    about: 'Content Strategist AI \u0431\u0443\u0434\u0443\u0454 \u0442\u0438\u0436\u0434\u0435\u043d\u044c \u0456\u0434\u0435\u0439 \u0434\u043b\u044f \u043f\u043e\u0441\u0442\u0456\u0432 \u0437\u0430 \u0440\u0430\u0437 \u2014 \u043d\u0435 \u043f\u0456\u0434\u043f\u0438\u0441\u0438, \u0430 \u0441\u0430\u043c\u0443 \u0442\u0435\u043c\u0443 \u043a\u043e\u0436\u043d\u043e\u0433\u043e \u0434\u043d\u044f, \u043f\u0456\u0434\u0456\u0431\u0440\u0430\u043d\u0443 \u043f\u0456\u0434 \u0442\u0435, \u0449\u043e \u0440\u0435\u0430\u043b\u044c\u043d\u043e \u043f\u0440\u0430\u0446\u044e\u0454 \u043d\u0430 \u0446\u0456\u0439 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0456.',
+  },
+  nl: {
+    subtitle: 'Een week aan idee\u00ebn, per platform doordacht. Voor teams die met intentie plannen.',
+    about: 'Content Strategist AI bouwt een week aan post-idee\u00ebn tegelijk -- geen bijschriften, maar het kernonderwerp van elke dag, afgestemd op wat echt werkt op dat platform.',
+  },
+  th: {
+    subtitle: '\u0e44\u0e2d\u0e40\u0e14\u0e35\u0e22\u0e2b\u0e19\u0e36\u0e48\u0e07\u0e2a\u0e31\u0e1b\u0e14\u0e32\u0e2b\u0e4c \u0e17\u0e35\u0e48\u0e04\u0e34\u0e14\u0e21\u0e32\u0e15\u0e32\u0e21\u0e41\u0e15\u0e48\u0e25\u0e30\u0e41\u0e1e\u0e25\u0e15\u0e1f\u0e2d\u0e23\u0e4c\u0e21 \u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e17\u0e35\u0e21\u0e17\u0e35\u0e48\u0e27\u0e32\u0e07\u0e41\u0e1c\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e15\u0e31\u0e49\u0e07\u0e43\u0e08',
+    about: 'Content Strategist AI \u0e2a\u0e23\u0e49\u0e32\u0e07\u0e44\u0e2d\u0e40\u0e14\u0e35\u0e22\u0e42\u0e1e\u0e2a\u0e15\u0e4c\u0e2b\u0e19\u0e36\u0e48\u0e07\u0e2a\u0e31\u0e1b\u0e14\u0e32\u0e2b\u0e4c\u0e43\u0e19\u0e04\u0e23\u0e32\u0e27\u0e40\u0e14\u0e35\u0e22\u0e27 -- \u0e44\u0e21\u0e48\u0e43\u0e0a\u0e48\u0e41\u0e04\u0e1b\u0e0a\u0e31\u0e48\u0e19 \u0e41\u0e15\u0e48\u0e40\u0e1b\u0e47\u0e19\u0e2b\u0e31\u0e27\u0e02\u0e49\u0e2d\u0e2b\u0e25\u0e31\u0e01\u0e02\u0e2d\u0e07\u0e41\u0e15\u0e48\u0e25\u0e30\u0e27\u0e31\u0e19',
+  },
+  id: {
+    subtitle: 'Seminggu ide, dipikirkan per platform. Untuk tim yang merencanakan dengan sengaja.',
+    about: 'Content Strategist AI membangun seminggu ide postingan sekaligus -- bukan keterangan, tetapi topik inti setiap hari, disesuaikan dengan apa yang benar-benar berhasil di platform tersebut.',
   },
 };
 
@@ -167,7 +244,9 @@ export default function App() {
     setDailyCount(getDailyCount());
     setRegeneratingDay(index);
     const oldIdea = result.ideas[index];
-    const prompt = `Give ONE new alternative post idea for ${oldIdea.day}, platform "${oldIdea.platform}", different from: "${oldIdea.idea}". Same content pillar: ${oldIdea.pillar}. Business: ${businessType}.
+    const outputLangName = LANG_ENGLISH_NAMES[uiLang] || 'English';
+    const langInstruction = uiLang === 'en' ? '' : ` Write the "idea" and hashtags in ${outputLangName}.`;
+    const prompt = `Give ONE new alternative post idea for ${oldIdea.day}, platform "${oldIdea.platform}", different from: "${oldIdea.idea}". Same content pillar: ${oldIdea.pillar}. Business: ${businessType}.${langInstruction}
 Respond ONLY with valid JSON: {"day": "${oldIdea.day}", "platform": "${oldIdea.platform}", "pillar": "${oldIdea.pillar}", "idea": "...", "hashtags": ["...", "...", "..."]}`;
     try {
       const res = await fetch('/api/generate', {
@@ -199,21 +278,25 @@ Respond ONLY with valid JSON: {"day": "${oldIdea.day}", "platform": "${oldIdea.p
 
     const platformLabel = PLATFORMS.find(p => p.code === platform)?.label || platform;
     const selectedLabels = selectedPlatforms.map(c => PLATFORMS.find(p => p.code === c)?.label || c);
+    const outputLangName = LANG_ENGLISH_NAMES[uiLang] || 'English';
+    const langInstruction = uiLang === 'en'
+      ? ''
+      : ` Write in ${outputLangName}: the "idea" text, hashtags, and any other free text. IMPORTANT: keep the "pillar" field exactly as one of these English words (do not translate it): ${PILLARS.join(', ')}. Keep the "platform" field as given (do not translate platform names). Day names may be in ${outputLangName} or English, whichever reads more naturally.`;
 
     let prompt;
     if (mode === 'single') {
       prompt = `You are a social media content strategist. Give a week of post IDEAS (topics, not captions) for ${platformLabel}.
 Business: ${businessType}. Occasion: ${occasion || 'none specific'}. Audience: ${audience || 'general'}.
-Give exactly 7 ideas, one per day, tailored to ${platformLabel}. Assign a content pillar from: ${PILLARS.join(', ')} to each, don't repeat more than twice, include 2-3 hashtags each.
+Give exactly 7 ideas, one per day, tailored to ${platformLabel}. Assign a content pillar from: ${PILLARS.join(', ')} to each, don't repeat more than twice, include 2-3 hashtags each.${langInstruction}
 Respond ONLY with valid JSON: {"ideas": [{"day": "Monday", "platform": "${platformLabel}", "pillar": "...", "idea": "...", "hashtags": ["...","...","..."]}, ...7 total]}`;
     } else if (mode === 'cross') {
       prompt = `You are a social media content strategist building a cross-platform calendar.
 Business: ${businessType}. Occasion: ${occasion || 'none specific'}. Audience: ${audience || 'general'}. Platforms: ${selectedLabels.join(', ')}.
-Give exactly 7 ideas, one per day, picking the best platform per idea from the list. Assign a content pillar from: ${PILLARS.join(', ')}, don't repeat more than twice, include 2-3 hashtags each.
+Give exactly 7 ideas, one per day, picking the best platform per idea from the list. Assign a content pillar from: ${PILLARS.join(', ')}, don't repeat more than twice, include 2-3 hashtags each.${langInstruction}
 Respond ONLY with valid JSON: {"ideas": [{"day": "Monday", "platform": "one of: ${selectedLabels.join(', ')}", "pillar": "...", "idea": "...", "hashtags": ["...","...","..."]}, ...7 total]}`;
     } else {
       prompt = `Find what a competitor is missing on ${platformLabel} and suggest a unique angle.
-Business: ${businessType || 'small business'}. Competitor content: "${competitorText}".
+Business: ${businessType || 'small business'}. Competitor content: "${competitorText}".${langInstruction}
 Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "..."}`;
     }
 
