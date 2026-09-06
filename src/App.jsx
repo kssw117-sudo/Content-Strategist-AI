@@ -234,7 +234,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
       <div
         style={{
           position: 'fixed', top: '50%', left: '50%', width: '150vmax', height: '150vmax',
-          transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: 0,
+          transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: -1,
         }}
       >
         <svg
