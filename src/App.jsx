@@ -66,6 +66,15 @@ const LANGS = [
   { code: 'th', label: '\u0e44\u0e17\u0e22' }, { code: 'id', label: 'Bahasa Indonesia' },
 ];
 
+const STAT_CUBES = [
+  { n: '07', label: 'Platforms', desc: 'Instagram, TikTok, LinkedIn, Facebook, Telegram, X, and Reddit -- each platform gets ideas tailored to what actually works there.' },
+  { n: '05', label: 'Pillars', desc: 'Educational, Behind-the-scenes, Social proof, Promotional, and Entertaining -- automatically balanced across your week.' },
+  { n: '20', label: 'Languages', desc: 'Explanations and ideas available in 20 languages, including right-to-left support for Arabic and Persian.' },
+  { n: '50', label: 'Daily Limit', desc: 'Fifty generations per day -- enough for real, ongoing use, without opening the door to abuse.' },
+  { n: '1', label: 'Free Trial', desc: 'Try one full generation before you buy. No code, no commitment.' },
+  { n: 'Once', label: 'Payment', desc: 'A single one-time payment. No subscription, no recurring charge, ever.' },
+];
+
 const UI_TEXT = {
   en: {
     subtitle: 'A week of ideas, considered per platform. For teams who plan with intention.',
@@ -89,6 +98,7 @@ export default function App() {
   const [showSupportEmail, setShowSupportEmail] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [uiLang, setUiLang] = useState('en');
+  const [expandedStat, setExpandedStat] = useState(null);
   const [regeneratingDay, setRegeneratingDay] = useState(null);
   const [copiedAll, setCopiedAll] = useState(false);
 
@@ -211,12 +221,47 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
         @keyframes welcomeFadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes welcomeFadeOut { to { opacity: 0; } }
         @keyframes checkDraw { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
+        @keyframes constellationSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .constellation-bg { animation: constellationSpin 90s linear infinite; }
         button { transition: all 0.2s ease; }
         button:hover:not(:disabled) { transform: translateY(-1px); }
         .platform-pill:hover { border-color: ${GOLD} !important; color: ${GOLD} !important; }
         @keyframes allowanceFill { from { width: 0; } }
         .allowance-fill { animation: allowanceFill 0.8s ease both; }
       `}</style>
+
+      {/* Вращающийся фон-созвездие на весь экран, в цветах сайта (золото/кремовый) */}
+      <svg
+        className="constellation-bg"
+        viewBox="0 0 400 400"
+        style={{
+          position: 'fixed', top: '50%', left: '50%', width: '150vmax', height: '150vmax',
+          transform: 'translate(-50%, -50%)', transformOrigin: 'center', opacity: 0.06,
+          pointerEvents: 'none', zIndex: 0,
+        }}
+      >
+        {(() => {
+          const pts = [
+            [200, 60], [120, 130], [200, 130], [280, 130],
+            [60, 200], [130, 200], [200, 200], [270, 200], [340, 200],
+            [120, 270], [200, 270], [280, 270], [200, 340],
+          ];
+          const lines = [
+            [0, 2], [2, 8 - 6], [1, 2], [2, 3], [4, 5], [5, 6], [6, 7], [7, 8],
+            [1, 5], [3, 7], [9, 10], [10, 11], [5, 9], [7, 11], [10, 12], [6, 3], [6, 1], [6, 9], [6, 11],
+          ];
+          return (
+            <>
+              {lines.map(([a, b], i) => (
+                <line key={i} x1={pts[a][0]} y1={pts[a][1]} x2={pts[b][0]} y2={pts[b][1]} stroke={GOLD} strokeWidth="0.6" />
+              ))}
+              {pts.map(([x, y], i) => (
+                <circle key={i} cx={x} cy={y} r={i === 6 ? 7 : 5} fill={i === 6 ? GOLD : CREAM} />
+              ))}
+            </>
+          );
+        })()}
+      </svg>
 
       {/* ---------- HERO: тёмный фон, фото в дуотоне, крупная serif-типографика ---------- */}
       <div style={{ position: 'relative', padding: '24px 24px 0', textAlign: 'center', overflow: 'hidden' }}>
@@ -253,19 +298,26 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
 
         <div className="fade-in" style={{ animationDelay: '0.3s', maxWidth: 680, margin: '0 auto', padding: '8px 0 40px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-            {[
-              ['07', 'Platforms'], ['05', 'Pillars'], ['20', 'Languages'],
-              ['50', 'Daily Limit'], ['1', 'Free Trial'], ['Once', 'Payment'],
-            ].map(([n, l]) => (
-              <div key={l} style={{
-                textAlign: 'center', border: `1px solid ${LINE}`, borderRadius: 3, padding: '16px 6px',
-                background: 'rgba(201,169,104,0.03)',
-              }}>
-                <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: 22, color: GOLD }}>{n}</div>
-                <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: INK_SOFT, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4 }}>{l}</div>
-              </div>
+            {STAT_CUBES.map((s) => (
+              <button
+                key={s.label}
+                onClick={() => setExpandedStat(expandedStat === s.label ? null : s.label)}
+                style={{
+                  textAlign: 'center', border: `1px solid ${expandedStat === s.label ? GOLD : LINE}`, borderRadius: 3, padding: '16px 6px',
+                  background: expandedStat === s.label ? 'rgba(201,169,104,0.08)' : 'rgba(201,169,104,0.03)',
+                  cursor: 'pointer', color: 'inherit', fontFamily: 'inherit',
+                }}
+              >
+                <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: 22, color: GOLD }}>{s.n}</div>
+                <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: INK_SOFT, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4 }}>{s.label}</div>
+              </button>
             ))}
           </div>
+          {expandedStat && (
+            <p style={{ fontSize: 13, color: INK_SOFT, lineHeight: 1.6, textAlign: 'center', marginTop: 16, fontWeight: 300 }}>
+              {STAT_CUBES.find(s => s.label === expandedStat)?.desc}
+            </p>
+          )}
         </div>
 
         <div className="fade-in" style={{ animationDelay: '0.4s', maxWidth: 720, margin: '0 auto', padding: '32px 0 60px', borderTop: `1px solid ${LINE}` }}>
