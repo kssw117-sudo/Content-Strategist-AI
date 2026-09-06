@@ -220,7 +220,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
 
       {/* ---------- HERO: тёмный фон, фото в дуотоне, крупная serif-типографика ---------- */}
       <div style={{ position: 'relative', padding: '24px 24px 0', textAlign: 'center', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', maxWidth: 640, margin: '0 auto 40px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', maxWidth: 1100, margin: '0 auto 40px' }}>
           <select
             value={uiLang}
             onChange={(e) => setUiLang(e.target.value)}
@@ -229,7 +229,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
             {LANGS.map(l => <option key={l.code} value={l.code} style={{ background: BG }}>{l.label}</option>)}
           </select>
         </div>
-        <div className="fade-in" style={{ maxWidth: 640, margin: '0 auto' }}>
+        <div className="fade-in" style={{ maxWidth: 720, margin: '0 auto' }}>
           <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD }}>Plainwork Studio</span>
           <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: 'clamp(38px, 6vw, 58px)', margin: '18px 0 20px', lineHeight: 1.08, letterSpacing: '-0.01em' }}>
             Content Strategist
@@ -240,7 +240,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
           </p>
         </div>
 
-        <div className="fade-in" style={{ animationDelay: '0.15s', maxWidth: 680, margin: '48px auto 0', position: 'relative' }}>
+        <div className="fade-in" style={{ animationDelay: '0.15s', maxWidth: 1100, margin: '48px auto 0', position: 'relative' }}>
           <div style={{ borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
             <img
               src="/images/hero-team.jpg" alt="Team planning content strategy together"
@@ -251,7 +251,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
           </div>
         </div>
 
-        <div className="fade-in" style={{ animationDelay: '0.3s', maxWidth: 460, margin: '0 auto', padding: '8px 0 40px' }}>
+        <div className="fade-in" style={{ animationDelay: '0.3s', maxWidth: 680, margin: '0 auto', padding: '8px 0 40px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {[
               ['07', 'Platforms'], ['05', 'Pillars'], ['20', 'Languages'],
@@ -268,7 +268,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
           </div>
         </div>
 
-        <div className="fade-in" style={{ animationDelay: '0.4s', maxWidth: 560, margin: '0 auto', padding: '32px 0 60px', borderTop: `1px solid ${LINE}` }}>
+        <div className="fade-in" style={{ animationDelay: '0.4s', maxWidth: 720, margin: '0 auto', padding: '32px 0 60px', borderTop: `1px solid ${LINE}` }}>
           <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: GOLD }}>About</span>
           <p style={{ fontSize: 14.5, color: INK_SOFT, fontWeight: 300, lineHeight: 1.7, margin: '14px 0 0' }}>
             {(UI_TEXT[uiLang] || UI_TEXT.en).about}
@@ -276,7 +276,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
         </div>
       </div>
 
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 24px 100px' }}>
+      <div style={{ maxWidth: 820, margin: '0 auto', padding: '0 24px 100px' }}>
 
         {!unlocked && (
           <div style={{ border: `1px solid ${freeTrialUsed ? 'rgba(201,120,104,0.4)' : LINE}`, borderRadius: 4, padding: 18, marginBottom: 32 }}>
@@ -481,7 +481,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: 80, paddingTop: 32, borderTop: `1px solid ${LINE}` }}>
-          <span style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.03em' }}>PLAINWORK &middot; BY KSENIA</span>
+          <span style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.03em' }}>POWERED BY CLAUDE &middot; PLAINWORK BY KSENIA</span>
           <div style={{ display: 'flex', gap: 18, marginTop: 4 }}>
             <a href="/terms.html" style={{ fontSize: 10.5, color: INK_SOFT }}>Terms</a>
             <a href="/privacy.html" style={{ fontSize: 10.5, color: INK_SOFT }}>Privacy</a>
