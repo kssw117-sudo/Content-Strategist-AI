@@ -5,14 +5,14 @@ const CARD = '#FAFAFA';
 const LINE = '#E8EAED';
 const INK = '#1F1F1F';
 const INK_SOFT = '#5F6368';
-const RUST = '#D97757';
-const RUST_DEEP = '#BD5D3A';
+const BLUE_MAIN = '#4285F4';
+const BLUE_DEEP = '#1A56C4';
 
 const PILLAR_COLORS = {
   'Educational': { bg: '#E6F1FB', text: '#0C447C', dot: '#4285F4' },
   'Behind-the-scenes': { bg: '#F1EBFB', text: '#5B2E8C', dot: '#8B5CF6' },
   'Social proof': { bg: '#EAF3DE', text: '#27500A', dot: '#34A853' },
-  'Promotional': { bg: '#FBEFEA', text: '#8A3D22', dot: RUST },
+  'Promotional': { bg: '#FBEFEA', text: '#8A3D22', dot: BLUE_MAIN },
   'Entertaining': { bg: '#FCF3DC', text: '#7A5200', dot: '#F5A623' },
 };
 const PILLARS = Object.keys(PILLAR_COLORS);
@@ -64,6 +64,27 @@ const MODES = [
   { value: 'competitor', label: 'Competitor gap' },
 ];
 
+const UI_TEXT = {
+  en: {
+    title: 'Content Strategist AI',
+    subtitle: 'A week of ideas, tailored per platform -- built for teams who actually plan together.',
+    tapHint: 'Tap a platform to select it',
+    statPlatforms: 'platforms', statPillars: 'content pillars', statIdeas: 'ideas, unlimited',
+  },
+  ru: {
+    title: 'Content Strategist AI',
+    subtitle: 'Неделя идей, адаптированных под платформу — для команд, которые реально планируют вместе.',
+    tapHint: 'Нажми на платформу, чтобы выбрать её',
+    statPlatforms: 'платформ', statPillars: 'категорий контента', statIdeas: 'идей, без ограничений',
+  },
+  es: {
+    title: 'Content Strategist AI',
+    subtitle: 'Una semana de ideas, adaptadas por plataforma -- para equipos que realmente planifican juntos.',
+    tapHint: 'Toca una plataforma para seleccionarla',
+    statPlatforms: 'plataformas', statPillars: 'pilares de contenido', statIdeas: 'ideas, ilimitadas',
+  },
+};
+
 export default function App() {
   const [licenseCode, setLicenseCode] = useState(() => localStorage.getItem('cs_licenseCode') || '');
   const [unlocked, setUnlocked] = useState(() => localStorage.getItem('cs_unlocked') === 'true');
@@ -71,6 +92,9 @@ export default function App() {
   const [dailyCount, setDailyCount] = useState(() => getDailyCount());
   const [showSupportEmail, setShowSupportEmail] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [uiLang, setUiLang] = useState('en');
+  const [audience, setAudience] = useState('');
+  const [regeneratingDay, setRegeneratingDay] = useState(null);
   const [history, setHistory] = useState([]);
   const [copiedAll, setCopiedAll] = useState(false);
 
@@ -116,6 +140,41 @@ export default function App() {
     return counts;
   }
 
+  async function regenerateDay(index) {
+    if (!unlocked) return; // перегенерация одного дня — только для разблокированных, не тратит пробную попытку
+    if (!checkAndUseDailyLimit()) {
+      setDailyCount(DAILY_LIMIT);
+      return;
+    }
+    setDailyCount(getDailyCount());
+    setRegeneratingDay(index);
+    const oldIdea = result.ideas[index];
+    const prompt = `You are a social media content strategist. Give ONE new alternative post idea for ${oldIdea.day}, for the platform "${oldIdea.platform}", different from this previous idea: "${oldIdea.idea}". Keep the same content pillar: ${oldIdea.pillar}. Business type: ${businessType}.
+
+Respond ONLY with valid JSON, no markdown, no code fences:
+{"day": "${oldIdea.day}", "platform": "${oldIdea.platform}", "pillar": "${oldIdea.pillar}", "idea": "...", "hashtags": ["...", "...", "..."]}`;
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ licenseCode, prompt, trial: false }),
+      });
+      const data = await res.json();
+      const text = data.content?.map(b => b.text || '').join('') || '';
+      const clean = text.replace(/```json|```/g, '').trim();
+      const newIdea = JSON.parse(clean);
+      setResult(r => {
+        const next = { ...r, ideas: [...r.ideas] };
+        next.ideas[index] = newIdea;
+        return next;
+      });
+    } catch (err) {
+      setError('Could not regenerate that day. Try again.');
+    } finally {
+      setRegeneratingDay(null);
+    }
+  }
+
   async function handleGenerate() {
     if ((mode === 'single' || mode === 'cross') && !businessType.trim()) {
       setError('Tell us what your business does first.');
@@ -154,6 +213,7 @@ export default function App() {
 
 Business type: ${businessType}
 Occasion/season: ${occasion || 'no specific occasion, just a normal week'}
+Target audience: ${audience || 'general audience for this business type'}
 
 Give exactly 7 post ideas, one per day, tailored to what actually performs well on ${platformLabel} specifically.
 For each idea, assign one content pillar from this exact list: ${PILLARS.join(', ')}. Spread the 7 ideas across different pillars -- don't repeat the same pillar more than twice.
@@ -165,6 +225,7 @@ Respond ONLY with valid JSON, no markdown, no code fences:
 
 Business type: ${businessType}
 Occasion/season: ${occasion || 'no specific occasion, just a normal week'}
+Target audience: ${audience || 'general audience for this business type'}
 Platforms in use: ${selectedLabels.join(', ')}
 
 Build exactly 7 post ideas, one per day, and for EACH day pick the single best platform from the list for that specific idea. For each idea, assign one content pillar from this exact list: ${PILLARS.join(', ')}, don't repeat the same pillar more than twice, and give 2-3 relevant hashtags.
@@ -238,54 +299,87 @@ Respond ONLY with valid JSON, no markdown, no code fences:
         .dot-1 { animation-delay: -0.3s; } .dot-2 { animation-delay: -1.2s; } .dot-3 { animation-delay: -2s; }
       `}</style>
 
-      {/* ---------- HERO: название + фото целиком + простые цветные значки вокруг ---------- */}
-      <div style={{ maxWidth: 780, margin: '0 auto', padding: '40px 24px 0' }}>
-        <div className="hero-title" style={{ textAlign: 'center', marginBottom: 28 }}>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 32, margin: '0 0 8px' }}>Content Strategist AI</h1>
-          <p style={{ fontSize: 14, color: INK_SOFT, margin: 0 }}>A week of ideas, tailored per platform -- built for teams who actually plan together.</p>
-        </div>
+      {/* ---------- HERO: светлый фон, кликабельные значки-платформы, языки ---------- */}
+      <div style={{ background: '#FFFFFF', padding: '48px 24px 0', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ maxWidth: 780, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+            <select
+              value={uiLang}
+              onChange={(e) => setUiLang(e.target.value)}
+              style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, color: BLUE_DEEP, background: 'rgba(66,133,244,0.08)', border: '1px solid rgba(66,133,244,0.25)', borderRadius: 999, padding: '3px 10px' }}
+            >
+              <option value="en">EN</option>
+              <option value="ru">RU</option>
+              <option value="es">ES</option>
+            </select>
+          </div>
 
-        <div className="hero-photo" style={{ position: 'relative', maxWidth: 560, margin: '0 auto 8px', padding: '30px 40px' }}>
-          <svg className="float-icon icon-blue" style={{ position: 'absolute', top: -6, left: 4 }} width="44" height="44" viewBox="0 0 44 44">
-            <circle cx="22" cy="22" r="20" fill="#4285F4" />
-            <polygon points="17,14 32,22 17,30" fill="#FFFFFF" />
-          </svg>
-          <svg className="float-icon icon-red" style={{ position: 'absolute', top: -14, left: '38%' }} width="40" height="40" viewBox="0 0 40 40">
-            <circle cx="20" cy="20" r="18" fill="#EA4335" />
-            <rect x="10" y="16" width="20" height="8" rx="4" fill="#FFFFFF" />
-          </svg>
-          <svg className="float-icon icon-yellow" style={{ position: 'absolute', top: -8, right: '20%' }} width="42" height="42" viewBox="0 0 42 42">
-            <circle cx="21" cy="21" r="19" fill="#FBBC05" />
-            <polygon points="21,10 24,18 33,18 26,23 28,32 21,27 14,32 16,23 9,18 18,18" fill="#FFFFFF" />
-          </svg>
-          <svg className="float-icon icon-green" style={{ position: 'absolute', top: -10, right: -4 }} width="40" height="40" viewBox="0 0 40 40">
-            <circle cx="20" cy="20" r="18" fill="#34A853" />
-            <path d="M12 20l5 5 11-11" stroke="#FFFFFF" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <span className="float-dot dot-1" style={{ position: 'absolute', bottom: 30, left: -10, width: 14, height: 14, borderRadius: '50%', background: '#EA4335' }} />
-          <span className="float-dot dot-2" style={{ position: 'absolute', bottom: -8, left: '30%', width: 12, height: 12, borderRadius: '50%', background: '#34A853' }} />
-          <span className="float-dot dot-3" style={{ position: 'absolute', bottom: -6, right: '22%', width: 13, height: 13, borderRadius: '50%', background: '#FBBC05' }} />
+          <div className="hero-title" style={{ textAlign: 'center', marginBottom: 28 }}>
+            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, letterSpacing: '0.12em', textTransform: 'uppercase', color: BLUE_DEEP }}>Plainwork &middot; AI-Powered</span>
+            <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 38, margin: '10px 0 12px', color: INK, letterSpacing: '-0.01em' }}>{UI_TEXT[uiLang].title}</h1>
+            <p style={{ fontSize: 15, color: INK_SOFT, margin: '0 auto', maxWidth: 460, lineHeight: 1.5 }}>{UI_TEXT[uiLang].subtitle}</p>
+          </div>
 
-          <div style={{
-            borderRadius: 18, overflow: 'hidden', border: '1px solid ' + LINE,
-            boxShadow: '0 16px 40px rgba(0,0,0,0.1)', background: '#FFFFFF',
-          }}>
-            <img src="/images/hero-team.jpg" alt="Team planning content strategy together" style={{ width: '100%', height: 'auto', display: 'block' }} />
+          <div style={{ position: 'relative', maxWidth: 620, margin: '0 auto' }}>
+            <div style={{
+              borderRadius: 20, overflow: 'hidden', border: `1px solid ${LINE}`,
+              boxShadow: '0 24px 60px rgba(66,133,244,0.12), 0 12px 30px rgba(0,0,0,0.08)',
+            }}>
+              <img src="/images/hero-team.jpg" alt="Team planning content strategy together" style={{ width: '100%', height: 'auto', display: 'block' }} />
+            </div>
+
+            {PLATFORMS.map((p, i) => {
+              const positions = [
+                { top: '-8%', left: '-4%' }, { top: '4%', right: '-6%' }, { top: '50%', left: '-8%' },
+                { top: '55%', right: '-8%' }, { bottom: '-6%', left: '8%' }, { bottom: '-8%', right: '14%' },
+                { top: '20%', right: '10%' },
+              ];
+              const isActive = mode === 'cross' ? selectedPlatforms.includes(p.code) : platform === p.code;
+              const pos = positions[i] || {};
+              return (
+                <button
+                  key={p.code}
+                  className={`float-icon icon-orbit-${i}`}
+                  onClick={() => mode === 'cross' ? togglePlatform(p.code) : setPlatform(p.code)}
+                  title={p.label}
+                  style={{
+                    position: 'absolute', ...pos, width: 46, height: 46, borderRadius: '50%',
+                    background: isActive ? p.color : '#FFFFFF', border: `2.5px solid ${isActive ? p.color : LINE}`,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10, fontWeight: 700, color: isActive ? '#FFFFFF' : INK_SOFT,
+                    boxShadow: isActive ? `0 6px 18px ${p.color}55` : '0 4px 12px rgba(0,0,0,0.08)',
+                    transition: 'background 0.2s, box-shadow 0.2s', zIndex: 2,
+                  }}
+                >
+                  {p.label.slice(0, 2).toUpperCase()}
+                </button>
+              );
+            })}
+          </div>
+          <p style={{ textAlign: 'center', fontSize: 11.5, color: INK_SOFT, margin: '18px 0 0' }}>{UI_TEXT[uiLang].tapHint}</p>
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 36, padding: '26px 0 8px', flexWrap: 'wrap' }}>
+            {[['7', UI_TEXT[uiLang].statPlatforms], ['5', UI_TEXT[uiLang].statPillars], ['\u221E', UI_TEXT[uiLang].statIdeas]].map(([n, l]) => (
+              <div key={l} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, color: BLUE_MAIN, fontWeight: 600 }}>{n}</div>
+                <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: INK_SOFT, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{l}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: 700, margin: '0 auto', padding: '32px 24px 80px' }}>
+      <div style={{ maxWidth: 700, margin: '0 auto', padding: '40px 24px 80px' }}>
 
         {!unlocked && (
           <div style={{ background: freeTrialUsed ? '#FDECEC' : '#F5F9FF', border: `1px solid ${freeTrialUsed ? '#F3C4C4' : '#D5E5FC'}`, borderRadius: 10, padding: 14, marginBottom: 20 }}>
             {freeTrialUsed ? (
               <div>
                 <p style={{ fontSize: 13.5, color: '#8A4A38', margin: '0 0 10px', fontWeight: 600 }}>Your free preview is over. Enter your code whenever you're ready to keep going.</p>
-                <a href="/unlock.html" style={{ display: 'inline-block', background: RUST, color: '#FFFFFF', padding: '8px 16px', borderRadius: 8, fontSize: 13.5, fontWeight: 600, textDecoration: 'none' }}>
+                <a href="/unlock.html" style={{ display: 'inline-block', background: BLUE_MAIN, color: '#FFFFFF', padding: '8px 16px', borderRadius: 8, fontSize: 13.5, fontWeight: 600, textDecoration: 'none' }}>
                   Enter your code &rarr;
                 </a>
-                <a href="/buy.html" style={{ display: 'block', fontSize: 12, color: RUST_DEEP, marginTop: 8 }}>No code? Get access</a>
+                <a href="/buy.html" style={{ display: 'block', fontSize: 12, color: BLUE_DEEP, marginTop: 8 }}>No code? Get access</a>
               </div>
             ) : (
               <p style={{ fontSize: 13.5, color: '#1B5FC4', margin: 0 }}>Try it free -- your first generation is on us. No code needed.</p>
@@ -301,8 +395,8 @@ Respond ONLY with valid JSON, no markdown, no code fences:
                 onClick={() => setMode(m.value)}
                 style={{
                   flex: 1, padding: '9px 8px', borderRadius: 8, fontSize: 11.5, fontWeight: 500, cursor: 'pointer',
-                  background: mode === m.value ? RUST : '#FFFFFF', color: mode === m.value ? '#FFFFFF' : INK_SOFT,
-                  border: `1px solid ${mode === m.value ? RUST : LINE}`,
+                  background: mode === m.value ? BLUE_MAIN : '#FFFFFF', color: mode === m.value ? '#FFFFFF' : INK_SOFT,
+                  border: `1px solid ${mode === m.value ? BLUE_MAIN : LINE}`,
                 }}
               >
                 {m.label}
@@ -326,6 +420,14 @@ Respond ONLY with valid JSON, no markdown, no code fences:
                 value={occasion}
                 onChange={(e) => setOccasion(e.target.value)}
                 placeholder="e.g. back to school, holiday season"
+                style={{ width: '100%', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#FFFFFF', border: `1px solid ${LINE}`, color: INK, marginBottom: 14, boxSizing: 'border-box' }}
+              />
+              <label style={{ fontSize: 12, color: INK_SOFT, fontWeight: 500, display: 'block', marginBottom: 4 }}>Who's your audience? (optional)</label>
+              <input
+                type="text"
+                value={audience}
+                onChange={(e) => setAudience(e.target.value)}
+                placeholder="e.g. busy parents in their 30s-40s"
                 style={{ width: '100%', borderRadius: 8, padding: '10px 12px', fontSize: 14, background: '#FFFFFF', border: `1px solid ${LINE}`, color: INK, marginBottom: 14, boxSizing: 'border-box' }}
               />
             </>
@@ -408,7 +510,7 @@ Respond ONLY with valid JSON, no markdown, no code fences:
               disabled={loading}
               style={{
                 width: '100%', padding: '12px', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                background: RUST, color: '#FFFFFF', border: 'none', opacity: loading ? 0.7 : 1,
+                background: BLUE_MAIN, color: '#FFFFFF', border: 'none', opacity: loading ? 0.7 : 1,
               }}
             >
               {loading ? 'Thinking...' : mode === 'competitor' ? 'Find the gap' : 'Build this week\u2019s calendar'}
@@ -420,7 +522,7 @@ Respond ONLY with valid JSON, no markdown, no code fences:
             <span style={{ fontSize: 10.5, color: INK_SOFT, fontWeight: 600 }}>{DAILY_LIMIT - dailyCount}/{DAILY_LIMIT} left</span>
           </div>
           <div style={{ height: 4, borderRadius: 999, background: LINE, overflow: 'hidden', marginTop: 4 }}>
-            <div style={{ height: '100%', width: `${(dailyCount / DAILY_LIMIT) * 100}%`, background: dailyCount >= DAILY_LIMIT ? '#C0392B' : RUST, borderRadius: 999 }} />
+            <div style={{ height: '100%', width: `${(dailyCount / DAILY_LIMIT) * 100}%`, background: dailyCount >= DAILY_LIMIT ? '#C0392B' : BLUE_MAIN, borderRadius: 999 }} />
           </div>
         </div>
 
@@ -428,7 +530,7 @@ Respond ONLY with valid JSON, no markdown, no code fences:
           <div style={{ marginTop: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
               <span style={{ fontSize: 12, color: INK_SOFT, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>This week's calendar</span>
-              <button onClick={copyAllIdeas} style={{ fontSize: 11.5, color: RUST_DEEP, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+              <button onClick={copyAllIdeas} style={{ fontSize: 11.5, color: BLUE_DEEP, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
                 {copiedAll ? '\u2713 Copied all' : 'Copy all'}
               </button>
             </div>
@@ -459,7 +561,16 @@ Respond ONLY with valid JSON, no markdown, no code fences:
                       <p style={{ fontSize: 11, color: '#4285F4', margin: '0 0 6px' }}>{it.hashtags.map(h => `#${h.replace(/^#/, '')}`).join(' ')}</p>
                     )}
                     {bestTime && (
-                      <p style={{ fontSize: 10, color: INK_SOFT, margin: 0 }}>Best time: {bestTime}</p>
+                      <p style={{ fontSize: 10, color: INK_SOFT, margin: '0 0 6px' }}>Best time: {bestTime}</p>
+                    )}
+                    {unlocked && (
+                      <button
+                        onClick={() => regenerateDay(i)}
+                        disabled={regeneratingDay === i}
+                        style={{ fontSize: 10.5, color: BLUE_DEEP, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontWeight: 600 }}
+                      >
+                        {regeneratingDay === i ? 'Regenerating...' : '\u21bb Try a different idea'}
+                      </button>
                     )}
                   </div>
                 );
@@ -470,11 +581,11 @@ Respond ONLY with valid JSON, no markdown, no code fences:
 
         {result && result.gap && (
           <div style={{ background: CARD, border: `1px solid ${LINE}`, borderRadius: 14, padding: 20, marginTop: 20 }}>
-            <div style={{ fontSize: 12, color: RUST_DEEP, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>What they're missing</div>
+            <div style={{ fontSize: 12, color: BLUE_DEEP, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>What they're missing</div>
             <p style={{ fontSize: 14, color: INK, marginBottom: 16, lineHeight: 1.5 }}>{result.gap}</p>
-            <div style={{ fontSize: 12, color: RUST_DEEP, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Your angle</div>
+            <div style={{ fontSize: 12, color: BLUE_DEEP, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Your angle</div>
             <p style={{ fontSize: 14, color: INK, marginBottom: 16, lineHeight: 1.5 }}>{result.angle}</p>
-            <div style={{ fontSize: 12, color: RUST_DEEP, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Try this</div>
+            <div style={{ fontSize: 12, color: BLUE_DEEP, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Try this</div>
             <p style={{ fontSize: 14, color: INK, margin: 0, lineHeight: 1.5 }}>{result.ideaExample}</p>
           </div>
         )}
@@ -498,7 +609,7 @@ Respond ONLY with valid JSON, no markdown, no code fences:
             <div style={{ position: 'relative', textAlign: 'center', animation: 'welcomeFadeOut 0.4s ease 3.4s both' }}>
               <div style={{
                 width: 76, height: 76, borderRadius: '50%', margin: '0 auto 18px',
-                background: `linear-gradient(135deg, ${RUST}, ${RUST_DEEP})`,
+                background: `linear-gradient(135deg, ${BLUE_MAIN}, ${BLUE_DEEP})`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: '0 12px 32px rgba(217,119,87,0.4)', animation: 'ringPop 0.55s cubic-bezier(0.34,1.56,0.64,1) both',
               }}>
@@ -519,9 +630,9 @@ Respond ONLY with valid JSON, no markdown, no code fences:
             <a href="/privacy.html" style={{ fontSize: 11, color: INK_SOFT }}>Privacy Policy</a>
           </div>
           {!showSupportEmail ? (
-            <button onClick={() => setShowSupportEmail(true)} style={{ fontSize: 11, color: RUST_DEEP, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Support</button>
+            <button onClick={() => setShowSupportEmail(true)} style={{ fontSize: 11, color: BLUE_DEEP, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Support</button>
           ) : (
-            <a href="mailto:kssw117@gmail.com" style={{ fontSize: 11, color: RUST_DEEP }}>kssw117@gmail.com</a>
+            <a href="mailto:kssw117@gmail.com" style={{ fontSize: 11, color: BLUE_DEEP }}>kssw117@gmail.com</a>
           )}
         </div>
       </div>
