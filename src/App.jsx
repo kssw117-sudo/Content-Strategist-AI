@@ -90,6 +90,31 @@ const UI_TEXT = {
   },
 };
 
+// Маленький значок-созвездие (узел в центре + точки вокруг, соединённые
+// линиями), используется как декоративный плавающий элемент в пустых
+// полях по краям страницы — не на весь экран, чтобы не перекрывать контент.
+function ConstellationMark({ className = '', style = {} }) {
+  const pts = [
+    [50, 10], [25, 30], [50, 30], [75, 30],
+    [10, 50], [30, 50], [50, 50], [70, 50], [90, 50],
+    [25, 70], [50, 70], [75, 70], [50, 90],
+  ];
+  const lines = [
+    [1, 2], [2, 3], [4, 5], [5, 6], [6, 7], [7, 8],
+    [1, 5], [3, 7], [9, 10], [10, 11], [5, 9], [7, 11], [10, 12], [6, 3], [6, 1], [6, 9], [6, 11],
+  ];
+  return (
+    <svg className={`float-constellation ${className}`} style={{ opacity: 0.28, pointerEvents: 'none', ...style }} viewBox="0 0 100 100">
+      {lines.map(([a, b], i) => (
+        <line key={i} x1={pts[a][0]} y1={pts[a][1]} x2={pts[b][0]} y2={pts[b][1]} stroke="#C9A968" strokeWidth="0.8" />
+      ))}
+      {pts.map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r={i === 6 ? 3 : 2} fill={i === 6 ? '#C9A968' : '#F5F1E8'} />
+      ))}
+    </svg>
+  );
+}
+
 export default function App() {
   const [licenseCode, setLicenseCode] = useState(() => localStorage.getItem('cs_licenseCode') || '');
   const [unlocked, setUnlocked] = useState(() => localStorage.getItem('cs_unlocked') === 'true');
@@ -221,8 +246,15 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
         @keyframes welcomeFadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes welcomeFadeOut { to { opacity: 0; } }
         @keyframes checkDraw { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
-        @keyframes constellationSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .constellation-bg { animation: constellationSpin 22s linear infinite; transform-origin: center; }
+        @keyframes floatMark {
+          0%   { transform: translate(0, 0) rotate(0deg); }
+          50%  { transform: translate(10px, -18px) rotate(8deg); }
+          100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        .float-constellation { animation: floatMark 8s ease-in-out infinite; }
+        .constellation-1 { animation-duration: 9s; }
+        .constellation-2 { animation-duration: 7s; animation-delay: -2s; }
+        .constellation-3 { animation-duration: 10s; animation-delay: -4s; }
         button { transition: all 0.2s ease; }
         button:hover:not(:disabled) { transform: translateY(-1px); }
         .platform-pill:hover { border-color: ${GOLD} !important; color: ${GOLD} !important; }
@@ -230,44 +262,10 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
         .allowance-fill { animation: allowanceFill 0.8s ease both; }
       `}</style>
 
-      {/* Вращающийся фон-созвездие на весь экран, в цветах сайта (золото/кремовый) */}
-      <div
-        style={{
-          position: 'fixed', top: '50%', left: '50%', width: '150vmax', height: '150vmax',
-          transform: 'translate(-50%, -50%)', pointerEvents: 'none', zIndex: 0,
-        }}
-      >
-        <svg
-          className="constellation-bg"
-          viewBox="0 0 400 400"
-          style={{ width: '100%', height: '100%', opacity: 0.14 }}
-        >
-        {(() => {
-          const pts = [
-            [200, 60], [120, 130], [200, 130], [280, 130],
-            [60, 200], [130, 200], [200, 200], [270, 200], [340, 200],
-            [120, 270], [200, 270], [280, 270], [200, 340],
-          ];
-          const lines = [
-            [0, 2], [2, 8 - 6], [1, 2], [2, 3], [4, 5], [5, 6], [6, 7], [7, 8],
-            [1, 5], [3, 7], [9, 10], [10, 11], [5, 9], [7, 11], [10, 12], [6, 3], [6, 1], [6, 9], [6, 11],
-          ];
-          return (
-            <>
-              {lines.map(([a, b], i) => (
-                <line key={i} x1={pts[a][0]} y1={pts[a][1]} x2={pts[b][0]} y2={pts[b][1]} stroke={GOLD} strokeWidth="0.6" />
-              ))}
-              {pts.map(([x, y], i) => (
-                <circle key={i} cx={x} cy={y} r={i === 6 ? 7 : 5} fill={i === 6 ? GOLD : CREAM} />
-              ))}
-            </>
-          );
-        })()}
-      </svg>
-      </div>
-
-      {/* Оборачиваем весь видимый контент в слой с z-index выше фона-созвездия */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      {/* Три маленьких значка-созвездия, плавающие в пустых чёрных полях по краям */}
+      <ConstellationMark className="constellation-1" style={{ position: 'fixed', top: '15%', left: '3%', width: 90 }} />
+      <ConstellationMark className="constellation-2" style={{ position: 'fixed', top: '55%', right: '3%', width: 70 }} />
+      <ConstellationMark className="constellation-3" style={{ position: 'fixed', bottom: '8%', left: '5%', width: 60 }} />
 
       {/* ---------- HERO: тёмный фон, фото в дуотоне, крупная serif-типографика ---------- */}
       <div style={{ position: 'relative', padding: '24px 24px 0', textAlign: 'center', overflow: 'hidden' }}>
@@ -550,7 +548,6 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
             <a href="mailto:kssw117@gmail.com" style={{ fontSize: 10.5, color: GOLD }}>kssw117@gmail.com</a>
           )}
         </div>
-      </div>
       </div>
     </div>
   );
