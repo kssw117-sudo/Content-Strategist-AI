@@ -5,13 +5,18 @@
 //    аналогично остальным продуктам Plainwork)
 // 3. trial: true — одна бесплатная генерация без кода, чтобы модераторы
 //    маркетплейсов могли реально попробовать продукт.
+//
+// Поддерживает два формата запроса:
+// - { prompt: "..." } — обычный текстовый запрос (как раньше)
+// - { prompt: "...", images: [{ base64, mediaType }, ...] } — запрос с
+//   фотографиями (для функции "загрузка фото → план размещения")
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { licenseCode, prompt, trial } = req.body || {};
+  const { licenseCode, prompt, images, trial } = req.body || {};
 
   const isSharedCode = licenseCode && licenseCode === process.env.ACCESS_CODE;
   const isAppSumoCode = licenseCode && licenseCode.trim().toUpperCase().startsWith('CSA-');
@@ -25,6 +30,26 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'No prompt provided.' });
   }
 
+  // Ограничение на количество фото за раз (защита от слишком больших запросов)
+  if (images && images.length > 7) {
+    return res.status(400).json({ error: 'Too many images -- 7 maximum.' });
+  }
+
+  // Собираем содержимое сообщения: если есть фото — массив блоков
+  // (картинки + текст), если нет — просто текст, как раньше
+  let content;
+  if (images && images.length > 0) {
+    content = [
+      ...images.map(img => ({
+        type: 'image',
+        source: { type: 'base64', media_type: img.mediaType || 'image/jpeg', data: img.base64 },
+      })),
+      { type: 'text', text: prompt },
+    ];
+  } else {
+    content = prompt;
+  }
+
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -35,8 +60,8 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 1200,
-        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 1500,
+        messages: [{ role: 'user', content }],
       }),
     });
 
