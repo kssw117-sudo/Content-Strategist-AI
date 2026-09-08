@@ -68,6 +68,8 @@ const LANGS = [
   { code: 'ja', label: '\u65e5\u672c\u8a9e' }, { code: 'it', label: 'Italiano' }, { code: 'pl', label: 'Polski' },
   { code: 'fa', label: '\u0641\u0627\u0631\u0633\u06cc' }, { code: 'uk', label: '\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430' }, { code: 'nl', label: 'Nederlands' },
   { code: 'th', label: '\u0e44\u0e17\u0e22' }, { code: 'id', label: 'Bahasa Indonesia' },
+  { code: 'el', label: '\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac' }, { code: 'sv', label: 'Svenska' }, { code: 'da', label: 'Dansk' },
+  { code: 'no', label: 'Norsk' }, { code: 'fi', label: 'Suomi' },
 ];
 
 // Английские названия языков — для промпта к Claude (модель точнее
@@ -77,13 +79,14 @@ const LANG_ENGLISH_NAMES = {
   pt: 'Portuguese', hi: 'Hindi', fr: 'French', vi: 'Vietnamese', ko: 'Korean',
   tr: 'Turkish', de: 'German', ja: 'Japanese', it: 'Italian', pl: 'Polish',
   fa: 'Persian', uk: 'Ukrainian', nl: 'Dutch', th: 'Thai', id: 'Indonesian',
+  el: 'Greek', sv: 'Swedish', da: 'Danish', no: 'Norwegian', fi: 'Finnish',
 };
 
 function getStatCubes(t) {
   return [
     { n: '08', label: t.statPlatforms, desc: t.descPlatforms },
     { n: '05', label: t.statPillars, desc: t.descPillars },
-    { n: '20', label: t.statLanguages, desc: t.descLanguages },
+    { n: '25', label: t.statLanguages, desc: t.descLanguages },
     { n: '50', label: t.statDailyLimit, desc: t.descDailyLimit },
     { n: '1', label: t.statFreeTrial, desc: t.descFreeTrial },
     { n: 'Once', label: t.statPayment, desc: t.descPayment },
@@ -92,6 +95,8 @@ function getStatCubes(t) {
 
 const UI_TEXT = {
   en: {
+    customPlatformPlaceholder: "Or type your own platform...",
+    addPlatform: "Add",
     subtitle: "A week of ideas, considered per platform. For teams who plan with intention.",
     about: "Content Strategist AI builds a week of post ideas at a time -- not captions, but the underlying topic for each day, matched to what actually works on that specific platform. Choose one platform, or plan across several at once. Paste a competitor’s post to find the gap you can fill.",
     tabSingle: "Single platform",
@@ -143,7 +148,7 @@ const UI_TEXT = {
     statPayment: "Payment",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit, and YouTube -- each platform gets ideas tailored to what actually works there.",
     descPillars: "Educational, Behind-the-scenes, Social proof, Promotional, and Entertaining -- automatically balanced across your week.",
-    descLanguages: "Explanations and ideas available in 20 languages, including right-to-left support for Arabic and Persian.",
+    descLanguages: "Explanations and ideas available in 25 languages, including right-to-left support for Arabic and Persian.",
     descDailyLimit: "Fifty generations per day -- enough for real, ongoing use, without opening the door to abuse.",
     descFreeTrial: "Try one full generation before you buy. No code, no commitment.",
     descPayment: "A single one-time payment. No subscription, no recurring charge, ever.",
@@ -154,6 +159,8 @@ const UI_TEXT = {
     privacy: "Privacy",
   },
   ru: {
+    customPlatformPlaceholder: "Или впиши свою платформу...",
+    addPlatform: "Добавить",
     subtitle: "Неделя идей, продуманных под платформу. Для команд, которые планируют осознанно.",
     about: "Content Strategist AI строит неделю идей для постов за раз — не подписи, а саму тему на каждый день, подобранную под то, что реально работает именно на этой платформе. Выбери одну платформу или планируй сразу по нескольким. Вставь пост конкурента, чтобы найти пробел, который можно занять.",
     tabSingle: "Одна платформа",
@@ -205,7 +212,7 @@ const UI_TEXT = {
     statPayment: "Оплата",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit и YouTube — под каждую платформу идеи подбираются с учётом того, что там реально работает.",
     descPillars: "Обучающий, закулисье, отзывы, продающий и развлекательный — автоматически сбалансированы по неделе.",
-    descLanguages: "Объяснения и идеи доступны на 20 языках, включая поддержку письма справа налево для арабского и персидского.",
+    descLanguages: "Объяснения и идеи доступны на 25 языках, включая поддержку письма справа налево для арабского и персидского.",
     descDailyLimit: "Пятьдесят генераций в день — достаточно для настоящего постоянного использования, но не открывает дверь для злоупотреблений.",
     descFreeTrial: "Попробуй одну полную генерацию перед покупкой. Без кода, без обязательств.",
     descPayment: "Разовый платёж. Без подписки, без повторных списаний — никогда.",
@@ -267,7 +274,7 @@ const UI_TEXT = {
     statPayment: "Pago",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit y YouTube -- cada plataforma recibe ideas ajustadas a lo que realmente funciona allí.",
     descPillars: "Educativo, entre bastidores, prueba social, promocional y entretenido -- equilibrados automáticamente durante tu semana.",
-    descLanguages: "Explicaciones e ideas disponibles en 20 idiomas, incluido soporte de derecha a izquierda para árabe y persa.",
+    descLanguages: "Explicaciones e ideas disponibles en 25 idiomas, incluido soporte de derecha a izquierda para árabe y persa.",
     descDailyLimit: "Cincuenta generaciones al día -- suficiente para un uso real y continuo, sin abrir la puerta al abuso.",
     descFreeTrial: "Prueba una generación completa antes de comprar. Sin código, sin compromiso.",
     descPayment: "Un único pago. Sin suscripción, sin cargos recurrentes, nunca.",
@@ -329,7 +336,7 @@ const UI_TEXT = {
     statPayment: "Paiement",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit et YouTube -- chaque plateforme reçoit des idées adaptées à ce qui y fonctionne vraiment.",
     descPillars: "Éducatif, coulisses, preuve sociale, promotionnel et divertissant -- automatiquement équilibrés sur votre semaine.",
-    descLanguages: "Explications et idées disponibles en 20 langues, avec support droite-à-gauche pour l’arabe et le persan.",
+    descLanguages: "Explications et idées disponibles en 25 langues, avec support droite-à-gauche pour l’arabe et le persan.",
     descDailyLimit: "Cinquante générations par jour -- suffisant pour un usage réel et continu, sans ouvrir la porte aux abus.",
     descFreeTrial: "Essayez une génération complète avant d’acheter. Aucun code, aucun engagement.",
     descPayment: "Un paiement unique. Aucun abonnement, aucun frais récurrent, jamais.",
@@ -391,7 +398,7 @@ const UI_TEXT = {
     statPayment: "Zahlung",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit und YouTube -- jede Plattform erhält Ideen, die dort wirklich funktionieren.",
     descPillars: "Lehrreich, Hinter-den-Kulissen, Sozialer Beweis, Werblich und Unterhaltsam -- automatisch über deine Woche ausbalanciert.",
-    descLanguages: "Erklärungen und Ideen in 20 Sprachen verfügbar, inklusive Rechts-nach-links-Unterstützung für Arabisch und Persisch.",
+    descLanguages: "Erklärungen und Ideen in 25 Sprachen verfügbar, inklusive Rechts-nach-links-Unterstützung für Arabisch und Persisch.",
     descDailyLimit: "Fünfzig Generierungen pro Tag -- genug für echte, fortlaufende Nutzung, ohne Missbrauch Tür und Tor zu öffnen.",
     descFreeTrial: "Probiere eine vollständige Generierung vor dem Kauf. Kein Code, keine Verpflichtung.",
     descPayment: "Eine einmalige Zahlung. Kein Abo, keine wiederkehrenden Kosten, niemals.",
@@ -453,7 +460,7 @@ const UI_TEXT = {
     statPayment: "Pagamento",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit e YouTube -- cada plataforma recebe ideias ajustadas ao que realmente funciona lá.",
     descPillars: "Educativo, bastidores, prova social, promocional e divertido -- automaticamente equilibrados ao longo da semana.",
-    descLanguages: "Explicações e ideias disponíveis em 20 idiomas, incluindo suporte direita-para-esquerda para árabe e persa.",
+    descLanguages: "Explicações e ideias disponíveis em 25 idiomas, incluindo suporte direita-para-esquerda para árabe e persa.",
     descDailyLimit: "Cinquenta gerações por dia -- suficiente para uso real e contínuo, sem abrir a porta para abusos.",
     descFreeTrial: "Experimente uma geração completa antes de comprar. Sem código, sem compromisso.",
     descPayment: "Um único pagamento. Sem assinatura, sem cobrança recorrente, nunca.",
@@ -515,7 +522,7 @@ const UI_TEXT = {
     statPayment: "Pagamento",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit e YouTube -- ogni piattaforma riceve idee adattate a ciò che funziona davvero lì.",
     descPillars: "Educativo, dietro le quinte, riprova sociale, promozionale e divertente -- bilanciati automaticamente durante la settimana.",
-    descLanguages: "Spiegazioni e idee disponibili in 20 lingue, incluso il supporto destra-sinistra per arabo e persiano.",
+    descLanguages: "Spiegazioni e idee disponibili in 25 lingue, incluso il supporto destra-sinistra per arabo e persiano.",
     descDailyLimit: "Cinquanta generazioni al giorno -- sufficienti per un uso reale e continuo, senza aprire la porta agli abusi.",
     descFreeTrial: "Prova una generazione completa prima di acquistare. Nessun codice, nessun impegno.",
     descPayment: "Un unico pagamento. Nessun abbonamento, nessun addebito ricorrente, mai.",
@@ -577,7 +584,7 @@ const UI_TEXT = {
     statPayment: "Betaling",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit en YouTube -- elk platform krijgt ideeën die daar echt werken.",
     descPillars: "Educatief, achter de schermen, sociaal bewijs, promotioneel en vermakelijk -- automatisch in balans over je week.",
-    descLanguages: "Uitleg en ideeën beschikbaar in 20 talen, inclusief rechts-naar-links ondersteuning voor Arabisch en Perzisch.",
+    descLanguages: "Uitleg en ideeën beschikbaar in 25 talen, inclusief rechts-naar-links ondersteuning voor Arabisch en Perzisch.",
     descDailyLimit: "Vijftig generaties per dag -- genoeg voor echt, doorlopend gebruik, zonder de deur open te zetten voor misbruik.",
     descFreeTrial: "Probeer een volledige generatie voordat je koopt. Geen code, geen verplichting.",
     descPayment: "Eén eenmalige betaling. Geen abonnement, nooit terugkerende kosten.",
@@ -639,7 +646,7 @@ const UI_TEXT = {
     statPayment: "Płatność",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit i YouTube -- każda platforma otrzymuje pomysły dopasowane do tego, co tam naprawdę działa.",
     descPillars: "Edukacyjny, zza kulis, dowód społeczny, promocyjny i rozrywkowy -- automatycznie zbalansowane w ciągu tygodnia.",
-    descLanguages: "Wyjaśnienia i pomysły dostępne w 20 językach, w tym wsparcie od prawej do lewej dla arabskiego i perskiego.",
+    descLanguages: "Wyjaśnienia i pomysły dostępne w 25 językach, w tym wsparcie od prawej do lewej dla arabskiego i perskiego.",
     descDailyLimit: "Pięćdziesiąt generacji dziennie -- wystarczająco dużo na realne, ciągłe użytkowanie, bez otwierania drzwi na nadużycia.",
     descFreeTrial: "Wypróbuj jedną pełną generację przed zakupem. Bez kodu, bez zobowiązań.",
     descPayment: "Jedna jednorazowa płatność. Bez subskrypcji, bez cyklicznych opłat, nigdy.",
@@ -701,7 +708,7 @@ const UI_TEXT = {
     statPayment: "付款",
     descPlatforms: "Instagram、TikTok、LinkedIn、Facebook、Telegram、X、Reddit和YouTube——每个平台都会获得适合该平台的想法。",
     descPillars: "教育、幕后花绝、社会证据、促销和娱乐——自动在一周内平衡分布。",
-    descLanguages: "支持20种语言的解释和想法，包括阿拉伯语和波斯语的从右到左支持。",
+    descLanguages: "支持25种语言的解释和想法，包括阿拉伯语和波斯语的从右到左支持。",
     descDailyLimit: "每天五十次生成——足以满足真实、持续的使用需求，同时不会开启滥用的大门。",
     descFreeTrial: "购买前先试用一次完整生成。无需代码，无需承诺。",
     descPayment: "一次性付款。无订阅，永远无循环收费。",
@@ -763,7 +770,7 @@ const UI_TEXT = {
     statPayment: "支払い",
     descPlatforms: "Instagram、TikTok、LinkedIn、Facebook、Telegram、X、Reddit、YouTube——各プラットフォームで実際に機能するアイデアを提供。",
     descPillars: "教育、裏側、社会的証拠、宣伝、エンタメ——週間を通じて自動でバランスを取ります。",
-    descLanguages: "20言語での説明とアイデアを提供、アラビア語・ペルシア語の右から左表記も対応。",
+    descLanguages: "25言語での説明とアイデアを提供、アラビア語・ペルシア語の右から左表記も対応。",
     descDailyLimit: "1日50回の生成——実際の継続利用に十分で、乱用を防ぐ適切な上限です。",
     descFreeTrial: "購入前に1回分を完全無料でお試しいただけます。コードも約束も不要。",
     descPayment: "一回きりの支払い。サブスクなし、定期課金なし。",
@@ -825,7 +832,7 @@ const UI_TEXT = {
     statPayment: "الدفع",
     descPlatforms: "Instagram، TikTok، LinkedIn، Facebook، Telegram، X، Reddit، وYouTube -- كل منصة تحصل على أفكار مصممة خصيصًا لما ينجح فيها فعلًا.",
     descPillars: "تعليمي، خلف الكواليس، إثبات اجتماعي، ترويجي، وترفيهي -- متوازنة تلقائيًا على مدار أسبوعك.",
-    descLanguages: "الشروحات والأفكار متاحة بـ 20 لغة، بما في ذلك دعم الكتابة من اليمين إلى اليسار للعربية والفارسية.",
+    descLanguages: "الشروحات والأفكار متاحة بـ 25 لغة، بما في ذلك دعم الكتابة من اليمين إلى اليسار للعربية والفارسية.",
     descDailyLimit: "خمسون إنشاءًا يوميًا -- يكفي للاستخدام الحقيقي المستمر، دون فتح الباب للإساءة.",
     descFreeTrial: "جرب إنشاءًا كاملًا قبل الشراء. بدون رمز، بدون التزام.",
     descPayment: "دفعة واحدة فقط. لا اشتراك، لا رسوم متكررة، أبدًا.",
@@ -887,7 +894,7 @@ const UI_TEXT = {
     statPayment: "भुगतान",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit और YouTube -- हर प्लेटफॉर्म के लिए वहां वास्तव में काम करने वाले आइडिया।",
     descPillars: "शैक्षिक, परदे के पीछे, सामाजिक प्रमाण, प्रचारात्मक और मनोरंजक — सप्ताह भर स्वचालित रूप से संतुलित।",
-    descLanguages: "20 भाषाओं में स्पष्टीकरण और आइडियाओं सहित।",
+    descLanguages: "25 भाषाओं में स्पष्टीकरण और आइडियाओं सहित।",
     descDailyLimit: "प्रतिदिन 50 जनरेशन — वास्तविक, जारी उपयोग के लिए पर्याप्त।",
     descFreeTrial: "खरीदने से पहले एक पूर्ण जनरेशन आजबाएं। कोई कोड नहीं।",
     descPayment: "एक बार का भुगतान। कोई सब्सक्रिप्शन नहीं।",
@@ -949,7 +956,7 @@ const UI_TEXT = {
     statPayment: "결제",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit, YouTube -- 각 플랫폼에서 실제로 효과적인 아이디어를 제공합니다.",
     descPillars: "교육, 비하인드, 사회적 증거, 홍보, 엔터테인먼트 -- 일주일 동안 자동으로 균형을 맞춥니다.",
-    descLanguages: "20개 언어로 설명과 아이디어 제공, 아랍어와 페르시아어의 오른쪽에서 왼쪽 지원 포함.",
+    descLanguages: "25개 언어로 설명과 아이디어 제공, 아랍어와 페르시아어의 오른쪽에서 왼쪽 지원 포함.",
     descDailyLimit: "하루 50회 생성 -- 실제적이고 지속적인 사용에 충분하면서 남용은 막습니다.",
     descFreeTrial: "구매 전에 완전한 생성 1회를 무료로 체험해보세요. 코드나 약정 없이.",
     descPayment: "단 한 번의 결제. 구독 없음, 반복 청구 없음, 영구히.",
@@ -1011,7 +1018,7 @@ const UI_TEXT = {
     statPayment: "Thanh Toán",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit và YouTube -- mỗi nền tảng nhận được ý tưởng phù hợp.",
     descPillars: "Giáo dục, hậu trường, bằng chứng xã hội, quảng bá và giải trí -- tự động cân bằng trong tuần.",
-    descLanguages: "Giải thích và ý tưởng có sẵn bằng 20 ngôn ngữ.",
+    descLanguages: "Giải thích và ý tưởng có sẵn bằng 25 ngôn ngữ.",
     descDailyLimit: "Năm mươi lượt tạo mỗi ngày -- đủ cho việc sử dụng thực tế.",
     descFreeTrial: "Dùng thử một lượt đầy đủ trước khi mua. Không cần mã.",
     descPayment: "Một lần thanh toán duy nhất. Không đăng ký, không phí định kỳ.",
@@ -1073,7 +1080,7 @@ const UI_TEXT = {
     statPayment: "Ödeme",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit ve YouTube -- her platform orada gerçekten işe yarayan fikirler alır.",
     descPillars: "Eğitici, perde arkası, sosyal kanıt, tanıtıcı ve eğlenceli -- haftanız boyunca otomatik dengelenir.",
-    descLanguages: "Açıklamalar ve fikirler 20 dilde mevcut.",
+    descLanguages: "Açıklamalar ve fikirler 25 dilde mevcut.",
     descDailyLimit: "Günde elli oluşturma -- gerçek, sürekli kullanım için yeterli.",
     descFreeTrial: "Satın almadan önce tam bir oluşturma deneyin. Kod yok, taahhüt yok.",
     descPayment: "Tek seferlik ödeme. Abonelik yok, tekrarlayan ücret yok, asla.",
@@ -1135,7 +1142,7 @@ const UI_TEXT = {
     statPayment: "پرداخت",
     descPlatforms: "Instagram، TikTok، LinkedIn، Facebook، Telegram، X، Reddit و YouTube.",
     descPillars: "آموزشی، پشت صحنه، اثبات اجتماعی، تبلیغاتی و سرگرمی‌کننده.",
-    descLanguages: "توضیحات و ایده‌ها به 20 زبان موجود است.",
+    descLanguages: "توضیحات و ایده‌ها به 25 زبان موجود است.",
     descDailyLimit: "پنجاه تولید در روز.",
     descFreeTrial: "قبل از خرید یک تولید کامل را امتحان کنید.",
     descPayment: "یک پرداخت یکجا. بدون اشتراک.",
@@ -1197,7 +1204,7 @@ const UI_TEXT = {
     statPayment: "Оплата",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit та YouTube.",
     descPillars: "Освітній, закулісся, відгуки, продаючий та розважальний -- автоматично збалансовані протягом тижня.",
-    descLanguages: "Пояснення та ідеї доступні 20 мовами.",
+    descLanguages: "Пояснення та ідеї доступні 25 мовами.",
     descDailyLimit: "П’ятдесят генерацій на день.",
     descFreeTrial: "Спробуйте одну повну генерацію перед покупкою.",
     descPayment: "Одинаразова оплата. Без підписки.",
@@ -1259,7 +1266,7 @@ const UI_TEXT = {
     statPayment: "การชำระเงิน",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit และ YouTube",
     descPillars: "เชิงการศึกษา เบื้องหลัง ข้อมูลสังคม โปรโมท และความบันเทิง",
-    descLanguages: "คำอธิบายและไอเดียมีให้ใน 20 ภาษา",
+    descLanguages: "คำอธิบายและไอเดียมีให้ใน 25 ภาษา",
     descDailyLimit: "สร้างได้ 50 ครั้งต่อวัน",
     descFreeTrial: "ทดลองสร้างเต็มรูปแบบก่อนซื้อ",
     descPayment: "จ่ายครั้งเดียว ไม่มีการสมัครสมาชิก",
@@ -1321,7 +1328,7 @@ const UI_TEXT = {
     statPayment: "Pembayaran",
     descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit, dan YouTube.",
     descPillars: "Edukatif, di balik layar, bukti sosial, promosi, dan hiburan -- seimbang otomatis sepanjang minggu.",
-    descLanguages: "Penjelasan dan ide tersedia dalam 20 bahasa.",
+    descLanguages: "Penjelasan dan ide tersedia dalam 25 bahasa.",
     descDailyLimit: "Lima puluh generasi per hari -- cukup untuk penggunaan nyata dan berkelanjutan.",
     descFreeTrial: "Coba satu generasi lengkap sebelum membeli. Tanpa kode, tanpa komitmen.",
     descPayment: "Satu kali pembayaran. Tanpa langganan, tanpa biaya berulang, selamanya.",
@@ -1330,6 +1337,316 @@ const UI_TEXT = {
     support: "Dukungan",
     terms: "Ketentuan",
     privacy: "Privasi",
+  },
+  el: {
+    subtitle: "Μία εβδομάδα ιδεών, προσαρμοσμένη ανά πλατφόρμα. Για ομάδες που σχεδιάζουν με πρόθεση.",
+    about: "Το Content Strategist AI δημιουργεί μία εβδομάδα ιδεών δημοσιεύσεων κάθε φορά.",
+    tabSingle: "Μία πλατφόρμα",
+    tabCross: "Πολυπλατφορμικά",
+    tabCompetitor: "Ανάλυση ανταγωνιστή",
+    labelBusiness: "ΤΙ ΚΑΝΕΙ Η ΕΠΙΧΕΙΡΗΣΗ ΣΑΣ",
+    placeholderBusiness: "Γειτονιά της γειτονιάς",
+    labelOccasion: "ΕΠΟΧΗ Η ΑΦΟΡΜΗ",
+    optional: "(ΠΡΟΑΙΡΕΤΙΚΟ)",
+    placeholderOccasion: "Εορταστική περίοδος",
+    labelAudience: "ΤΟ ΚΟΙΝΟ ΣΑΣ",
+    placeholderAudience: "Απασχολημένοι γονείς, 30-40",
+    labelPlatform: "ΠΛΑΤΦΟΡΜΑ",
+    labelPlatformsMulti: "ΠΛΑΤΦΟΡΜΕΣ",
+    pickTwo: "(ΕΠΙΛΕΞΤΕ 2 Η ΠΕΡΙΣΣΟΤΕΡΕΣ)",
+    labelCompetitorPost: "ΔΗΜΟΣΙΕΥΣΗ Η ΠΡΟΦΙΛ ΑΝΤΑΓΩΝΙΣΤΗ",
+    placeholderCompetitorPost: "Επικολλήστε εδώ...",
+    errBusiness: "Πείτε μας πρώτα τι κάνει η επιχείρησή σας.",
+    errPlatforms: "Επιλέξτε τουλάχιστον 2 πλατφόρμες.",
+    errCompetitor: "Επικολλήστε πρώτα τη δημοσίευση του ανταγωνιστή.",
+    errTrialUsed: "Η δωρεάν επισκόπηση χρησιμοποιήθηκε. Εισάγετε τον κωδικό πρόσβασης.",
+    errInvalidCode: "Μη έγκυρος ή ληγμένος κωδικός πρόσβασης.",
+    errGeneric: "Κάτι πήγε στραβά.",
+    errRegenerate: "Δεν ήταν δυνατή η αναδημιουργία αυτής της ημέρας.",
+    limitReached: "Το όριό σας για σήμερα συμπληρώθηκε.",
+    limitTomorrow: "Ακόμα πενήντα σας περιμένουν αύριο.",
+    btnThinking: "ΣΚΕΦΤΟΜΑΙ...",
+    btnBuildWeek: "ΔΗΜΙΟΥΡΓΙΑ ΕΒΔΟΜΑΔΑΣ",
+    btnFindGap: "ΒΡΕΣΕ ΤΟ ΚΕΝΟ",
+    dailyAllowance: "ΗΜΕΡΗΣΙΟ ΟΡΙΟ",
+    theWeek: "Η Εβδομάδα",
+    copied: "ΑΝΤΙΓΡΑΦΗΚΕ",
+    copyAll: "ΑΝΤΙΓΡΑΨΕ ΟΛΑ",
+    whatMissing: "ΤΙ ΤΟΥΣ ΛΕΙΠΕΙ",
+    yourAngle: "Η ΓΩΝΙΑ ΣΑΣ",
+    tryThis: "ΔΟΚΙΜΑΣΕ ΑΥΤΟ",
+    bestTime: "Καλύτερη ώρα",
+    regenerating: "ΑΝΑΔΗΜΙΟΥΡΓΙΑ...",
+    tryAnother: "ΔΟΚΙΜΑΣΕ ΑΛΛΟ",
+    trialUsedMsg: "Η δωρεάν δοκιμή σας έχει ήδη χρησιμοποιηθεί. Εισάγετε τον κωδικό όταν είστε έτοιμοι.",
+    enterCode: "ΕΙΣΑΓΕΤΕ ΚΩΔΙΚΟ",
+    noCode: "Δεν έχετε κώδικο; Αποκτήστε πρόσβαση",
+    trialFreeMsg: "Η πρώτη σας δημιουργία είναι δωρεάν. Δεν απαιτείται κώδικος.",
+    statPlatforms: "Πλατφόρμες",
+    statPillars: "Πυλώνες",
+    statLanguages: "Γλώσσες",
+    statDailyLimit: "Ημερήσιο Όριο",
+    statFreeTrial: "Δωρεάν Δοκιμή",
+    statPayment: "Πληρωμή",
+    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit και YouTube -- κάθε πλατφόρμα λαμβάνει ιδέες που λειτουργούν πραγματικά εκεί.",
+    descPillars: "Εκπαιδευτικό, πίσω από τις σκηνές, κοινωνική απόδειξη, προωθητικό και ψυχαγωγό -- αυτόματα ισορροπημένα στην εβδομάδα σας.",
+    descLanguages: "Εξηγήσεις και ιδέες διαθέσιμες σε 25 γλώσσες.",
+    descDailyLimit: "Πενήντα δημιουργίες την ημέρα -- αρκετό για πραγματική, συνεχόμενη χρήση.",
+    descFreeTrial: "Δοκιμάστε μία πλήρη δημιουργία πριν αγοράσετε. Χωρίς κωδικό, χωρίς δέσμευση.",
+    descPayment: "Μία εφάπαξ πληρωμή. Χωρίς συνδρομή, χωρίς επαναλαμβανόμενες χρεώσεις.",
+    welcomeTitle: "Καλώς ήρθατε",
+    welcomeSub: "Από εδώ και πέρα, απεριόριστες δημιουργίες.",
+    support: "Υποστήριξη",
+    terms: "Όροι",
+    privacy: "Απόρρητο",
+  },
+  sv: {
+    subtitle: "En vecka av idéer, genomtänkta per plattform. För team som planerar med avsikt.",
+    about: "Content Strategist AI bygger en veckas inläggsidéer i taget.",
+    tabSingle: "En plattform",
+    tabCross: "Flera plattformar",
+    tabCompetitor: "Konkurrentanalys",
+    labelBusiness: "VAD GÖR DITT FÖRETAG",
+    placeholderBusiness: "Lokalt kafé",
+    labelOccasion: "SÄSONG ELLER TILLFÄLLE",
+    optional: "(VALFRITT)",
+    placeholderOccasion: "Högtidssäsong",
+    labelAudience: "DIN MÅLGRUPP",
+    placeholderAudience: "Upptagna föräldrar, 30-40 år",
+    labelPlatform: "PLATTFORM",
+    labelPlatformsMulti: "PLATTFORMAR",
+    pickTwo: "(VÄLJ 2 ELLER FLER)",
+    labelCompetitorPost: "KONKURRENTENS INLÄGG ELLER PROFIL",
+    placeholderCompetitorPost: "Klistra in här...",
+    errBusiness: "Berätta först vad ditt företag gör.",
+    errPlatforms: "Välj minst 2 plattformar.",
+    errCompetitor: "Klistra in konkurrentens inlägg först.",
+    errTrialUsed: "Gratis förhandsvisning använd. Ange din åtkomstkod för att fortsätta.",
+    errInvalidCode: "Ogiltig eller utgången åtkomstkod.",
+    errGeneric: "Något gick fel.",
+    errRegenerate: "Kunde inte återskapa den dagen.",
+    limitReached: "Dagens tilldelning är slut.",
+    limitTomorrow: "Femtio till väntar imorgon.",
+    btnThinking: "FUNDERAR...",
+    btnBuildWeek: "BYGG VECKAN",
+    btnFindGap: "HITTA LUCKAN",
+    dailyAllowance: "DAGLIG TILLDELNING",
+    theWeek: "Veckan",
+    copied: "KOPIERAT",
+    copyAll: "KOPIERA ALLT",
+    whatMissing: "VAD DE SAKNAR",
+    yourAngle: "DIN VINKEL",
+    tryThis: "PROVA DETTA",
+    bestTime: "Bästa tid",
+    regenerating: "ÅTERSKAPAR...",
+    tryAnother: "PROVA EN ANNAN",
+    trialUsedMsg: "Din gratis förhandsvisning har redan använts. Ange koden när du är redo.",
+    enterCode: "ANGE DIN KOD",
+    noCode: "Ingen kod? Få åtkomst",
+    trialFreeMsg: "Din första generering är gratis. Ingen kod krävs.",
+    statPlatforms: "Plattformar",
+    statPillars: "Pelare",
+    statLanguages: "Språk",
+    statDailyLimit: "Daglig Gräns",
+    statFreeTrial: "Gratis Provning",
+    statPayment: "Betalning",
+    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit och YouTube -- varje plattform får idéer anpassade dit.",
+    descPillars: "Pädagogiskt, bakom kulisserna, socialt bevis, marknadsföring och underhållning -- automatiskt balanserat.",
+    descLanguages: "Förklaringar och idéer tillgängliga på 25 språk.",
+    descDailyLimit: "Femtio genereringar per dag -- tillräckligt för verklig, löpande användning.",
+    descFreeTrial: "Prova en full generering innan du köper. Ingen kod, inget åtagande.",
+    descPayment: "En engångsbetalning. Ingen prenumeration, aldrig återkommande avgifter.",
+    welcomeTitle: "Välkommen",
+    welcomeSub: "Från och med nu, obegränsade genereringar.",
+    support: "Support",
+    terms: "Villkor",
+    privacy: "Integritet",
+  },
+  da: {
+    subtitle: "En uge med idéer, overvejet pr. platform. Til teams, der planlægger med hensigt.",
+    about: "Content Strategist AI bygger en uges opslagsidéer ad gangen.",
+    tabSingle: "Én platform",
+    tabCross: "Tværplatform",
+    tabCompetitor: "Konkurrentanalyse",
+    labelBusiness: "HVAD LAVER DIN VIRKSOMHED",
+    placeholderBusiness: "Lokal cafe",
+    labelOccasion: "SÆSON ELLER LEJLIGHED",
+    optional: "(VALGFRIT)",
+    placeholderOccasion: "Højtidssæson",
+    labelAudience: "DIN MÅLGRUPPE",
+    placeholderAudience: "Travle forældre, 30-40 år",
+    labelPlatform: "PLATFORM",
+    labelPlatformsMulti: "PLATFORME",
+    pickTwo: "(VÆLG 2 ELLER FLERE)",
+    labelCompetitorPost: "KONKURRENTENS OPSLAG ELLER PROFIL",
+    placeholderCompetitorPost: "Indsæt her...",
+    errBusiness: "Fortæl os først, hvad din virksomhed laver.",
+    errPlatforms: "Vælg mindst 2 platforme.",
+    errCompetitor: "Indsæt konkurrentens opslag først.",
+    errTrialUsed: "Gratis prøvevisning brugt. Indtast din adgangskode for at fortsætte.",
+    errInvalidCode: "Ugyldig eller udløbet adgangskode.",
+    errGeneric: "Noget gik galt.",
+    errRegenerate: "Kunne ikke genskabe den dag.",
+    limitReached: "Dagens tildeling er brugt op.",
+    limitTomorrow: "Halvtreds mere venter i morgen.",
+    btnThinking: "TÆNKER...",
+    btnBuildWeek: "BYG UGEN",
+    btnFindGap: "FIND HULLET",
+    dailyAllowance: "DAGLIG TILDELING",
+    theWeek: "Ugen",
+    copied: "KOPIERET",
+    copyAll: "KOPIÉR ALT",
+    whatMissing: "HVAD DE MANGLER",
+    yourAngle: "DIN VINKEL",
+    tryThis: "PRØV DETTE",
+    bestTime: "Bedste tidspunkt",
+    regenerating: "GENSKABER...",
+    tryAnother: "PRØV EN ANDEN",
+    trialUsedMsg: "Din gratis prøvevisning er allerede brugt. Indtast koden, når du er klar.",
+    enterCode: "INDTAST DIN KODE",
+    noCode: "Ingen kode? Få adgang",
+    trialFreeMsg: "Din første generering er gratis. Ingen kode krævet.",
+    statPlatforms: "Platforme",
+    statPillars: "Søjler",
+    statLanguages: "Sprog",
+    statDailyLimit: "Dagligt Loft",
+    statFreeTrial: "Gratis Prøve",
+    statPayment: "Betaling",
+    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit og YouTube -- hver platform får idéer tilpasset dertil.",
+    descPillars: "Lærerigt, bag kulisserne, socialt bevis, promoverende og underholdende -- automatisk afbalanceret.",
+    descLanguages: "Forklaringer og idéer tilgængelige på 25 sprog.",
+    descDailyLimit: "Halvtreds genereringer om dagen -- nok til reel, løbende brug.",
+    descFreeTrial: "Prøv en fuld generering, før du køber. Ingen kode, ingen forpligtelse.",
+    descPayment: "Én engangsbetaling. Intet abonnement, aldrig tilbagevendende gebür.",
+    welcomeTitle: "Velkommen",
+    welcomeSub: "Fra nu af, ubegrænsede genereringer.",
+    support: "Support",
+    terms: "Vilkår",
+    privacy: "Privatliv",
+  },
+  no: {
+    subtitle: "En uke med ideer, gjennomtænkt per plattform. For team som planlegger med hensikt.",
+    about: "Content Strategist AI bygger en ukes innleggsideer om gangen.",
+    tabSingle: "Én plattform",
+    tabCross: "Kryssplattform",
+    tabCompetitor: "Konkurrentanalyse",
+    labelBusiness: "HVA GJØR BEDRIFTEN DIN",
+    placeholderBusiness: "Lokal kafé",
+    labelOccasion: "SESONG ELLER ANLEDNING",
+    optional: "(VALGFRITT)",
+    placeholderOccasion: "Høytidssesong",
+    labelAudience: "MÅLGRUPPEN DIN",
+    placeholderAudience: "Travle foreldre, 30-40 år",
+    labelPlatform: "PLATTFORM",
+    labelPlatformsMulti: "PLATTFORMER",
+    pickTwo: "(VELG 2 ELLER FLERE)",
+    labelCompetitorPost: "KONKURRENTENS INNLEGG ELLER PROFIL",
+    placeholderCompetitorPost: "Lim inn her...",
+    errBusiness: "Fortell oss først hva bedriften din gjør.",
+    errPlatforms: "Velg minst 2 plattformer.",
+    errCompetitor: "Lim inn konkurrentens innlegg først.",
+    errTrialUsed: "Gratis forhåndsvisning brukt. Skriv inn tilgangskoden din for å fortsette.",
+    errInvalidCode: "Ugyldig eller utløpt tilgangskode.",
+    errGeneric: "Noe gikk galt.",
+    errRegenerate: "Kunne ikke gjenskape den dagen.",
+    limitReached: "Dagens tildeling er brukt opp.",
+    limitTomorrow: "Femti til venter i morgen.",
+    btnThinking: "TENKER...",
+    btnBuildWeek: "BYGG UKEN",
+    btnFindGap: "FINN HULLET",
+    dailyAllowance: "DAGLIG TILDELING",
+    theWeek: "Uken",
+    copied: "KOPIERT",
+    copyAll: "KOPIÉR ALT",
+    whatMissing: "HVA DE MANGLER",
+    yourAngle: "DIN VINKEL",
+    tryThis: "PRØV DETTE",
+    bestTime: "Beste tidspunkt",
+    regenerating: "GJENSKAPER...",
+    tryAnother: "PRØV EN ANNEN",
+    trialUsedMsg: "Din gratis forhåndsvisning er allerede brukt. Skriv inn koden når du er klar.",
+    enterCode: "SKRIV INN KODEN",
+    noCode: "Ingen kode? Få tilgang",
+    trialFreeMsg: "Din første generering er gratis. Ingen kode kreves.",
+    statPlatforms: "Plattformer",
+    statPillars: "Søyler",
+    statLanguages: "Språk",
+    statDailyLimit: "Daglig Grense",
+    statFreeTrial: "Gratis Prøve",
+    statPayment: "Betaling",
+    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit og YouTube -- hver plattform får ideer tilpasset der.",
+    descPillars: "Lærerikt, bak kulissene, sosialt bevis, promoterende og underholdende -- automatisk balansert.",
+    descLanguages: "Forklaringer og ideer tilgjengelig på 25 språk.",
+    descDailyLimit: "Femti genereringer per dag -- nok til reell, løpende bruk.",
+    descFreeTrial: "Prøv en full generering før du kjøper. Ingen kode, ingen forpliktelse.",
+    descPayment: "Én engangsbetaling. Ingen abonnement, aldri tilbakevendende avgift.",
+    welcomeTitle: "Velkommen",
+    welcomeSub: "Fra nå av, ubegrensede genereringer.",
+    support: "Støtte",
+    terms: "Vilkår",
+    privacy: "Personvern",
+  },
+  fi: {
+    subtitle: "Viikko ideoita, harkittu alustakohtaisesti. Tiimeille, jotka suunnittelevat tarkoituksella.",
+    about: "Content Strategist AI rakentaa viikon julkaisuideoita kerrallaan.",
+    tabSingle: "Yksi alusta",
+    tabCross: "Monialustainen",
+    tabCompetitor: "Kilpailija-analyysi",
+    labelBusiness: "MITÄ YRITYKSESI TEKEE",
+    placeholderBusiness: "Naapuruston kahvila",
+    labelOccasion: "VUODENAIKA TAI TILAISUUS",
+    optional: "(VALINNAINEN)",
+    placeholderOccasion: "Juhlakausi",
+    labelAudience: "YLEISÖSI",
+    placeholderAudience: "Kiireiset vanhemmat, 30-40v",
+    labelPlatform: "ALUSTA",
+    labelPlatformsMulti: "ALUSTAT",
+    pickTwo: "(VALITSE 2 TAI ENEMMÄN)",
+    labelCompetitorPost: "KILPAILIJAN JULKAISU TAI PROFIILI",
+    placeholderCompetitorPost: "Liitä tähän...",
+    errBusiness: "Kerro ensin, mitä yrityksesi tekee.",
+    errPlatforms: "Valitse vähintään 2 alustaa.",
+    errCompetitor: "Liitä ensin kilpailijan julkaisu.",
+    errTrialUsed: "Ilmainen esikatselu käytetty. Syötä käyttöoikeuskoodisi jatkaaksesi.",
+    errInvalidCode: "Virheellinen tai vanhentunut käyttöoikeuskoodi.",
+    errGeneric: "Jokin meni pieleen.",
+    errRegenerate: "Tätä päivää ei voitu luoda uudelleen.",
+    limitReached: "Tämän päivän kiintiö on täynnä.",
+    limitTomorrow: "Viisikymmentä lisää odottaa huomenna.",
+    btnThinking: "MIETITÄÄN...",
+    btnBuildWeek: "RAKENNA VIIKKO",
+    btnFindGap: "LÖYDÄ AUKKO",
+    dailyAllowance: "PÄIVITTÄINEN KIINTIÖ",
+    theWeek: "Tämä Viikko",
+    copied: "KOPIOITU",
+    copyAll: "KOPIOI KAIKKI",
+    whatMissing: "MITÄ HEILTÄ PUUTTUU",
+    yourAngle: "SINUN NÄKÖKULMASI",
+    tryThis: "KOKEILE TÄTÄ",
+    bestTime: "Paras aika",
+    regenerating: "LUODAAN UUDELLEEN...",
+    tryAnother: "KOKEILE TOISTA",
+    trialUsedMsg: "Ilmainen esikatselusi on jo käytetty. Syötä koodi, kun olet valmis.",
+    enterCode: "SYÖTÄ KOODISI",
+    noCode: "Ei koodia? Hanki käyttöoikeus",
+    trialFreeMsg: "Ensimmäinen luontisi on ilmainen. Koodia ei tarvita.",
+    statPlatforms: "Alustat",
+    statPillars: "Pilarit",
+    statLanguages: "Kielet",
+    statDailyLimit: "Päiväraja",
+    statFreeTrial: "Ilmainen Kokeilu",
+    statPayment: "Maksu",
+    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit ja YouTube -- jokainen alusta saa sille sopivia ideoita.",
+    descPillars: "Opettava, kulissien takana, sosiaalinen todiste, mainostava ja viihdyttävä -- automaattisesti tasapainossa.",
+    descLanguages: "Selitykset ja ideat saatavilla 25 kielellä.",
+    descDailyLimit: "Viisikymmentä luontia päivässä -- riittävästi todelliseen, jatkuvaan käyttöön.",
+    descFreeTrial: "Kokeile täyttä luontia ennen ostoa. Ei koodia, ei sitoumusta.",
+    descPayment: "Yksi kertamaksu. Ei tilausta, ei koskaan toistuvia maksuja.",
+    welcomeTitle: "Tervetuloa",
+    welcomeSub: "Tästä eteenpäin rajattomat luonnit.",
+    support: "Tuki",
+    terms: "Ehdot",
+    privacy: "Tietosuoja",
   },
 };
 
@@ -1373,8 +1690,9 @@ export default function App() {
   const [businessType, setBusinessType] = useState('');
   const [occasion, setOccasion] = useState('');
   const [audience, setAudience] = useState('');
-  const [platform, setPlatform] = useState('instagram');
-  const [selectedPlatforms, setSelectedPlatforms] = useState(['instagram', 'tiktok']);
+  const [platform, setPlatform] = useState('Instagram');
+  const [selectedPlatforms, setSelectedPlatforms] = useState(['Instagram', 'TikTok']);
+  const [customPlatformInput, setCustomPlatformInput] = useState('');
   const [mode, setMode] = useState('single');
   const [competitorText, setCompetitorText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -1392,6 +1710,15 @@ export default function App() {
 
   function togglePlatform(code) {
     setSelectedPlatforms(prev => prev.includes(code) ? prev.filter(p => p !== code) : [...prev, code]);
+  }
+
+  function addCustomPlatform() {
+    const name = customPlatformInput.trim();
+    if (!name) return;
+    if (!selectedPlatforms.includes(name)) {
+      setSelectedPlatforms(prev => [...prev, name]);
+    }
+    setCustomPlatformInput('');
   }
 
   function copyAllIdeas() {
@@ -1637,38 +1964,71 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
         {mode === 'single' && (
           <>
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>{t.labelPlatform}</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 26 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
               {PLATFORMS.map(p => (
-                <button key={p.code} onClick={() => setPlatform(p.code)} className="platform-pill"
+                <button key={p.code} onClick={() => setPlatform(p.label)} className="platform-pill"
                   style={{
                     padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s ease',
-                    background: platform === p.code ? GOLD : 'none',
-                    color: platform === p.code ? BG : INK_SOFT,
-                    border: `1px solid ${platform === p.code ? GOLD : LINE}`,
+                    background: platform === p.label ? GOLD : 'none',
+                    color: platform === p.label ? BG : INK_SOFT,
+                    border: `1px solid ${platform === p.label ? GOLD : LINE}`,
                   }}>
                   {p.label}
                 </button>
               ))}
             </div>
+            <input
+              type="text" list="platform-suggestions" value={platform}
+              onChange={(e) => setPlatform(e.target.value)}
+              placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', marginBottom: 26, boxSizing: 'border-box', outline: 'none' }}
+            />
+            <datalist id="platform-suggestions">
+              {PLATFORMS.map(p => <option key={p.code} value={p.label} />)}
+            </datalist>
           </>
         )}
 
         {mode === 'cross' && (
           <>
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>{t.labelPlatformsMulti} <span style={{ opacity: 0.5 }}>{t.pickTwo}</span></label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 26 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
               {PLATFORMS.map(p => (
-                <button key={p.code} onClick={() => togglePlatform(p.code)}
+                <button key={p.code} onClick={() => togglePlatform(p.label)}
                   style={{
                     padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer',
-                    background: selectedPlatforms.includes(p.code) ? GOLD : 'none',
-                    color: selectedPlatforms.includes(p.code) ? BG : INK_SOFT,
-                    border: `1px solid ${selectedPlatforms.includes(p.code) ? GOLD : LINE}`,
+                    background: selectedPlatforms.includes(p.label) ? GOLD : 'none',
+                    color: selectedPlatforms.includes(p.label) ? BG : INK_SOFT,
+                    border: `1px solid ${selectedPlatforms.includes(p.label) ? GOLD : LINE}`,
                   }}>
                   {p.label}
                 </button>
               ))}
+              {selectedPlatforms.filter(p => !PLATFORMS.some(std => std.label === p)).map(custom => (
+                <button key={custom} onClick={() => togglePlatform(custom)}
+                  style={{
+                    padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer',
+                    background: GOLD, color: BG, border: `1px solid ${GOLD}`,
+                  }}>
+                  {custom} &times;
+                </button>
+              ))}
             </div>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 26 }}>
+              <input
+                type="text" list="platform-suggestions" value={customPlatformInput}
+                onChange={(e) => setCustomPlatformInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomPlatform(); } }}
+                placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
+                style={{ flex: 1, background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
+              />
+              <button onClick={addCustomPlatform} style={{ fontSize: 11, color: GOLD, background: 'none', border: `1px solid ${GOLD}`, borderRadius: 2, padding: '0 14px', cursor: 'pointer' }}>
+                {t.addPlatform || 'Add'}
+              </button>
+            </div>
+            <datalist id="platform-suggestions">
+              {PLATFORMS.map(p => <option key={p.code} value={p.label} />)}
+            </datalist>
           </>
         )}
 
@@ -1678,19 +2038,25 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
             <input type="text" value={businessType} onChange={(e) => setBusinessType(e.target.value)} placeholder={t.placeholderBusiness}
               style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }} />
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>{t.labelPlatform}</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 22 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
               {PLATFORMS.map(p => (
-                <button key={p.code} onClick={() => setPlatform(p.code)}
+                <button key={p.code} onClick={() => setPlatform(p.label)}
                   style={{
                     padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s ease',
-                    background: platform === p.code ? GOLD : 'none',
-                    color: platform === p.code ? BG : INK_SOFT,
-                    border: `1px solid ${platform === p.code ? GOLD : LINE}`,
+                    background: platform === p.label ? GOLD : 'none',
+                    color: platform === p.label ? BG : INK_SOFT,
+                    border: `1px solid ${platform === p.label ? GOLD : LINE}`,
                   }}>
                   {p.label}
                 </button>
               ))}
             </div>
+            <input
+              type="text" list="platform-suggestions" value={platform}
+              onChange={(e) => setPlatform(e.target.value)}
+              placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }}
+            />
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelCompetitorPost}</label>
             <textarea value={competitorText} onChange={(e) => setCompetitorText(e.target.value)} rows={4} placeholder={t.placeholderCompetitorPost}
               style={{ width: '100%', background: 'none', border: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '10px 12px', marginBottom: 26, boxSizing: 'border-box', outline: 'none', resize: 'vertical' }} />
