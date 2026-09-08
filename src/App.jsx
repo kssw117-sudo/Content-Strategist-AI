@@ -61,6 +61,29 @@ function getModes(t) {
   ];
 }
 
+const BUSINESS_CATEGORY_OPTIONS = [
+  'Coffee shop', 'Restaurant', 'Cafe', 'Bakery', 'Bar', 'Pizza restaurant',
+  'Hair salon', 'Barbershop', 'Nail salon', 'Spa', 'Massage therapist',
+  'Gym', 'Yoga studio', 'Dentist', 'Doctor', 'Pharmacy', 'Veterinarian',
+  'Auto repair shop', 'Car wash', 'Florist', 'Pet store', 'Bookstore',
+  'Clothing store', 'Jewelry store', 'Furniture store', 'Hardware store',
+  'Law firm', 'Accounting firm', 'Real estate agency', 'Insurance agency',
+  'Photography studio', 'Tattoo shop', 'Dry cleaner', 'Locksmith',
+  'E-commerce store', 'SaaS company', 'Marketing agency', 'Freelance consultant',
+];
+
+const OCCASION_OPTIONS = [
+  'Holiday season', 'Back to school', 'New Year', 'Valentine\u2019s Day', 'Spring launch',
+  'Summer sale', 'Black Friday', 'Anniversary', 'Grand opening', 'Seasonal menu change',
+  'Product launch', 'Local festival', 'Weekly routine, no occasion',
+];
+
+const AUDIENCE_OPTIONS = [
+  'Young professionals', 'Parents with children', 'College students', 'Retirees',
+  'Local residents', 'Tourists and visitors', 'Small business owners', 'Fitness enthusiasts',
+  'Pet owners', 'Budget-conscious shoppers', 'Luxury-focused customers', 'B2B decision-makers',
+];
+
 const LANGS = [
   { code: 'en', label: 'English' }, { code: 'ru', label: '\u0420\u0443\u0441\u0441\u043a\u0438\u0439' }, { code: 'es', label: 'Espa\u00f1ol' },
   { code: 'zh', label: '\u4e2d\u6587' }, { code: 'ar', label: '\u0627\u0644\u0639\u0631\u0628\u064a\u0629' }, { code: 'pt', label: 'Portugu\u00eas' },
@@ -109,7 +132,7 @@ const UI_TEXT = {
     optional: "(OPTIONAL)",
     placeholderOccasion: "Holiday season",
     labelAudience: "YOUR AUDIENCE",
-    placeholderAudience: "Busy parents, 30s-40s",
+    placeholderAudience: "Young professionals",
     labelPlatform: "PLATFORM",
     labelPlatformsMulti: "PLATFORMS",
     pickTwo: "(PICK 2 OR MORE)",
@@ -173,7 +196,7 @@ const UI_TEXT = {
     optional: "(НЕОБЯЗАТЕЛЬНО)",
     placeholderOccasion: "Праздничный сезон",
     labelAudience: "ТВОЯ АУДИТОРИЯ",
-    placeholderAudience: "Занятые родители, 30-40 лет",
+    placeholderAudience: "Молодые специалисты",
     labelPlatform: "ПЛАТФОРМА",
     labelPlatformsMulti: "ПЛАТФОРМЫ",
     pickTwo: "(ВЫБЕРИ 2 ИЛИ БОЛЬШЕ)",
@@ -235,7 +258,7 @@ const UI_TEXT = {
     optional: "(OPCIONAL)",
     placeholderOccasion: "Temporada festiva",
     labelAudience: "TU AUDIENCIA",
-    placeholderAudience: "Padres ocupados, 30-40 años",
+    placeholderAudience: "Jóvenes profesionales",
     labelPlatform: "PLATAFORMA",
     labelPlatformsMulti: "PLATAFORMAS",
     pickTwo: "(ELIGE 2 O MÁS)",
@@ -297,7 +320,7 @@ const UI_TEXT = {
     optional: "(OPTIONNEL)",
     placeholderOccasion: "Période des fêtes",
     labelAudience: "VOTRE AUDIENCE",
-    placeholderAudience: "Parents occupés, 30-40 ans",
+    placeholderAudience: "Jeunes professionnels",
     labelPlatform: "PLATEFORME",
     labelPlatformsMulti: "PLATEFORMES",
     pickTwo: "(CHOISISSEZ-EN 2 OU PLUS)",
@@ -359,7 +382,7 @@ const UI_TEXT = {
     optional: "(OPTIONAL)",
     placeholderOccasion: "Feiertagssaison",
     labelAudience: "DEINE ZIELGRUPPE",
-    placeholderAudience: "Beschäftigte Eltern, 30-40",
+    placeholderAudience: "Junge Berufstätige",
     labelPlatform: "PLATTFORM",
     labelPlatformsMulti: "PLATTFORMEN",
     pickTwo: "(WÄHLE 2 ODER MEHR)",
@@ -421,7 +444,7 @@ const UI_TEXT = {
     optional: "(OPCIONAL)",
     placeholderOccasion: "Temporada de festas",
     labelAudience: "SEU PÚBLICO",
-    placeholderAudience: "Pais ocupados, 30-40 anos",
+    placeholderAudience: "Jovens profissionais",
     labelPlatform: "PLATAFORMA",
     labelPlatformsMulti: "PLATAFORMAS",
     pickTwo: "(ESCOLHA 2 OU MAIS)",
@@ -483,7 +506,7 @@ const UI_TEXT = {
     optional: "(OPZIONALE)",
     placeholderOccasion: "Periodo festivo",
     labelAudience: "IL TUO PUBBLICO",
-    placeholderAudience: "Genitori impegnati, 30-40 anni",
+    placeholderAudience: "Giovani professionisti",
     labelPlatform: "PIATTAFORMA",
     labelPlatformsMulti: "PIATTAFORME",
     pickTwo: "(SCEGLINE 2 O PIÙ)",
@@ -545,7 +568,7 @@ const UI_TEXT = {
     optional: "(OPTIONEEL)",
     placeholderOccasion: "Feestdagenseizoen",
     labelAudience: "JE DOELGROEP",
-    placeholderAudience: "Drukke ouders, 30-40",
+    placeholderAudience: "Jonge professionals",
     labelPlatform: "PLATFORM",
     labelPlatformsMulti: "PLATFORMS",
     pickTwo: "(KIES ER 2 OF MEER)",
@@ -607,7 +630,7 @@ const UI_TEXT = {
     optional: "(OPCJONALNIE)",
     placeholderOccasion: "Sezon świąteczny",
     labelAudience: "TWOJA GRUPA ODBIORCÓW",
-    placeholderAudience: "Zajęci rodzice, 30-40 lat",
+    placeholderAudience: "Młodzi profesjonaliści",
     labelPlatform: "PLATFORMA",
     labelPlatformsMulti: "PLATFORMY",
     pickTwo: "(WYBIERZ 2 LUB WIĘCEJ)",
@@ -669,7 +692,7 @@ const UI_TEXT = {
     optional: "（可选）",
     placeholderOccasion: "节日季",
     labelAudience: "你的受众",
-    placeholderAudience: "忙碌的家长，30-40岁",
+    placeholderAudience: "年轻职场人士",
     labelPlatform: "平台",
     labelPlatformsMulti: "平台",
     pickTwo: "（选择2个或以上）",
@@ -731,7 +754,7 @@ const UI_TEXT = {
     optional: "（任意）",
     placeholderOccasion: "ホリデーシーズン",
     labelAudience: "ターゲット層",
-    placeholderAudience: "忙しい親、30～40代",
+    placeholderAudience: "若手のプロフェッショナル",
     labelPlatform: "プラットフォーム",
     labelPlatformsMulti: "プラットフォーム",
     pickTwo: "（2つ以上選択）",
@@ -793,7 +816,7 @@ const UI_TEXT = {
     optional: "(اختياري)",
     placeholderOccasion: "موسم الأعياد",
     labelAudience: "جمهورك",
-    placeholderAudience: "آباء مشغولون، 30-40",
+    placeholderAudience: "المهنيون الشباب",
     labelPlatform: "المنصة",
     labelPlatformsMulti: "المنصات",
     pickTwo: "(اختر 2 أو أكثر)",
@@ -855,7 +878,7 @@ const UI_TEXT = {
     optional: "(ऐच्छिक)",
     placeholderOccasion: "त्यौहार का मौसम",
     labelAudience: "आपकी ऑडिएंस",
-    placeholderAudience: "व्यस्त माता-पिता, 30-40",
+    placeholderAudience: "युवा पेशेवर",
     labelPlatform: "प्लेटफॉर्म",
     labelPlatformsMulti: "प्लेटफॉर्म",
     pickTwo: "(2 या अधिक चुनें)",
@@ -917,7 +940,7 @@ const UI_TEXT = {
     optional: "(선택)",
     placeholderOccasion: "연말연시 시즘",
     labelAudience: "대상 고객",
-    placeholderAudience: "바빠한 부모, 30-40대",
+    placeholderAudience: "젊은 전문직 종사자",
     labelPlatform: "플랫폼",
     labelPlatformsMulti: "플랫폼",
     pickTwo: "(2개 이상 선택)",
@@ -979,7 +1002,7 @@ const UI_TEXT = {
     optional: "(TÙY CHỌN)",
     placeholderOccasion: "Mùa lễ hội",
     labelAudience: "ĐốI TƯỢNG CỦA BạN",
-    placeholderAudience: "Phụ huynh bận rộn, 30-40 tuổi",
+    placeholderAudience: "Chuyên gia trẻ",
     labelPlatform: "NỀN TẢNG",
     labelPlatformsMulti: "NỀN TẢNG",
     pickTwo: "(CHỌN 2 HOẶC NHIỀU HƠN)",
@@ -1041,7 +1064,7 @@ const UI_TEXT = {
     optional: "(İSTEĞE BAĞLI)",
     placeholderOccasion: "Tatil sezonu",
     labelAudience: "HEDEF KİTLENİZ",
-    placeholderAudience: "Meşgul ebeveynler, 30-40 yaş",
+    placeholderAudience: "Genç profesyoneller",
     labelPlatform: "PLATFORM",
     labelPlatformsMulti: "PLATFORMLAR",
     pickTwo: "(2 VEYA DAHA FAZLA SEÇİN)",
@@ -1103,7 +1126,7 @@ const UI_TEXT = {
     optional: "(اختیاری)",
     placeholderOccasion: "فصل تعطیلات",
     labelAudience: "مخاطبان شما",
-    placeholderAudience: "والدین شاغل، 30-40 ساله",
+    placeholderAudience: "متخصصان جوان",
     labelPlatform: "پلتفرم",
     labelPlatformsMulti: "پلتفرم‌ها",
     pickTwo: "(2 یا بیشتر انتخاب کنید)",
@@ -1165,7 +1188,7 @@ const UI_TEXT = {
     optional: "(НЕОБОВ’ЯЗКОВО)",
     placeholderOccasion: "Святковий сезон",
     labelAudience: "ВАША АУДИТОРІЯ",
-    placeholderAudience: "Зайняті батьки, 30-40 років",
+    placeholderAudience: "Молоді фахівці",
     labelPlatform: "ПЛАТФОРМА",
     labelPlatformsMulti: "ПЛАТФОРМИ",
     pickTwo: "(ОБЕРІТЬ 2 АБО БІЛЬШЕ)",
@@ -1227,7 +1250,7 @@ const UI_TEXT = {
     optional: "(ไม่บังคับ)",
     placeholderOccasion: "เทศกาลวันหยุด",
     labelAudience: "กลุ่มเป้าหมายของคุณ",
-    placeholderAudience: "พ่อแม่ที่ยุ่ง อายุ 30-40 ปี",
+    placeholderAudience: "คนทำงานรุ่นใหม่",
     labelPlatform: "แพลตฟอร์ม",
     labelPlatformsMulti: "แพลตฟอร์ม",
     pickTwo: "(เลือก 2 อันขึ้นไป)",
@@ -1289,7 +1312,7 @@ const UI_TEXT = {
     optional: "(OPSIONAL)",
     placeholderOccasion: "Musim liburan",
     labelAudience: "AUDIENS ANDA",
-    placeholderAudience: "Orang tua sibuk, usia 30-40",
+    placeholderAudience: "Profesional muda",
     labelPlatform: "PLATFORM",
     labelPlatformsMulti: "PLATFORM",
     pickTwo: "(PILIH 2 ATAU LEBIH)",
@@ -1351,7 +1374,7 @@ const UI_TEXT = {
     optional: "(ΠΡΟΑΙΡΕΤΙΚΟ)",
     placeholderOccasion: "Εορταστική περίοδος",
     labelAudience: "ΤΟ ΚΟΙΝΟ ΣΑΣ",
-    placeholderAudience: "Απασχολημένοι γονείς, 30-40",
+    placeholderAudience: "Νέοι επαγγελματίες",
     labelPlatform: "ΠΛΑΤΦΟΡΜΑ",
     labelPlatformsMulti: "ΠΛΑΤΦΟΡΜΕΣ",
     pickTwo: "(ΕΠΙΛΕΞΤΕ 2 Η ΠΕΡΙΣΣΟΤΕΡΕΣ)",
@@ -1413,7 +1436,7 @@ const UI_TEXT = {
     optional: "(VALFRITT)",
     placeholderOccasion: "Högtidssäsong",
     labelAudience: "DIN MÅLGRUPP",
-    placeholderAudience: "Upptagna föräldrar, 30-40 år",
+    placeholderAudience: "Unga yrkesverksamma",
     labelPlatform: "PLATTFORM",
     labelPlatformsMulti: "PLATTFORMAR",
     pickTwo: "(VÄLJ 2 ELLER FLER)",
@@ -1475,7 +1498,7 @@ const UI_TEXT = {
     optional: "(VALGFRIT)",
     placeholderOccasion: "Højtidssæson",
     labelAudience: "DIN MÅLGRUPPE",
-    placeholderAudience: "Travle forældre, 30-40 år",
+    placeholderAudience: "Unge professionelle",
     labelPlatform: "PLATFORM",
     labelPlatformsMulti: "PLATFORME",
     pickTwo: "(VÆLG 2 ELLER FLERE)",
@@ -1537,7 +1560,7 @@ const UI_TEXT = {
     optional: "(VALGFRITT)",
     placeholderOccasion: "Høytidssesong",
     labelAudience: "MÅLGRUPPEN DIN",
-    placeholderAudience: "Travle foreldre, 30-40 år",
+    placeholderAudience: "Unge fagfolk",
     labelPlatform: "PLATTFORM",
     labelPlatformsMulti: "PLATTFORMER",
     pickTwo: "(VELG 2 ELLER FLERE)",
@@ -1599,7 +1622,7 @@ const UI_TEXT = {
     optional: "(VALINNAINEN)",
     placeholderOccasion: "Juhlakausi",
     labelAudience: "YLEISÖSI",
-    placeholderAudience: "Kiireiset vanhemmat, 30-40v",
+    placeholderAudience: "Nuoret ammattilaiset",
     labelPlatform: "ALUSTA",
     labelPlatformsMulti: "ALUSTAT",
     pickTwo: "(VALITSE 2 TAI ENEMMÄN)",
@@ -2042,16 +2065,26 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
         {mode !== 'competitor' && (
           <>
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelBusiness}</label>
-            <input type="text" value={businessType} onChange={(e) => setBusinessType(e.target.value)} placeholder={t.placeholderBusiness}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }} />
+            <AutocompleteInput
+              value={businessType} onChange={setBusinessType} options={BUSINESS_CATEGORY_OPTIONS}
+              placeholder={t.placeholderBusiness}
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
+            />
+            <div style={{ marginBottom: 22 }} />
 
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelOccasion} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
-            <input type="text" value={occasion} onChange={(e) => setOccasion(e.target.value)} placeholder={t.placeholderOccasion}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }} />
+            <AutocompleteInput
+              value={occasion} onChange={setOccasion} options={OCCASION_OPTIONS} placeholder={t.placeholderOccasion}
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
+            />
+            <div style={{ marginBottom: 22 }} />
 
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelAudience} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
-            <input type="text" value={audience} onChange={(e) => setAudience(e.target.value)} placeholder={t.placeholderAudience}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 26, boxSizing: 'border-box', outline: 'none' }} />
+            <AutocompleteInput
+              value={audience} onChange={setAudience} options={AUDIENCE_OPTIONS} placeholder={t.placeholderAudience}
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
+            />
+            <div style={{ marginBottom: 26 }} />
           </>
         )}
 
@@ -2072,10 +2105,8 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
               ))}
             </div>
             <div style={{ marginBottom: 26 }}>
-              <AutocompleteInput
-                value={platform}
-                onChange={setPlatform}
-                options={PLATFORMS.map(p => p.label)}
+              <input
+                type="text" value={platform} onChange={(e) => setPlatform(e.target.value)}
                 placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
                 style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
               />
@@ -2110,10 +2141,8 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
             </div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 26 }}>
               <div style={{ flex: 1 }}>
-                <AutocompleteInput
-                  value={customPlatformInput}
-                  onChange={setCustomPlatformInput}
-                  options={PLATFORMS.map(p => p.label)}
+                <input
+                  type="text" value={customPlatformInput} onChange={(e) => setCustomPlatformInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomPlatform(); } }}
                   placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
                   style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
@@ -2129,8 +2158,12 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
         {mode === 'competitor' && (
           <>
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelBusiness} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
-            <input type="text" value={businessType} onChange={(e) => setBusinessType(e.target.value)} placeholder={t.placeholderBusiness}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }} />
+            <AutocompleteInput
+              value={businessType} onChange={setBusinessType} options={BUSINESS_CATEGORY_OPTIONS}
+              placeholder={t.placeholderBusiness}
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
+            />
+            <div style={{ marginBottom: 22 }} />
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>{t.labelPlatform}</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
               {PLATFORMS.map(p => (
@@ -2146,10 +2179,8 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
               ))}
             </div>
             <div style={{ marginBottom: 22 }}>
-              <AutocompleteInput
-                value={platform}
-                onChange={setPlatform}
-                options={PLATFORMS.map(p => p.label)}
+              <input
+                type="text" value={platform} onChange={(e) => setPlatform(e.target.value)}
                 placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
                 style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
               />
@@ -2163,8 +2194,12 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
         {mode === 'photos' && (
           <>
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelBusiness} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
-            <input type="text" value={businessType} onChange={(e) => setBusinessType(e.target.value)} placeholder={t.placeholderBusiness}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }} />
+            <AutocompleteInput
+              value={businessType} onChange={setBusinessType} options={BUSINESS_CATEGORY_OPTIONS}
+              placeholder={t.placeholderBusiness}
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
+            />
+            <div style={{ marginBottom: 22 }} />
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>{t.labelPhotos || 'Upload your photos'} <span style={{ opacity: 0.5 }}>({uploadedPhotos.length}/7)</span></label>
 
             {uploadedPhotos.length > 0 && (
