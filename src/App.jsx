@@ -1676,6 +1676,47 @@ function ConstellationMark({ className = '', style = {} }) {
   );
 }
 
+// Собственный выпадающий список вместо нативного <datalist> — тот плохо
+// или совсем не поддерживается в мобильных браузерах (особенно iOS Safari).
+function AutocompleteInput({ value, onChange, options, placeholder, style, onKeyDown }) {
+  const [open, setOpen] = useState(false);
+  const filtered = options.filter(o => o.toLowerCase().includes((value || '').toLowerCase()) && o.toLowerCase() !== (value || '').toLowerCase());
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => { onChange(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onKeyDown={onKeyDown}
+        placeholder={placeholder}
+        style={style}
+      />
+      {open && filtered.length > 0 && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20,
+          background: '#151412', border: '1px solid rgba(245,241,232,0.15)', borderRadius: 3,
+          marginTop: 2, maxHeight: 180, overflowY: 'auto',
+        }}>
+          {filtered.map(o => (
+            <div
+              key={o}
+              onMouseDown={() => { onChange(o); setOpen(false); }}
+              style={{ padding: '9px 12px', fontSize: 13.5, color: '#F5F1E8', cursor: 'pointer' }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(201,169,104,0.12)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              {o}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   const [licenseCode, setLicenseCode] = useState(() => localStorage.getItem('cs_licenseCode') || '');
   const [unlocked, setUnlocked] = useState(() => localStorage.getItem('cs_unlocked') === 'true');
@@ -2025,15 +2066,15 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
                 </button>
               ))}
             </div>
-            <input
-              type="text" list="platform-suggestions" value={platform}
-              onChange={(e) => setPlatform(e.target.value)}
-              placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', marginBottom: 26, boxSizing: 'border-box', outline: 'none' }}
-            />
-            <datalist id="platform-suggestions">
-              {PLATFORMS.map(p => <option key={p.code} value={p.label} />)}
-            </datalist>
+            <div style={{ marginBottom: 26 }}>
+              <AutocompleteInput
+                value={platform}
+                onChange={setPlatform}
+                options={PLATFORMS.map(p => p.label)}
+                placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
+                style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
+              />
+            </div>
           </>
         )}
 
@@ -2063,20 +2104,20 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
               ))}
             </div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 26 }}>
-              <input
-                type="text" list="platform-suggestions" value={customPlatformInput}
-                onChange={(e) => setCustomPlatformInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomPlatform(); } }}
-                placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
-                style={{ flex: 1, background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
-              />
-              <button onClick={addCustomPlatform} style={{ fontSize: 11, color: GOLD, background: 'none', border: `1px solid ${GOLD}`, borderRadius: 2, padding: '0 14px', cursor: 'pointer' }}>
+              <div style={{ flex: 1 }}>
+                <AutocompleteInput
+                  value={customPlatformInput}
+                  onChange={setCustomPlatformInput}
+                  options={PLATFORMS.map(p => p.label)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomPlatform(); } }}
+                  placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
+                  style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
+                />
+              </div>
+              <button onClick={addCustomPlatform} style={{ fontSize: 11, color: GOLD, background: 'none', border: `1px solid ${GOLD}`, borderRadius: 2, padding: '0 14px', cursor: 'pointer', flexShrink: 0, height: 34 }}>
                 {t.addPlatform || 'Add'}
               </button>
             </div>
-            <datalist id="platform-suggestions">
-              {PLATFORMS.map(p => <option key={p.code} value={p.label} />)}
-            </datalist>
           </>
         )}
 
@@ -2099,15 +2140,15 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
                 </button>
               ))}
             </div>
-            <input
-              type="text" list="platform-suggestions" value={platform}
-              onChange={(e) => setPlatform(e.target.value)}
-              placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }}
-            />
-            <datalist id="platform-suggestions">
-              {PLATFORMS.map(p => <option key={p.code} value={p.label} />)}
-            </datalist>
+            <div style={{ marginBottom: 22 }}>
+              <AutocompleteInput
+                value={platform}
+                onChange={setPlatform}
+                options={PLATFORMS.map(p => p.label)}
+                placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
+                style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
+              />
+            </div>
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelCompetitorPost}</label>
             <textarea value={competitorText} onChange={(e) => setCompetitorText(e.target.value)} rows={4} placeholder={t.placeholderCompetitorPost}
               style={{ width: '100%', background: 'none', border: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '10px 12px', marginBottom: 26, boxSizing: 'border-box', outline: 'none', resize: 'vertical' }} />
