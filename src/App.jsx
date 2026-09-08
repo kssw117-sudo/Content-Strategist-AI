@@ -57,6 +57,7 @@ function getModes(t) {
     { value: 'single', label: t.tabSingle },
     { value: 'cross', label: t.tabCross },
     { value: 'competitor', label: t.tabCompetitor },
+    { value: 'photos', label: t.tabPhotos || 'Photo planner' },
   ];
 }
 
@@ -1693,6 +1694,8 @@ export default function App() {
   const [platform, setPlatform] = useState('Instagram');
   const [selectedPlatforms, setSelectedPlatforms] = useState(['Instagram', 'TikTok']);
   const [customPlatformInput, setCustomPlatformInput] = useState('');
+  const [uploadedPhotos, setUploadedPhotos] = useState([]);
+  const [photoError, setPhotoError] = useState('');
   const [mode, setMode] = useState('single');
   const [competitorText, setCompetitorText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -1719,6 +1722,36 @@ export default function App() {
       setSelectedPlatforms(prev => [...prev, name]);
     }
     setCustomPlatformInput('');
+  }
+
+  function handlePhotoUpload(e) {
+    const files = Array.from(e.target.files || []);
+    setPhotoError('');
+    if (uploadedPhotos.length + files.length > 7) {
+      setPhotoError('Up to 7 photos at a time.');
+      return;
+    }
+    files.forEach(file => {
+      if (!file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result;
+        const base64 = dataUrl.split(',')[1];
+        setUploadedPhotos(prev => [...prev, {
+          id: Date.now() + Math.random(),
+          name: file.name,
+          previewUrl: dataUrl,
+          base64,
+          mediaType: file.type,
+        }]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  }
+
+  function removePhoto(id) {
+    setUploadedPhotos(prev => prev.filter(p => p.id !== id));
   }
 
   function copyAllIdeas() {
@@ -1759,6 +1792,7 @@ Respond ONLY with valid JSON: {"day": "${oldIdea.day}", "platform": "${oldIdea.p
     if ((mode === 'single' || mode === 'cross') && !businessType.trim()) { setError(t.errBusiness); return; }
     if (mode === 'cross' && selectedPlatforms.length < 2) { setError(t.errPlatforms); return; }
     if (mode === 'competitor' && !competitorText.trim()) { setError(t.errCompetitor); return; }
+    if (mode === 'photos' && uploadedPhotos.length === 0) { setError(t.errPhotos || 'Upload at least one photo first.'); return; }
     const isTrial = !unlocked && !freeTrialUsed;
     if (!unlocked && freeTrialUsed) { setError(t.errTrialUsed); return; }
     if (!isTrial) {
@@ -1791,10 +1825,24 @@ Business: ${businessType || 'small business'}. Competitor content: "${competitor
 Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "..."}`;
     }
 
+    // Для режима с фото — отдельная логика: без caption, только
+    // стратегическое распределение (день/платформа/pillar на фото)
+    const isPhotoMode = mode === 'photos';
+    if (isPhotoMode) {
+      prompt = `You are a social media content strategist. You are given ${uploadedPhotos.length} photos, in order (Photo 1, Photo 2, etc). Business: ${businessType || 'small business'}. Occasion: ${occasion || 'none specific'}.
+
+For EACH photo, decide: which day of the week it should be posted, which platform fits it best (from: ${PLATFORMS.map(p => p.label).join(', ')}, or suggest another if none fit), and which content pillar it represents (from: ${PILLARS.join(', ')}). Do NOT write a caption -- only the strategic placement. Briefly describe what you see in 3-6 words per photo (for reference, not a caption).${langInstruction}
+
+Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday", "platform": "...", "pillar": "...", "whatItShows": "..."}, ... one per photo]}`;
+    }
+
     try {
       const res = await fetch('/api/generate', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ licenseCode, prompt, trial: isTrial }),
+        body: JSON.stringify({
+          licenseCode, prompt, trial: isTrial,
+          images: isPhotoMode ? uploadedPhotos.map(p => ({ base64: p.base64, mediaType: p.mediaType })) : undefined,
+        }),
       });
       if (res.status === 403) throw new Error(t.errInvalidCode);
       const data = await res.json();
@@ -2063,7 +2111,38 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
           </>
         )}
 
-        {error && <p style={{ fontSize: 13, color: '#D98E7F', margin: '0 0 16px' }}>{error}</p>}
+        {mode === 'photos' && (
+          <>
+            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelBusiness} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
+            <input type="text" value={businessType} onChange={(e) => setBusinessType(e.target.value)} placeholder={t.placeholderBusiness}
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }} />
+            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>{t.labelPhotos || 'Upload your photos'} <span style={{ opacity: 0.5 }}>({uploadedPhotos.length}/7)</span></label>
+
+            {uploadedPhotos.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
+                {uploadedPhotos.map((p, i) => (
+                  <div key={p.id} style={{ position: 'relative', width: 64, height: 64 }}>
+                    <img src={p.previewUrl} alt={p.name} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 3, border: `1px solid ${LINE}` }} />
+                    <span style={{ position: 'absolute', top: -6, left: -6, background: GOLD, color: BG, borderRadius: '50%', width: 16, height: 16, fontSize: 9.5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>{i + 1}</span>
+                    <button onClick={() => removePhoto(p.id)} style={{ position: 'absolute', top: -6, right: -6, background: '#0A0908', border: `1px solid ${LINE}`, color: INK_SOFT, borderRadius: '50%', width: 16, height: 16, fontSize: 10, cursor: 'pointer', lineHeight: 1, padding: 0 }}>&times;</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {uploadedPhotos.length < 7 && (
+              <label style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', height: 56, border: `1px dashed ${LINE}`,
+                borderRadius: 3, cursor: 'pointer', marginBottom: 8, fontSize: 12.5, color: INK_SOFT,
+              }}>
+                {t.uploadPhotosHint || 'Click to upload photos (up to 7)'}
+                <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} style={{ display: 'none' }} />
+              </label>
+            )}
+            {photoError && <p style={{ fontSize: 12, color: '#D98E7F', margin: '0 0 8px' }}>{photoError}</p>}
+            <div style={{ marginBottom: 22 }} />
+          </>
+        )}
 
         {dailyCount >= DAILY_LIMIT ? (
           <div style={{ textAlign: 'center', padding: 16, border: `1px solid ${LINE}` }}>
@@ -2076,7 +2155,7 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
               width: '100%', padding: '15px', fontSize: 13, letterSpacing: '0.08em', fontWeight: 500, cursor: 'pointer',
               background: GOLD, color: BG, border: 'none', borderRadius: 2, opacity: loading ? 0.6 : 1,
             }}>
-            {loading ? t.btnThinking : mode === 'competitor' ? t.btnFindGap : t.btnBuildWeek}
+            {loading ? t.btnThinking : mode === 'competitor' ? t.btnFindGap : mode === 'photos' ? (t.btnPlanPhotos || 'Plan the week') : t.btnBuildWeek}
           </button>
         )}
 
@@ -2138,6 +2217,32 @@ Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "...
             <p style={{ fontSize: 16, color: INK, marginBottom: 26, lineHeight: 1.6, fontWeight: 300 }}>{result.angle}</p>
             <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: GOLD, letterSpacing: '0.08em', marginBottom: 10 }}>{t.tryThis}</div>
             <p style={{ fontSize: 16, color: INK, margin: 0, lineHeight: 1.6, fontWeight: 300 }}>{result.ideaExample}</p>
+          </div>
+        )}
+
+        {result && result.photoIdeas && (
+          <div style={{ marginTop: 48 }}>
+            <div style={{ fontSize: 12, color: INK_SOFT, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 24 }}>{t.theWeek}</div>
+            {result.photoIdeas.map((it, i) => {
+              const photo = uploadedPhotos[it.photoIndex - 1] || uploadedPhotos[i];
+              const pc = PILLAR_COLORS[it.pillar] || PILLAR_COLORS['Educational'];
+              return (
+                <div key={i} className="idea-row" style={{ animationDelay: `${i * 0.06}s`, display: 'flex', gap: 14, padding: '20px 0', borderTop: `1px solid ${LINE}` }}>
+                  {photo && <img src={photo.previewUrl} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: INK_SOFT, letterSpacing: '0.05em' }}>{it.day?.toUpperCase()}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ fontSize: 10.5, color: INK_SOFT }}>{it.platform}</span>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: pc.dot, display: 'inline-block' }} />
+                        <span style={{ fontSize: 10.5, color: INK_SOFT }}>{it.pillar}</span>
+                      </div>
+                    </div>
+                    <p style={{ fontSize: 14, color: INK, margin: 0, lineHeight: 1.5, fontWeight: 300, fontStyle: 'italic', opacity: 0.8 }}>{it.whatItShows}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
