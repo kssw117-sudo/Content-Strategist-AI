@@ -1680,7 +1680,11 @@ function ConstellationMark({ className = '', style = {} }) {
 // или совсем не поддерживается в мобильных браузерах (особенно iOS Safari).
 function AutocompleteInput({ value, onChange, options, placeholder, style, onKeyDown }) {
   const [open, setOpen] = useState(false);
-  const filtered = options.filter(o => o.toLowerCase().includes((value || '').toLowerCase()) && o.toLowerCase() !== (value || '').toLowerCase());
+  // Показываем весь список при пустом поле или фокусе на точном совпадении
+  // (раньше точное совпадение исключалось из списка — при клике на уже
+  // заполненное поле подсказки казались "не работающими")
+  const v = (value || '').toLowerCase().trim();
+  const filtered = v === '' ? options : options.filter(o => o.toLowerCase().includes(v));
 
   return (
     <div style={{ position: 'relative' }}>
@@ -1689,6 +1693,7 @@ function AutocompleteInput({ value, onChange, options, placeholder, style, onKey
         value={value}
         onChange={(e) => { onChange(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
+        onClick={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
