@@ -82,6 +82,8 @@ const AUDIENCE_OPTIONS = [
   'Young professionals', 'Parents with children', 'College students', 'Retirees',
   'Local residents', 'Tourists and visitors', 'Small business owners', 'Fitness enthusiasts',
   'Pet owners', 'Budget-conscious shoppers', 'Luxury-focused customers', 'B2B decision-makers',
+  'Enterprise companies', 'Corporate executives', 'Startup founders', 'Freelancers',
+  'Content creators', 'Influencers and bloggers', 'Marketing teams', 'HR departments',
 ];
 
 const LANGS = [
