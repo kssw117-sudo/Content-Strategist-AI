@@ -182,6 +182,8 @@ const UI_TEXT = {
   en: {
     customPlatformPlaceholder: "Or type your own platform...",
     addPlatform: "Add",
+    labelWeekTopic: "WHAT'S THIS WEEK ACTUALLY ABOUT",
+    placeholderWeekTopic: "e.g. launching our new espresso blend, opening a second location...",
     subtitle: "A week of ideas, considered per platform. For teams who plan with intention.",
     about: "Content Strategist AI builds a week of post ideas at a time -- not captions, but the underlying topic for each day, matched to what actually works on that specific platform. Choose one platform, or plan across several at once. Paste a competitor’s post to find the gap you can fill.",
     tabSingle: "Single platform",
@@ -246,6 +248,8 @@ const UI_TEXT = {
   ru: {
     customPlatformPlaceholder: "Или впиши свою платформу...",
     addPlatform: "Добавить",
+    labelWeekTopic: "О ЧЁМ ЭТА НЕДЕЛЯ НА САМОМ ДЕЛЕ",
+    placeholderWeekTopic: "например: запуск нового вкуса эспрессо, открытие второй точки...",
     subtitle: "Неделя идей, продуманных под платформу. Для команд, которые планируют осознанно.",
     about: "Content Strategist AI строит неделю идей для постов за раз — не подписи, а саму тему на каждый день, подобранную под то, что реально работает именно на этой платформе. Выбери одну платформу или планируй сразу по нескольким. Вставь пост конкурента, чтобы найти пробел, который можно занять.",
     tabSingle: "Одна платформа",
@@ -308,6 +312,8 @@ const UI_TEXT = {
     privacy: "Конфиденциальность",
   },
   es: {
+    labelWeekTopic: "QUÉ ES REALMENTE ESTA SEMANA",
+    placeholderWeekTopic: "ej. lanzamos nuestra nueva mezcla de espresso, abrimos una segunda sucursal...",
     subtitle: "Una semana de ideas, pensadas por plataforma. Para equipos que planifican con intención.",
     about: "Content Strategist AI construye una semana de ideas de publicaciones a la vez -- no subtítulos, sino el tema de cada día, ajustado a lo que realmente funciona en esa plataforma. Elige una plataforma, o planifica varias a la vez.",
     tabSingle: "Una plataforma",
@@ -370,6 +376,8 @@ const UI_TEXT = {
     privacy: "Privacidad",
   },
   fr: {
+    labelWeekTopic: "DE QUOI PARLE VRAIMENT CETTE SEMAINE",
+    placeholderWeekTopic: "ex. lancement de notre nouveau mélange espresso, ouverture d'une deuxième adresse...",
     subtitle: "Une semaine d’idées, pensées par plateforme. Pour les équipes qui planifient avec intention.",
     about: "Content Strategist AI construit une semaine d’idées de publication à la fois -- pas des légendes, mais le sujet central de chaque jour, adapté à ce qui fonctionne vraiment sur cette plateforme.",
     tabSingle: "Une plateforme",
@@ -432,6 +440,8 @@ const UI_TEXT = {
     privacy: "Confidentialité",
   },
   de: {
+    labelWeekTopic: "WORUM ES DIESE WOCHE WIRKLICH GEHT",
+    placeholderWeekTopic: "z.B. Einführung unserer neuen Espresso-Mischung, Eröffnung einer zweiten Filiale...",
     subtitle: "Eine Woche voller Ideen, durchdacht pro Plattform. Für Teams, die mit Absicht planen.",
     about: "Content Strategist AI erstellt eine Woche Post-Ideen auf einmal -- keine Bildunterschriften, sondern das zentrale Thema jedes Tages, abgestimmt darauf, was auf dieser Plattform wirklich funktioniert.",
     tabSingle: "Eine Plattform",
@@ -494,6 +504,8 @@ const UI_TEXT = {
     privacy: "Datenschutz",
   },
   pt: {
+    labelWeekTopic: "SOBRE O QUE É ESTA SEMANA DE VERDADE",
+    placeholderWeekTopic: "ex. lançamento da nossa nova mistura de espresso, abertura de uma segunda unidade...",
     subtitle: "Uma semana de ideias, pensadas por plataforma. Para equipes que planejam com intenção.",
     about: "Content Strategist AI constrói uma semana de ideias de posts de cada vez -- não legendas, mas o tema central de cada dia, ajustado ao que realmente funciona naquela plataforma.",
     tabSingle: "Uma plataforma",
@@ -556,6 +568,8 @@ const UI_TEXT = {
     privacy: "Privacidade",
   },
   it: {
+    labelWeekTopic: "DI COSA SI TRATTA DAVVERO QUESTA SETTIMANA",
+    placeholderWeekTopic: "es. lancio della nostra nuova miscela espresso, apertura di una seconda sede...",
     subtitle: "Una settimana di idee, pensate per piattaforma. Per team che pianificano con intenzione.",
     about: "Content Strategist AI costruisce una settimana di idee per post alla volta -- non didascalie, ma l’argomento centrale di ogni giorno, adattato a ciò che funziona davvero su quella piattaforma.",
     tabSingle: "Una piattaforma",
@@ -618,6 +632,8 @@ const UI_TEXT = {
     privacy: "Privacy",
   },
   nl: {
+    labelWeekTopic: "WAAR DEZE WEEK ECHT OVER GAAT",
+    placeholderWeekTopic: "bijv. lancering van onze nieuwe espressoblend, opening van een tweede vestiging...",
     subtitle: "Een week aan ideeën, per platform doordacht. Voor teams die met intentie plannen.",
     about: "Content Strategist AI bouwt een week aan post-ideeën tegelijk -- geen bijschriften, maar het kernonderwerp van elke dag, afgestemd op wat echt werkt op dat platform.",
     tabSingle: "Eén platform",
@@ -680,6 +696,8 @@ const UI_TEXT = {
     privacy: "Privacy",
   },
   pl: {
+    labelWeekTopic: "O CZYM NAPRAWDĘ JEST TEN TYDZIEŃ",
+    placeholderWeekTopic: "np. premiera naszej nowej mieszanki espresso, otwarcie drugiej lokalizacji...",
     subtitle: "Tydzień pomysłów, dopasowanych do platformy. Dla zespołów, które planują świadomie.",
     about: "Content Strategist AI buduje tydzień pomysłów na posty naraz -- nie podpisy, ale główny temat każdego dnia, dopasowany do tego, co naprawdę działa na danej platformie.",
     tabSingle: "Jedna platforma",
@@ -742,6 +760,8 @@ const UI_TEXT = {
     privacy: "Prywatność",
   },
   zh: {
+    labelWeekTopic: "这周真正的主题是什么",
+    placeholderWeekTopic: "例如：推出新的浓缩咖啡拼配、开设第二家门店...",
     subtitle: "每周的内容想法，根据平台量身定制。为真正有计划地规划的团队而建。",
     about: "Content Strategist AI 一次性构建一周的帖文想法——不是文案，而是每天的核心主题，匹配该平台真正有效的内容。",
     tabSingle: "单一平台",
@@ -804,6 +824,8 @@ const UI_TEXT = {
     privacy: "隐私",
   },
   ja: {
+    labelWeekTopic: "今週の本当のテーマは何か",
+    placeholderWeekTopic: "例：新しいエスプレッソブレンドの発売、2号店のオープンなど...",
     subtitle: "プラットフォームごとに考えられた一週間分のアイデア。意図を持って計画するチームのために。",
     about: "Content Strategist AIは一度に一週間分の投稿アイデアを作成します——キャプションではなく、そのプラットフォームで実際に機能する内容に合わせた、毎日の中心テーマです。",
     tabSingle: "単一プラットフォーム",
@@ -866,6 +888,8 @@ const UI_TEXT = {
     privacy: "プライバシー",
   },
   ar: {
+    labelWeekTopic: "عمّا يدور هذا الأسبوع فعليًا",
+    placeholderWeekTopic: "مثال: إطلاق مزيج الإسبريسو الجديد، افتتاح فرع ثانٍ...",
     subtitle: "أسبوع من الأفكار، مدروسة لكل منصة. للفرق التي تخطط بوعي.",
     about: "Content Strategist AI يبني أسبوعًا من أفكار المنشورات في كل مرة -- ليس التسميات، بل الموضوع الأساسي لكل يوم.",
     tabSingle: "منصة واحدة",
@@ -928,6 +952,8 @@ const UI_TEXT = {
     privacy: "الخصوصية",
   },
   hi: {
+    labelWeekTopic: "यह सप्ताह वास्तव में किस बारे में है",
+    placeholderWeekTopic: "जैसे: नया एस्प्रेसो ब्लेंड लॉन्च करना, दूसरी शाखा खोलना...",
     subtitle: "प्लेटफॉर्म के अनुसार एक सप्ताह के आइडिया। उन टीमों के लिए जो वाकई योजना बनाते हैं।",
     about: "Content Strategist AI एक समय में एक सप्ताह के पोस्ट आइडिया बनाता है।",
     tabSingle: "एक प्लेटफॉर्म",
@@ -990,6 +1016,8 @@ const UI_TEXT = {
     privacy: "गोपनीयता",
   },
   ko: {
+    labelWeekTopic: "이번 주는 실제로 무엇에 관한 것인가요",
+    placeholderWeekTopic: "예: 새로운 에스프레소 블렌드 출시, 2호점 오픈 등...",
     subtitle: "플랫폼별로 고려된 일주일 아이디어. 진지하게 계획하는 팀을 위해.",
     about: "Content Strategist AI는 한 번에 일주일치 게시물 아이디어를 만듭니다.",
     tabSingle: "단일 플랫폼",
@@ -1052,6 +1080,8 @@ const UI_TEXT = {
     privacy: "개인정보",
   },
   vi: {
+    labelWeekTopic: "TUẦN NÀY THỰC SỰ NÓI VỀ ĐIỀU GÌ",
+    placeholderWeekTopic: "vd. ra mắt hỗn hợp espresso mới, khai trương chi nhánh thứ hai...",
     subtitle: "Một tuần ý tưởng, được cân nhắc theo từng nền tảng. Dành cho các nhóm lập kế hoạch có chủ đích.",
     about: "Content Strategist AI xây dựng một tuần ý tưởng bài đăng mỗi lần.",
     tabSingle: "Một nền tảng",
@@ -1114,6 +1144,8 @@ const UI_TEXT = {
     privacy: "Quyền riêng tư",
   },
   tr: {
+    labelWeekTopic: "BU HAFTA GERÇEKTEN NE HAKKINDA",
+    placeholderWeekTopic: "örn. yeni espresso karışımımızın lansmanı, ikinci şubenin açılışı...",
     subtitle: "Platforma göre düşünülmüş bir haftalık fikirler. Kasıtlı planlayan ekipler için.",
     about: "Content Strategist AI, bir seferde bir haftalık gönderi fikri oluşturur.",
     tabSingle: "Tek platform",
@@ -1176,6 +1208,8 @@ const UI_TEXT = {
     privacy: "Gizlilik",
   },
   fa: {
+    labelWeekTopic: "این هفته واقعاً درباره چیست",
+    placeholderWeekTopic: "مثلاً: عرضه ترکیب اسپرسوی جدید، افتتاح شعبه دوم...",
     subtitle: "یک هفته ایده، متناسب با هر پلتفرم. برای تیم‌هایی که با قصد برنامه‌ریزی می‌کنند.",
     about: "Content Strategist AI یک هفته ایده پست در یک زمان می‌سازد.",
     tabSingle: "یک پلتفرم",
@@ -1238,6 +1272,8 @@ const UI_TEXT = {
     privacy: "حریم خصوصی",
   },
   uk: {
+    labelWeekTopic: "ПРО ЩО НАСПРАВДІ ЦЕЙ ТИЖДЕНЬ",
+    placeholderWeekTopic: "напр. запуск нової суміші еспресо, відкриття другої точки...",
     subtitle: "Тиждень ідей, продуманих під платформу. Для команд, які планують за задумом.",
     about: "Content Strategist AI будує тиждень ідей для постів за раз.",
     tabSingle: "Одна платформа",
@@ -1300,6 +1336,8 @@ const UI_TEXT = {
     privacy: "Конфіденційність",
   },
   th: {
+    labelWeekTopic: "สัปดาห์นี้เกี่ยวกับอะไรจริงๆ",
+    placeholderWeekTopic: "เช่น เปิดตัวเอสเพรสโซ่สูตรใหม่ เปิดสาขาที่สอง...",
     subtitle: "ไอเดียหนึ่งสัปดาห์ ที่คิดมาตามแต่ละแพลตฟอร์ม สำหรับทีมที่วางแผนอย่างตั้งใจ",
     about: "Content Strategist AI สร้างไอเดียโพสต์หนึ่งสัปดาห์ในคราวเดียว.",
     tabSingle: "แพลตฟอร์มเดียว",
@@ -1362,6 +1400,8 @@ const UI_TEXT = {
     privacy: "ความเป็นส่วนตัว",
   },
   id: {
+    labelWeekTopic: "SEBENARNYA MINGGU INI TENTANG APA",
+    placeholderWeekTopic: "mis. peluncuran campuran espresso baru, pembukaan cabang kedua...",
     subtitle: "Seminggu ide, dipikirkan per platform. Untuk tim yang merencanakan dengan sengaja.",
     about: "Content Strategist AI membangun seminggu ide postingan sekaligus.",
     tabSingle: "Satu platform",
@@ -1424,6 +1464,8 @@ const UI_TEXT = {
     privacy: "Privasi",
   },
   el: {
+    labelWeekTopic: "ΓΙΑ ΤΙ ΑΦΟΡΑ ΠΡΑΓΜΑΤΙΚΑ ΑΥΤΗ Η ΕΒΔΟΜΑΔΑ",
+    placeholderWeekTopic: "π.χ. κυκλοφορία του νέου μείγματος espresso, άνοιγμα δεύτερου καταστήματος...",
     subtitle: "Μία εβδομάδα ιδεών, προσαρμοσμένη ανά πλατφόρμα. Για ομάδες που σχεδιάζουν με πρόθεση.",
     about: "Το Content Strategist AI δημιουργεί μία εβδομάδα ιδεών δημοσιεύσεων κάθε φορά.",
     tabSingle: "Μία πλατφόρμα",
@@ -1486,6 +1528,8 @@ const UI_TEXT = {
     privacy: "Απόρρητο",
   },
   sv: {
+    labelWeekTopic: "VAD DEN HÄR VECKAN VERKLIGEN HANDLAR OM",
+    placeholderWeekTopic: "t.ex. lansering av vår nya espressoblandning, öppning av en andra butik...",
     subtitle: "En vecka av idéer, genomtänkta per plattform. För team som planerar med avsikt.",
     about: "Content Strategist AI bygger en veckas inläggsidéer i taget.",
     tabSingle: "En plattform",
@@ -1548,6 +1592,8 @@ const UI_TEXT = {
     privacy: "Integritet",
   },
   da: {
+    labelWeekTopic: "HVAD DENNE UGE REELT HANDLER OM",
+    placeholderWeekTopic: "f.eks. lancering af vores nye espressoblanding, åbning af en anden filial...",
     subtitle: "En uge med idéer, overvejet pr. platform. Til teams, der planlægger med hensigt.",
     about: "Content Strategist AI bygger en uges opslagsidéer ad gangen.",
     tabSingle: "Én platform",
@@ -1610,6 +1656,8 @@ const UI_TEXT = {
     privacy: "Privatliv",
   },
   no: {
+    labelWeekTopic: "HVA DENNE UKEN FAKTISK HANDLER OM",
+    placeholderWeekTopic: "f.eks. lansering av vår nye espressoblanding, åpning av en ny avdeling...",
     subtitle: "En uke med ideer, gjennomtænkt per plattform. For team som planlegger med hensikt.",
     about: "Content Strategist AI bygger en ukes innleggsideer om gangen.",
     tabSingle: "Én plattform",
@@ -1672,6 +1720,8 @@ const UI_TEXT = {
     privacy: "Personvern",
   },
   fi: {
+    labelWeekTopic: "MISTÄ TÄMÄ VIIKKO OIKEASTI KERTOO",
+    placeholderWeekTopic: "esim. uuden espressosekoituksemme lanseeraus, toisen toimipisteen avaaminen...",
     subtitle: "Viikko ideoita, harkittu alustakohtaisesti. Tiimeille, jotka suunnittelevat tarkoituksella.",
     about: "Content Strategist AI rakentaa viikon julkaisuideoita kerrallaan.",
     tabSingle: "Yksi alusta",
@@ -1820,6 +1870,7 @@ export default function App() {
 
   const [businessType, setBusinessType] = useState('');
   const [occasion, setOccasion] = useState('');
+  const [weekTopic, setWeekTopic] = useState('');
   const [audience, setAudience] = useState('');
   const [platform, setPlatform] = useState('Instagram');
   const [selectedPlatforms, setSelectedPlatforms] = useState(['Instagram', 'TikTok']);
@@ -1939,14 +1990,17 @@ Respond ONLY with valid JSON: {"day": "${oldIdea.day}", "platform": "${oldIdea.p
       : ` Write in ${outputLangName}: the "idea" text, hashtags, and any other free text. IMPORTANT: keep the "pillar" field exactly as one of these English words (do not translate it): ${PILLARS.join(', ')}. Keep the "platform" field as given (do not translate platform names). Day names may be in ${outputLangName} or English, whichever reads more naturally.`;
 
     let prompt;
+    const topicInstruction = weekTopic.trim()
+      ? `\n\nThis week is specifically about: "${weekTopic.trim()}". This is the real, concrete thing happening -- don't just mention it in passing. Build the week AROUND it: some days introduce it, some show it in use, some address doubts about it, some celebrate it. Avoid generic filler ideas that could apply to any business -- every idea should feel like it could only exist because of this specific thing.`
+      : `\n\nNo specific topic was given, so ground the ideas in concrete, believable specifics for this exact business (real-sounding details, not generic "great products, great service" filler).`;
     if (mode === 'single') {
       prompt = `You are a social media content strategist. Give a week of post IDEAS (topics, not captions) for ${platformLabel}.
-Business: ${businessType}. Occasion: ${occasion || 'none specific'}. Audience: ${audience || 'general'}.
+Business: ${businessType}. Occasion: ${occasion || 'none specific'}. Audience: ${audience || 'general'}.${topicInstruction}
 Give exactly 7 ideas, one per day, tailored to ${platformLabel}. Assign a content pillar from: ${PILLARS.join(', ')} to each, don't repeat more than twice, include 2-3 hashtags each.${langInstruction}
 Respond ONLY with valid JSON: {"ideas": [{"day": "Monday", "platform": "${platformLabel}", "pillar": "...", "idea": "...", "hashtags": ["...","...","..."]}, ...7 total]}`;
     } else if (mode === 'cross') {
       prompt = `You are a social media content strategist building a cross-platform calendar.
-Business: ${businessType}. Occasion: ${occasion || 'none specific'}. Audience: ${audience || 'general'}. Platforms: ${selectedLabels.join(', ')}.
+Business: ${businessType}. Occasion: ${occasion || 'none specific'}. Audience: ${audience || 'general'}. Platforms: ${selectedLabels.join(', ')}.${topicInstruction}
 Give exactly 7 ideas, one per day, picking the best platform per idea from the list. Assign a content pillar from: ${PILLARS.join(', ')}, don't repeat more than twice, include 2-3 hashtags each.${langInstruction}
 Respond ONLY with valid JSON: {"ideas": [{"day": "Monday", "platform": "one of: ${selectedLabels.join(', ')}", "pillar": "...", "idea": "...", "hashtags": ["...","...","..."]}, ...7 total]}`;
     } else {
@@ -2139,6 +2193,13 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
               style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
             />
             <div style={{ marginBottom: 22 }} />
+
+            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelWeekTopic || 'WHAT\u2019S THIS WEEK ACTUALLY ABOUT'} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
+            <input
+              type="text" value={weekTopic} onChange={(e) => setWeekTopic(e.target.value)}
+              placeholder={t.placeholderWeekTopic || 'e.g. launching our new espresso blend, opening a second location...'}
+              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }}
+            />
 
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelAudience} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
             <AutocompleteInput
