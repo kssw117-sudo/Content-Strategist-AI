@@ -2469,6 +2469,7 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
           <div style={{ display: 'flex', gap: 18, marginTop: 4 }}>
             <a href="/terms.html" style={{ fontSize: 10.5, color: INK_SOFT }}>{t.terms}</a>
             <a href="/privacy.html" style={{ fontSize: 10.5, color: INK_SOFT }}>{t.privacy}</a>
+            <a href="/refund.html" style={{ fontSize: 10.5, color: INK_SOFT }}>{t.refund || 'Refunds'}</a>
           </div>
           {!showSupportEmail ? (
             <button onClick={() => setShowSupportEmail(true)} style={{ fontSize: 10.5, color: GOLD, background: 'none', border: 'none', cursor: 'pointer' }}>{t.support}</button>
