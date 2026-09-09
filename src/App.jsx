@@ -1,2482 +1,762 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-const BG = '#0A0908';
-const CREAM = '#F5F1E8';
-const CARD = '#151412';
-const LINE = 'rgba(245,241,232,0.12)';
-const INK = '#F5F1E8';
-const INK_SOFT = 'rgba(245,241,232,0.6)';
-const GOLD = '#C9A968';
-const GOLD_DEEP = '#A6863F';
+const INK = '#2D2A26';
+const INK_SOFT = '#87837A';
+const BG = '#F5F4EE';
+const CARD = '#FFFFFF';
+const LINE = '#E4E1D6';
+const RUST = '#D97757';
+const RUST_DEEP = '#A56A45';
 
-const PILLAR_COLORS = {
-  'Educational': { text: '#F5F1E8', dot: '#7A8B99' },
-  'Behind-the-scenes': { text: '#F5F1E8', dot: '#9B8AA8' },
-  'Social proof': { text: '#F5F1E8', dot: '#7FA88A' },
-  'Promotional': { text: '#0A0908', dot: GOLD },
-  'Entertaining': { text: '#F5F1E8', dot: '#B98A6B' },
-};
-const PILLARS = Object.keys(PILLAR_COLORS);
-
-const BEST_TIMES = {
-  instagram: '11am\u20132pm or 7\u20139pm', tiktok: '6\u20139am or 7\u201310pm', linkedin: 'Tue\u2013Thu, 8\u201310am',
-  facebook: '1\u20134pm', telegram: '9\u201311am or 6\u20138pm', x: '8\u20139am or 6\u20139pm', reddit: 'weekday mornings',
-  youtube: '2\u20134pm or 7\u20139pm',
-};
-
-const DAILY_LIMIT = 50;
-const DAILY_KEY = 'cs_daily_gens';
-
-function getDailyCount() {
-  const today = new Date().toISOString().slice(0, 10);
-  let record;
-  try { record = JSON.parse(localStorage.getItem(DAILY_KEY) || 'null'); } catch (e) { record = null; }
-  if (!record || record.date !== today) return 0;
-  return record.count;
-}
-function checkAndUseDailyLimit() {
-  const today = new Date().toISOString().slice(0, 10);
-  let record;
-  try { record = JSON.parse(localStorage.getItem(DAILY_KEY) || 'null'); } catch (e) { record = null; }
-  if (!record || record.date !== today) record = { date: today, count: 0 };
-  if (record.count >= DAILY_LIMIT) return false;
-  record.count += 1;
-  localStorage.setItem(DAILY_KEY, JSON.stringify(record));
-  return true;
-}
-
-const PLATFORMS = [
-  { code: 'instagram', label: 'Instagram' }, { code: 'tiktok', label: 'TikTok' },
-  { code: 'linkedin', label: 'LinkedIn' }, { code: 'facebook', label: 'Facebook' },
-  { code: 'telegram', label: 'Telegram' }, { code: 'x', label: 'X' }, { code: 'reddit', label: 'Reddit' },
-  { code: 'youtube', label: 'YouTube' },
+const products = [
+  {
+    tag: '01',
+    name: 'TagGenerator AI',
+    line: {
+      en: 'Turn any post idea into captions and hashtags in seconds.',
+      ru: 'Превращает любую идею поста в подпись и хэштеги за секунды.',
+      es: 'Convierte cualquier idea de publicación en subtitulos y hashtags en segundos.',
+      fr: 'Transforme n\u2019importe quelle id\u00e9e de post en l\u00e9gendes et hashtags en quelques secondes.',
+      de: 'Verwandelt jede Post-Idee in Sekunden in Bildunterschriften und Hashtags.',
+      pt: 'Transforma qualquer ideia de post em legendas e hashtags em segundos.',
+      zh: '\u5c06\u4efb\u4f55\u5e16\u5b50\u521b\u610f\u5728\u6570\u79d2\u5185\u8f6c\u5316\u4e3a\u914d\u6587\u548c\u6807\u7b7e\u3002',
+      ja: '\u3069\u3093\u306a\u6295\u7a3f\u30a2\u30a4\u30c7\u30a2\u3082\u6570\u79d2\u3067\u30ad\u30e3\u30d7\u30b7\u30e7\u30f3\u3068\u30cf\u30c3\u30b7\u30e5\u30bf\u30b0\u306b\u5909\u63db\u3057\u307e\u3059\u3002',
+    },
+    problem: {
+      en: 'You spend 15-20 minutes staring at a blank caption box before every post.',
+      ru: 'Ты тратишь 15-20 минут на придумывание подписи перед каждым постом.',
+      es: 'Pasas 15-20 minutos mirando un cuadro de texto vac\u00edo antes de cada publicaci\u00f3n.',
+      fr: 'Tu passes 15 \u00e0 20 minutes devant une l\u00e9gende vide avant chaque post.',
+      de: 'Du starrst vor jedem Post 15-20 Minuten auf ein leeres Textfeld.',
+      pt: 'Voc\u00ea gasta 15-20 minutos olhando para uma legenda em branco antes de cada post.',
+      zh: '\u6bcf\u6b21\u53d1\u5e16\u524d\u4f60\u90fd\u8981\u76ef\u7740\u7a7a\u767d\u6587\u672c\u6846\u770b15-20\u5206\u949f\u3002',
+      ja: '\u6295\u7a3f\u524d\u306b\u7a7a\u306e\u30ad\u30e3\u30d7\u30b7\u30e7\u30f3\u6b04\u3092\u524d\u306b15\u301c20\u5206\u60a9\u3080\u3002',
+    },
+    result: {
+      en: 'Saves roughly 2 hours a week on content planning.',
+      ru: 'Экономит примерно 2 часа в неделю на планировании контента.',
+      es: 'Ahorra unas 2 horas por semana en la planificaci\u00f3n de contenido.',
+      fr: '\u00c9conomise environ 2 heures par semaine sur la planification de contenu.',
+      de: 'Spart etwa 2 Stunden pro Woche bei der Content-Planung.',
+      pt: 'Economiza cerca de 2 horas por semana no planejamento de conte\u00fado.',
+      zh: '\u6bcf\u5468\u8282\u7701\u5927\u7ea62\u5c0f\u65f6\u7684\u5185\u5bb9\u89c4\u5212\u65f6\u95f4\u3002',
+      ja: '\u30b3\u30f3\u30c6\u30f3\u30c4\u8a08\u753b\u306e\u624b\u9593\u3092\u9031\u7d042\u6642\u9593\u524a\u6e1b\u3002',
+    },
+    price: '$49',
+    stat: { en: '20 languages', ru: '20 языков', es: '20 idiomas', fr: '20 langues', de: '20 Sprachen', pt: '20 idiomas', zh: '20\u79cd\u8bed\u8a00', ja: '20\u8a00\u8a9e' },
+    url: 'https://taggeneratorai.vercel.app/',
+    widget: 'https://widget.lava.top/d058ad7b-f43f-45a9-9d8a-e255697c8f46',
+    benefits: [
+      'The AI actually sees your photo -- no need to describe what\u2019s in it.',
+      'One input, every platform: Instagram, TikTok, WhatsApp, YouTube Shorts, X, Pinterest.',
+      'Your brand voice in every line -- friendly, expert, playful, or formal.',
+      'Batch mode plans a full week of posts in one click.',
+    ],
+  },
+  {
+    tag: '02',
+    name: 'ReviewReply AI',
+    line: {
+      en: 'Paste any customer review, get thoughtful replies in seconds.',
+      ru: 'Вставляешь любой отзыв клиента — получаешь продуманный ответ за секунды.',
+      es: 'Pega cualquier rese\u00f1a de cliente y obt\u00e9n respuestas reflexivas en segundos.',
+      fr: 'Collez n\u2019importe quel avis client, obtenez des r\u00e9ponses r\u00e9fl\u00e9chies en quelques secondes.',
+      de: 'F\u00fcge jede Kundenbewertung ein und erhalte durchdachte Antworten in Sekunden.',
+      pt: 'Cole qualquer avalia\u00e7\u00e3o de cliente e receba respostas cuidadosas em segundos.',
+      zh: '\u7c98\u8d34\u4efb\u4f55\u5ba2\u6237\u8bc4\u4ef7\uff0c\u6570\u79d2\u5185\u83b7\u5f97\u7ecf\u8fc7\u601d\u8003\u7684\u56de\u590d\u3002',
+      ja: '\u9867\u5ba2\u30ec\u30d3\u30e5\u30fc\u3092\u8cbc\u308a\u4ed8\u3051\u308b\u3060\u3051\u3067\u3001\u6570\u79d2\u3067\u4e01\u5be7\u306a\u8fd4\u4fe1\u304c\u5f97\u3089\u308c\u307e\u3059\u3002',
+    },
+    problem: {
+      en: 'A negative review sits unanswered for days because you don\u2019t know what to say.',
+      ru: 'Негативный отзыв висит без ответа днями, потому что не знаешь, что написать.',
+      es: 'Una rese\u00f1a negativa queda sin respuesta durante d\u00edas porque no sabes qu\u00e9 decir.',
+      fr: 'Un avis n\u00e9gatif reste sans r\u00e9ponse pendant des jours parce que tu ne sais pas quoi dire.',
+      de: 'Eine negative Bewertung bleibt tagelang unbeantwortet, weil du nicht wei\u00dft, was du sagen sollst.',
+      pt: 'Uma avalia\u00e7\u00e3o negativa fica sem resposta por dias porque voc\u00ea n\u00e3o sabe o que dizer.',
+      zh: '\u56e0\u4e3a\u4e0d\u77e5\u9053\u8be5\u8bf4\u4ec0\u4e48\uff0c\u5dee\u8bc4\u5c31\u8fd9\u6837\u653e\u7740\u597d\u51e0\u5929\u65e0\u4eba\u56de\u590d\u3002',
+      ja: '\u4f55\u3092\u66f8\u3051\u3070\u3044\u3044\u304b\u5206\u304b\u3089\u305a\u3001\u60aa\u3044\u30ec\u30d3\u30e5\u30fc\u304c\u4f55\u65e5\u3082\u653e\u7f6e\u3055\u308c\u308b\u3002',
+    },
+    result: {
+      en: 'Replies go out in minutes, not hours of second-guessing.',
+      ru: 'Ответы уходят за минуты, а не после часов раздумья.',
+      es: 'Las respuestas salen en minutos, no tras horas de dudas.',
+      fr: 'Les r\u00e9ponses partent en quelques minutes, pas apr\u00e8s des heures d\u2019h\u00e9sitation.',
+      de: 'Antworten gehen in Minuten raus, nicht nach Stunden des Z\u00f6gerns.',
+      pt: 'As respostas saem em minutos, n\u00e3o depois de horas de d\u00favida.',
+      zh: '\u56de\u590d\u5728\u51e0\u5206\u949f\u5185\u53d1\u51fa\uff0c\u800c\u4e0d\u662f\u7ea0\u7ed3\u597d\u51e0\u4e2a\u5c0f\u65f6\u3002',
+      ja: '\u8fd4\u4fe1\u306f\u4f55\u6642\u9593\u3082\u60a9\u3080\u3053\u3068\u306a\u304f\u3001\u6570\u5206\u3067\u9001\u4fe1\u3067\u304d\u308b\u3002',
+    },
+    price: '$79',
+    stat: { en: '20 languages', ru: '20 языков', es: '20 idiomas', fr: '20 langues', de: '20 Sprachen', pt: '20 idiomas', zh: '20\u79cd\u8bed\u8a00', ja: '20\u8a00\u8a9e' },
+    url: 'https://reviewreply-ai-one.vercel.app/',
+    widget: 'https://widget.lava.top/f30c6c97-507b-4591-b810-dd62ff16fb66',
+    benefits: [
+      'Reads between the lines -- understands what an unhappy customer actually needs.',
+      'Three reply options every time, different lengths and tones.',
+      '\u201cFor your eyes only\u201d -- spots systemic issues hiding inside a single review.',
+      'Drafts a private follow-up message, and turns positive reviews into social posts.',
+    ],
+  },
+  {
+    tag: '03',
+    name: 'Local Signal',
+    line: {
+      en: 'Get found on Google Search and Maps -- posts, replies, SEO copy.',
+      ru: 'Помогает найти вас в Google Поиске и Картах — посты, ответы, SEO-тексты.',
+      es: 'Hazte visible en Google B\u00fasqueda y Maps: publicaciones, respuestas, textos SEO.',
+      fr: 'Soyez visible sur Google Recherche et Maps : posts, r\u00e9ponses, textes SEO.',
+      de: 'Werde auf Google Suche und Maps gefunden -- Beitr\u00e4ge, Antworten, SEO-Texte.',
+      pt: 'Seja encontrado no Google Pesquisa e Maps -- posts, respostas, textos de SEO.',
+      zh: '\u5728Google\u641c\u7d22\u548c\u5730\u56fe\u4e2d\u88ab\u53d1\u73b0\u2014\u2014\u5e16\u6587\u3001\u56de\u590d\u3001SEO\u6587\u6848\u3002',
+      ja: 'Google\u691c\u7d22\u3068\u30de\u30c3\u30d7\u3067\u898b\u3064\u3051\u3066\u3082\u3089\u3048\u308b\u2014\u2014\u6295\u7a3f\u3001\u8fd4\u4fe1\u3001SEO\u6587\u3002',
+    },
+    problem: {
+      en: 'Your Google Business Profile sits untouched for months, quietly losing ground in search.',
+      ru: 'Профиль в Google Business месяцами стоит без обновлений, теряя позиции в поиске.',
+      es: 'Tu perfil de Google Business lleva meses sin actualizar, perdiendo posiciones en la b\u00fasqueda.',
+      fr: 'Votre fiche Google Business reste inchang\u00e9e pendant des mois, perdant du terrain dans les recherches.',
+      de: 'Dein Google-Business-Profil bleibt monatelang unber\u00fchrt und verliert leise an Sichtbarkeit.',
+      pt: 'Seu perfil do Google Business fica meses sem atualiza\u00e7\u00e3o, perdendo posi\u00e7\u00f5es na busca.',
+      zh: '\u4f60\u7684Google\u5546\u5bb6\u4e2a\u4eba\u8d44\u6599\u6570\u6708\u672a\u66f4\u65b0\uff0c\u6392\u540d\u6094\u6094\u4e0b\u6ed1\u3002',
+      ja: 'Google\u30d3\u30b8\u30cd\u30b9\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u304c\u6570\u30f6\u6708\u653e\u7f6e\u3055\u308c\u3001\u691c\u7d22\u9806\u4f4d\u304c\u4f4e\u4e0b\u3002',
+    },
+    result: {
+      en: 'Stays active without you having to invent something to post every week.',
+      ru: 'Остаётся активным без необходимости каждую неделю придумывать, что постить.',
+      es: 'Se mantiene activo sin que tengas que inventar algo que publicar cada semana.',
+      fr: 'Reste actif sans que vous ayez \u00e0 inventer quelque chose \u00e0 publier chaque semaine.',
+      de: 'Bleibt aktiv, ohne dass du dir jede Woche etwas Neues ausdenken musst.',
+      pt: 'Permanece ativo sem que voc\u00ea precise inventar algo para postar toda semana.',
+      zh: '\u65e0\u9700\u6bcf\u5468\u60f3\u53d1\u4ec0\u4e48\uff0c\u4fdd\u6301\u6d3b\u8dc3\u3002',
+      ja: '\u6bce\u9031\u6295\u7a3f\u5185\u5bb9\u3092\u8003\u3048\u308b\u5fc5\u8981\u306a\u304f\u3001\u30a2\u30af\u30c6\u30a3\u30d6\u3092\u7dad\u6301\u3002',
+    },
+    price: '$99',
+    stat: { en: '5 tools', ru: '5 инструментов', es: '5 herramientas', fr: '5 outils', de: '5 Werkzeuge', pt: '5 ferramentas', zh: '5\u4e2a\u5de5\u5177', ja: '5\u3064\u306e\u30c4\u30fc\u30eb' },
+    url: 'https://local-signal.vercel.app/',
+    widget: 'https://widget.lava.top/cb430a7a-32e3-4578-9806-817d65bb3a26',
+    benefits: [
+      '\u201cThis Week\u2019s 3 Actions\u201d -- a concrete plan, not just data.',
+      'GBP posts and Q&A replies, matched to your tone and location.',
+      'A full month\u2019s content calendar -- 12 post ideas, ready to publish.',
+      'Stand Out: paste a competitor\u2019s post, find the gap you can fill.',
+    ],
+  },
+  {
+    tag: '04',
+    name: 'SayItRight AI',
+    line: {
+      en: 'Write in your own language -- get natural, professional English back.',
+      ru: 'Пишешь на своём языке — получаешь естественный профессиональный английский.',
+      es: 'Escribe en tu idioma -- recibe ingl\u00e9s natural y profesional.',
+      fr: '\u00c9crivez dans votre langue -- recevez un anglais naturel et professionnel.',
+      de: 'Schreibe in deiner Sprache -- erhalte nat\u00fcrliches, professionelles Englisch.',
+      pt: 'Escreva no seu idioma -- receba ingl\u00eas natural e profissional.',
+      zh: '\u7528\u4f60\u81ea\u5df1\u7684\u8bed\u8a00\u5199\u4f5c\u2014\u2014\u83b7\u5f97\u81ea\u7136\u4e13\u4e1a\u7684\u82f1\u8bed\u3002',
+      ja: '\u81ea\u5206\u306e\u8a00\u8a9e\u3067\u66f8\u3044\u3066\u2014\u2014\u81ea\u7136\u3067\u30d7\u30ed\u306e\u82f1\u8a9e\u306b\u3002',
+    },
+    problem: {
+      en: 'You write to a client in broken English and just hope they understand.',
+      ru: 'Ты пишешь клиенту на ломаном английском и надеешься, что он поймёт.',
+      es: 'Le escribes a un cliente en ingl\u00e9s roto y solo esperas que te entienda.',
+      fr: 'Vous \u00e9crivez \u00e0 un client dans un anglais approximatif en esp\u00e9rant qu\u2019il comprenne.',
+      de: 'Du schreibst einem Kunden in gebrochenem Englisch und hoffst, dass er es versteht.',
+      pt: 'Voc\u00ea escreve para um cliente em ingl\u00eas quebrado e s\u00f3 espera que ele entenda.',
+      zh: '\u4f60\u7528\u751f\u786c\u7684\u82f1\u8bed\u7ed9\u5ba2\u6237\u5199\u4fe1\uff0c\u53ea\u80fd\u5e0c\u671b\u5bf9\u65b9\u770b\u61c2\u3002',
+      ja: '\u30d6\u30ed\u30fc\u30af\u30f3\u82f1\u8a9e\u3067\u9867\u5ba2\u306b\u66f8\u304d\u3001\u4f1d\u308f\u308b\u3053\u3068\u3092\u9858\u3046\u3060\u3051\u3002',
+    },
+    result: {
+      en: 'Every fix is explained in your own language, so you actually learn.',
+      ru: 'Каждое исправление объясняется на твоём языке — ты реально учишься.',
+      es: 'Cada correcci\u00f3n se explica en tu idioma -- realmente aprendes.',
+      fr: 'Chaque correction est expliqu\u00e9e dans votre langue -- vous apprenez vraiment.',
+      de: 'Jede Korrektur wird in deiner Sprache erkl\u00e4rt -- du lernst wirklich dazu.',
+      pt: 'Cada corre\u00e7\u00e3o \u00e9 explicada no seu idioma -- voc\u00ea realmente aprende.',
+      zh: '\u6bcf\u4e2a\u4fee\u6539\u90fd\u7528\u4f60\u7684\u8bed\u8a00\u89e3\u91ca\u2014\u2014\u4f60\u771f\u6b63\u5b66\u5230\u4e1c\u897f\u3002',
+      ja: '\u4fee\u6b63\u306f\u3059\u3079\u3066\u81ea\u5206\u306e\u8a00\u8a9e\u3067\u8aac\u660e\u3055\u308c\u308b\u2014\u2014\u672c\u5f53\u306b\u5b66\u3079\u308b\u3002',
+    },
+    price: '$59',
+    stat: { en: '35 languages', ru: '35 языков', es: '35 idiomas', fr: '35 langues', de: '35 Sprachen', pt: '35 idiomas', zh: '35\u79cd\u8bed\u8a00', ja: '35\u8a00\u8a9e' },
+    url: 'https://say-it-right-blush.vercel.app/',
+    widget: 'https://widget.lava.top/a60a430e-55eb-4989-9881-a98ad2a99e45',
+    benefits: [
+      'Write however you want -- your language or rough English, either works.',
+      'Every fix explained in your own language, so you actually learn.',
+      'A formality slider -- from very formal to casual, in one move.',
+      'Listen to the result read aloud, and save your last 5 rewrites.',
+    ],
+  },
+  {
+    tag: '05',
+    name: 'Content Strategist AI',
+    line: {
+      en: 'A week of content ideas -- built for the platform you\u2019re actually posting on.',
+      ru: 'Неделя идей для контента — под ту платформу, где ты реально публикуешься.',
+      es: 'Una semana de ideas de contenido -- pensadas para la plataforma en la que realmente publicas.',
+      fr: 'Une semaine d\u2019id\u00e9es de contenu -- pens\u00e9e pour la plateforme sur laquelle vous publiez vraiment.',
+      de: 'Eine Woche Content-Ideen -- gemacht f\u00fcr die Plattform, auf der du wirklich postest.',
+      pt: 'Uma semana de ideias de conte\u00fado -- feitas para a plataforma onde voc\u00ea realmente publica.',
+      zh: '\u4e00\u5468\u7684\u5185\u5bb9\u60f3\u6cd5\u2014\u2014\u4e13\u4e3a\u4f60\u771f\u6b63\u53d1\u5e03\u7684\u5e73\u53f0\u6253\u9020\u3002',
+      ja: '\u5b9f\u969b\u306b\u6295\u7a3f\u3059\u308b\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0\u306e\u305f\u3081\u306e\u3001\u4e00\u9031\u9593\u5206\u306e\u30b3\u30f3\u30c6\u30f3\u30c4\u30a2\u30a4\u30c7\u30a2\u3002',
+    },
+    problem: {
+      en: 'You stare at an empty content calendar every single week, and every idea feels the same.',
+      ru: 'Каждую неделю смотришь на пустой контент-план, и все идеи звучат одинаково.',
+      es: 'Miras un calendario de contenido vac\u00edo cada semana, y todas las ideas suenan igual.',
+      fr: 'Vous fixez un calendrier de contenu vide chaque semaine, et toutes les id\u00e9es se ressemblent.',
+      de: 'Du starrst jede Woche auf einen leeren Content-Kalender, und jede Idee klingt gleich.',
+      pt: 'Voc\u00ea encara um calend\u00e1rio de conte\u00fado vazio toda semana, e todas as ideias parecem iguais.',
+      zh: '\u4f60\u6bcf\u5468\u90fd\u76ef\u7740\u7a7a\u767d\u7684\u5185\u5bb9\u65e5\u5386\u53d1\u6101\uff0c\u6240\u6709\u60f3\u6cd5\u90fd\u5927\u540c\u5c0f\u5f02\u3002',
+      ja: '\u6bce\u9031\u7a7a\u3063\u307d\u306e\u30b3\u30f3\u30c6\u30f3\u30c4\u30ab\u30ec\u30f3\u30c0\u30fc\u3092\u524d\u306b\u3057\u3066\u3001\u3069\u306e\u30a2\u30a4\u30c7\u30a2\u3082\u540c\u3058\u3088\u3046\u306b\u611f\u3058\u3066\u3057\u307e\u3046\u3002',
+    },
+    result: {
+      en: 'A full week of ideas, balanced across five content pillars, ready to publish.',
+      ru: 'Полная неделя идей, сбалансированных по пяти content pillars, готовых к публикации.',
+      es: 'Una semana completa de ideas, equilibradas en cinco pilares de contenido, listas para publicar.',
+      fr: 'Une semaine compl\u00e8te d\u2019id\u00e9es, \u00e9quilibr\u00e9es sur cinq piliers de contenu, pr\u00eates \u00e0 publier.',
+      de: 'Eine ganze Woche Ideen, ausgewogen \u00fcber f\u00fcnf Content-S\u00e4ulen, bereit zur Ver\u00f6ffentlichung.',
+      pt: 'Uma semana inteira de ideias, equilibradas em cinco pilares de conte\u00fado, prontas para publicar.',
+      zh: '\u6574\u6574\u4e00\u5468\u7684\u60f3\u6cd5\uff0c\u5728\u4e94\u4e2a\u5185\u5bb9\u652f\u67f1\u4e4b\u95f4\u5e73\u8861\u5206\u5e03\uff0c\u968f\u65f6\u53ef\u53d1\u3002',
+      ja: '5\u3064\u306e\u30b3\u30f3\u30c6\u30f3\u30c4\u30d4\u30e9\u30fc\u306b\u30d0\u30e9\u30f3\u30b9\u3088\u304f\u5206\u914d\u3055\u308c\u305f\u3001\u4e00\u9031\u9593\u5206\u306e\u6295\u7a3f\u6e96\u5099\u5b8c\u4e86\u306e\u30a2\u30a4\u30c7\u30a2\u3002',
+    },
+    price: '$129',
+    stat: { en: '4 modes', ru: '4 режима', es: '4 modos', fr: '4 modes', de: '4 Modi', pt: '4 modos', zh: '4\u79cd\u6a21\u5f0f', ja: '4\u3064\u306e\u30e2\u30fc\u30c9' },
+    url: 'https://content-strategist-ai.vercel.app/',
+    widget: 'https://widget.lava.top/bfbe4e9d-a890-48eb-82a6-8d081e6bec26',
+    benefits: [
+      'Single platform, cross-platform calendar, competitor gap analysis, or upload photos for a strategic posting plan.',
+      '5 content pillars, automatically balanced so your feed never feels one-note.',
+      'Regenerate a single day without redoing the whole week -- and hashtags, best posting times included.',
+      'Available in 25 languages -- interface and generation both.',
+    ],
+  },
 ];
 
-function getModes(t) {
-  return [
-    { value: 'single', label: t.tabSingle },
-    { value: 'cross', label: t.tabCross },
-    { value: 'competitor', label: t.tabCompetitor },
-    { value: 'photos', label: t.tabPhotos || 'Photo planner' },
-  ];
-}
+const principles = [
+  {
+    n: '1',
+    title: { en: 'One job, done well', ru: 'Одна задача, сделанная хорошо', es: 'Una tarea, bien hecha', fr: 'Une t\u00e2che, bien faite', de: 'Eine Aufgabe, gut gemacht', pt: 'Uma tarefa, bem feita', zh: '\u4e00\u9879\u4efb\u52a1\uff0c\u505a\u5230\u6781\u81f4', ja: '\u4e00\u3064\u306e\u4ed5\u4e8b\u3092\u3001\u3057\u3063\u304b\u308a\u3068' },
+    body: { en: 'Every tool solves exactly one repetitive task. No dashboards to learn, no features you\u2019ll never open.', ru: 'Каждый инструмент решает ровно одну повторяющуюся задачу. Никаких панелей для изучения, никаких функций, которые ты никогда не откроешь.', es: 'Cada herramienta resuelve exactamente una tarea repetitiva. Sin paneles que aprender, sin funciones que nunca usar\u00e1s.', fr: 'Chaque outil r\u00e9sout exactement une t\u00e2che r\u00e9p\u00e9titive. Pas de tableau de bord \u00e0 apprendre, pas de fonctions que vous n\u2019ouvrirez jamais.', de: 'Jedes Tool l\u00f6st genau eine wiederkehrende Aufgabe. Kein Dashboard zum Lernen, keine Funktionen, die du nie \u00f6ffnest.', pt: 'Cada ferramenta resolve exatamente uma tarefa repetitiva. Sem pain\u00e9is para aprender, sem recursos que voc\u00ea nunca vai abrir.', zh: '\u6bcf\u4e2a\u5de5\u5177\u53ea\u89e3\u51b3\u4e00\u4e2a\u91cd\u590d\u6027\u4efb\u52a1\u3002\u65e0\u9700\u5b66\u4e60\u4eea\u8868\u76d8\uff0c\u6ca1\u6709\u4f60\u6c38\u8fdc\u4e0d\u4f1a\u6253\u5f00\u7684\u529f\u80fd\u3002', ja: '\u5404\u30c4\u30fc\u30eb\u306f\u305f\u3060\u4e00\u3064\u306e\u53cd\u5fa9\u4f5c\u696d\u3092\u89e3\u6c7a\u3002\u5b66\u3076\u3079\u304d\u30c0\u30c3\u30b7\u30e5\u30dc\u30fc\u30c9\u3082\u3001\u4f7f\u308f\u306a\u3044\u6a5f\u80fd\u3082\u306a\u3057\u3002' },
+  },
+  {
+    n: '2',
+    title: { en: 'Try before you trust', ru: 'Попробуй, прежде чем довериться', es: 'Prueba antes de confiar', fr: 'Essayez avant de faire confiance', de: 'Testen, bevor man vertraut', pt: 'Experimente antes de confiar', zh: '\u5148\u4f53\u9a8c\uff0c\u540e\u4fe1\u4efb', ja: '\u4fe1\u983c\u3059\u308b\u524d\u306b\u8a66\u3059' },
+    body: { en: 'You can see what a tool does before you hand over any details. No account required just to look.', ru: 'Ты можешь увидеть, что делает инструмент, до того как что-то указывать. Аккаунт не нужен даже чтобы просто посмотреть.', es: 'Puedes ver qu\u00e9 hace una herramienta antes de dar ning\u00fan dato. No hace falta cuenta solo para mirar.', fr: 'Vous pouvez voir ce que fait un outil avant de fournir la moindre information. Aucun compte requis juste pour regarder.', de: 'Du siehst, was ein Tool tut, bevor du irgendwelche Angaben machst. Kein Konto n\u00f6tig, nur um zu schauen.', pt: 'Voc\u00ea pode ver o que uma ferramenta faz antes de fornecer qualquer dado. N\u00e3o \u00e9 preciso conta s\u00f3 para olhar.', zh: '\u5728\u63d0\u4f9b\u4efb\u4f55\u4fe1\u606f\u4e4b\u524d\uff0c\u4f60\u5c31\u80fd\u770b\u5230\u5de5\u5177\u7684\u5b9e\u9645\u6548\u679c\u3002\u4ec5\u4ec5\u67e5\u770b\u65e0\u9700\u6ce8\u518c\u8d26\u53f7\u3002', ja: '\u60c5\u5831\u3092\u5165\u529b\u3059\u308b\u524d\u306b\u3001\u30c4\u30fc\u30eb\u306e\u52d5\u304d\u3092\u78ba\u8a8d\u3067\u304d\u308b\u3002\u898b\u308b\u3060\u3051\u306a\u3089\u30a2\u30ab\u30a6\u30f3\u30c8\u4e0d\u8981\u3002' },
+  },
+  {
+    n: '3',
+    title: { en: 'Ships in days, not quarters', ru: 'Запускается за дни, не за кварталы', es: 'Se lanza en d\u00edas, no en trimestres', fr: 'Livr\u00e9 en jours, pas en trimestres', de: 'Fertig in Tagen, nicht in Quartalen', pt: 'Lan\u00e7ado em dias, n\u00e3o em trimestres', zh: '\u6570\u5929\u5373\u53ef\u4e0a\u7ebf\uff0c\u800c\u975e\u6570\u4e2a\u5b63\u5ea6', ja: '\u56db\u534a\u671f\u3067\u306f\u306a\u304f\u6570\u65e5\u3067\u30ea\u30ea\u30fc\u30b9' },
+    body: { en: 'Small enough that one person can build it end to end -- so it goes from idea to live product fast.', ru: 'Достаточно просто, чтобы один человек построил всё целиком — от идеи до живого продукта быстро.', es: 'Lo bastante peque\u00f1o para que una sola persona lo construya de principio a fin, as\u00ed que pasa de idea a producto real r\u00e1pido.', fr: 'Assez petit pour qu\u2019une seule personne le construise de bout en bout -- donc \u00e7a passe vite de l\u2019id\u00e9e au produit r\u00e9el.', de: 'Klein genug, dass eine Person es komplett allein baut -- von der Idee zum fertigen Produkt, schnell.', pt: 'Pequeno o suficiente para que uma pessoa construa tudo sozinha -- da ideia ao produto real, r\u00e1pido.', zh: '\u89c4\u6a21\u5c0f\u5230\u4e00\u4e2a\u4eba\u5c31\u80fd\u5b8c\u6210\u5f00\u53d1\u2014\u2014\u4ece\u60f3\u6cd5\u5230\u4e0a\u7ebf\u4ea7\u54c1\u5f88\u5feb\u3002', ja: '\u4e00\u4eba\u3067\u5b8c\u7d50\u3067\u304d\u308b\u898f\u6a21\u3060\u304b\u3089\u3001\u30a2\u30a4\u30c7\u30a2\u304b\u3089\u5b9f\u969b\u306e\u88fd\u54c1\u307e\u3067\u304c\u65e9\u3044\u3002' },
+  },
+  {
+    n: '4',
+    title: { en: 'Pay once, keep it', ru: 'Оплатил раз — пользуйся всегда', es: 'Paga una vez, qu\u00e9datelo', fr: 'Payez une fois, gardez-le', de: 'Einmal zahlen, für immer behalten', pt: 'Pague uma vez, fique com ele', zh: '\u4ed8\u8d39\u4e00\u6b21\uff0c\u6c38\u4e45\u62e5\u6709', ja: '\u4e00\u5ea6\u306e\u652f\u6255\u3044\u3067\u3001\u305a\u3063\u3068\u4f7f\u3048\u308b' },
+    body: { en: 'No subscriptions to track or cancel. You buy access, it\u2019s yours.', ru: 'Никаких подписок, которые надо отслеживать или отменять. Купил доступ — он твой.', es: 'Sin suscripciones que rastrear ni cancelar. Compras el acceso y es tuyo.', fr: 'Aucun abonnement \u00e0 suivre ou annuler. Vous achetez l\u2019acc\u00e8s, il est \u00e0 vous.', de: 'Keine Abos zum Verfolgen oder K\u00fcndigen. Du kaufst Zugang, er geh\u00f6rt dir.', pt: 'Sem assinaturas para rastrear ou cancelar. Voc\u00ea compra o acesso, ele \u00e9 seu.', zh: '\u65e0\u9700\u8ffd\u8e2a\u6216\u53d6\u6d88\u8ba2\u9605\u3002\u4e00\u6b21\u8d2d\u4e70\uff0c\u6c38\u4e45\u5c5e\u4e8e\u4f60\u3002', ja: '\u8ffd\u8de1\u3084\u89e3\u7d04\u304c\u5fc5\u8981\u306a\u30b5\u30d6\u30b9\u30af\u30ea\u30d7\u30b7\u30e7\u30f3\u306a\u3057\u3002\u8cfc\u5165\u3057\u305f\u30a2\u30af\u30bb\u30b9\u306f\u3042\u306a\u305f\u306e\u3082\u306e\u3002' },
+  },
+];
 
-const BUSINESS_CATEGORY_OPTIONS_BY_LANG = {
-  en: ["Coffee shop", "Restaurant", "Cafe", "Bakery", "Bar", "Pizza restaurant", "Hair salon", "Barbershop", "Nail salon", "Spa", "Massage therapist", "Gym", "Yoga studio", "Dentist", "Doctor", "Pharmacy", "Veterinarian", "Auto repair shop", "Car wash", "Florist", "Pet store", "Bookstore", "Clothing store", "Jewelry store", "Furniture store", "Hardware store", "Law firm", "Accounting firm", "Real estate agency", "Insurance agency", "Photography studio", "Tattoo shop", "Dry cleaner", "Locksmith", "E-commerce store", "SaaS company", "Marketing agency", "Freelance consultant", "Blogging", "Entertainment"],
-  ru: ["Кофейня", "Ресторан", "Кафе", "Пекарня", "Бар", "Пиццерия", "Парикмахерская", "Барбершоп", "Ногтевой салон", "Спа", "Массажист", "Спортзал", "Йога-студия", "Стоматолог", "Врач", "Аптека", "Ветеринар", "Автосервис", "Автомойка", "Цветочный магазин", "Зоомагазин", "Книжный магазин", "Магазин одежды", "Ювелирный магазин", "Магазин мебели", "Хозяйственный магазин", "Юридическая фирма", "Бухгалтерская фирма", "Агентство недвижимости", "Страховое агентство", "Фотостудия", "Тату-салон", "Химчистка", "Служба замков", "Интернет-магазин", "SaaS-компания", "Маркетинговое агентство", "Фриланс-консультант", "Блогинг", "Развлечения"],
-  es: ["Cafetería", "Restaurante", "Café", "Panadería", "Bar", "Pizzería", "Peluquería", "Barbería", "Salón de uñas", "Spa", "Masajista", "Gimnasio", "Estudio de yoga", "Dentista", "Médico", "Farmacia", "Veterinario", "Taller mecánico", "Autolavado", "Floristería", "Tienda de mascotas", "Librería", "Tienda de ropa", "Joyería", "Tienda de muebles", "Ferretería", "Bufete de abogados", "Estudio contable", "Agencia inmobiliaria", "Agencia de seguros", "Estudio fotográfico", "Estudio de tatuajes", "Tintorería", "Cerrajería", "Tienda en línea", "Empresa SaaS", "Agencia de marketing", "Consultor independiente", "Blogging", "Entretenimiento"],
-  fr: ["Café", "Restaurant", "Bistrot", "Boulangerie", "Bar", "Pizzeria", "Salon de coiffure", "Barbier", "Salon de manucure", "Spa", "Masseur", "Salle de sport", "Studio de yoga", "Dentiste", "Médecin", "Pharmacie", "Vétérinaire", "Garage automobile", "Lavage auto", "Fleuriste", "Animalerie", "Librairie", "Boutique de vêtements", "Bijouterie", "Magasin de meubles", "Quincaillerie", "Cabinet d’avocats", "Cabinet comptable", "Agence immobilière", "Agence d’assurance", "Studio photo", "Salon de tatouage", "Pressing", "Serrurerie", "Boutique en ligne", "Entreprise SaaS", "Agence marketing", "Consultant indépendant", "Blogging", "Divertissement"],
-  de: ["Café", "Restaurant", "Kaffeehaus", "Bäckerei", "Bar", "Pizzeria", "Friseursalon", "Barbershop", "Nagelstudio", "Spa", "Masseur", "Fitnessstudio", "Yoga-Studio", "Zahnarzt", "Arzt", "Apotheke", "Tierarzt", "Autowerkstatt", "Autowaschanlage", "Blumenladen", "Tierhandlung", "Buchhandlung", "Bekleidungsgeschäft", "Juwelier", "Möbelgeschäft", "Baumarkt", "Anwaltskanzlei", "Steuerberatung", "Immobilienagentur", "Versicherungsagentur", "Fotostudio", "Tattoo-Studio", "Reinigung", "Schlüsseldienst", "Online-Shop", "SaaS-Unternehmen", "Marketingagentur", "Freiberuflicher Berater", "Blogging", "Unterhaltung"],
-  pt: ["Cafeteria", "Restaurante", "Café", "Padaria", "Bar", "Pizzaria", "Salão de cabeleireiro", "Barbearia", "Salão de unhas", "Spa", "Massagista", "Academia", "Estúdio de ioga", "Dentista", "Médico", "Farmácia", "Veterinário", "Oficina mecânica", "Lava-jato", "Floricultura", "Pet shop", "Livraria", "Loja de roupas", "Joalheria", "Loja de móveis", "Loja de ferragens", "Escritório de advocacia", "Escritório de contabilidade", "Imobiliária", "Corretora de seguros", "Estúdio fotográfico", "Estúdio de tatuagem", "Lavanderia", "Chaveiro", "Loja online", "Empresa SaaS", "Agência de marketing", "Consultor freelancer", "Blogging", "Entretenimento"],
-  it: ["Caffetteria", "Ristorante", "Bar", "Panetteria", "Pub", "Pizzeria", "Parrucchiere", "Barbiere", "Salone per unghie", "Spa", "Massaggiatore", "Palestra", "Studio yoga", "Dentista", "Medico", "Farmacia", "Veterinario", "Officina auto", "Autolavaggio", "Fioraio", "Negozio per animali", "Libreria", "Negozio di abbigliamento", "Gioielleria", "Negozio di mobili", "Ferramenta", "Studio legale", "Studio commercialista", "Agenzia immobiliare", "Agenzia assicurativa", "Studio fotografico", "Studio tatuaggi", "Lavanderia", "Fabbro", "Negozio online", "Azienda SaaS", "Agenzia di marketing", "Consulente freelance", "Blogging", "Intrattenimento"],
-  nl: ["Koffiezaak", "Restaurant", "Café", "Bakkerij", "Bar", "Pizzeria", "Kapsalon", "Barbershop", "Nagelstudio", "Spa", "Masseur", "Sportschool", "Yogastudio", "Tandarts", "Huisarts", "Apotheek", "Dierenarts", "Autogarage", "Wasstraat", "Bloemenwinkel", "Dierenwinkel", "Boekwinkel", "Kledingwinkel", "Juwelier", "Meubelwinkel", "Bouwmarkt", "Advocatenkantoor", "Accountantskantoor", "Makelaarskantoor", "Verzekeringskantoor", "Fotostudio", "Tattooshop", "Stomerij", "Slotenmaker", "Webshop", "SaaS-bedrijf", "Marketingbureau", "Freelance consultant", "Bloggen", "Entertainment"],
-  pl: ["Kawiarnia", "Restauracja", "Kafejka", "Piekarnia", "Bar", "Pizzeria", "Salon fryzjerski", "Barbershop", "Salon paznokci", "Spa", "Masażysta", "Siłownia", "Studio jogi", "Dentysta", "Lekarz", "Apteka", "Weterynarz", "Warsztat samochodowy", "Myjnia samochodowa", "Kwiaciarnia", "Sklep zoologiczny", "Księgarnia", "Sklep odzieżowy", "Jubiler", "Sklep meblowy", "Sklep budowlany", "Kancelaria prawna", "Biuro rachunkowe", "Agencja nieruchomości", "Agencja ubezpieczeniowa", "Studio fotograficzne", "Studio tatuażu", "Pralnia chemiczna", "Zakład ślusarski", "Sklep internetowy", "Firma SaaS", "Agencja marketingowa", "Niezależny konsultant", "Blogowanie", "Rozrywka"],
-  zh: ["咖啡店", "餐厅", "咖啡馆", "面包店", "酒吧", "披萨店", "美发沙龙", "理发店", "美甲店", "水疗中心", "按摩师", "健身房", "瑜伽馆", "牙医", "医生", "药店", "兽医", "汽车修理店", "洗车店", "花店", "宠物店", "书店", "服装店", "珠宝店", "家具店", "五金店", "律师事务所", "会计事务所", "房地产中介", "保险代理", "摄影工作室", "纹身店", "干洗店", "锁匠", "电商店铺", "SaaS公司", "营销机构", "自由顾问", "博客", "娱乐"],
-  ja: ["コーヒーショップ", "レストラン", "カフェ", "パン屋", "バー", "ピザ店", "美容室", "理容室", "ネイルサロン", "スパ", "マッサージ師", "ジム", "ヨガスタジオ", "歯科医", "医師", "薬局", "獣医", "自動車修理店", "洗車場", "花屋", "ペットショップ", "書店", "衣料品店", "宝石店", "家具店", "金物店", "法律事務所", "会計事務所", "不動産会社", "保険代理店", "写真スタジオ", "タトゥーショップ", "クリーニング店", "鍵屋", "ネットショップ", "SaaS企業", "マーケティング会社", "フリーランスコンサルタント", "ブログ運営", "エンターテインメント"],
-  ko: ["커피숍", "레스토랑", "카페", "베이커리", "바", "피자 레스토랑", "헤어살롱", "이발소", "네일샵", "스파", "마사지사", "헬스장", "요가 스튜디오", "치과의사", "의사", "약국", "수의사", "자동차 정비소", "세차장", "꽃집", "펫샵", "서점", "의류 매장", "보석상", "가구점", "철물점", "법률 사무소", "회계 사무소", "부동산 중개소", "보험 대리점", "사진 스튜디오", "문신샵", "세탁소", "열쇠 수리점", "온라인 쇼핑몰", "SaaS 기업", "마케팅 대행사", "프리랜서 컨설턴트", "블로깅", "엔터테인먼트"],
-  ar: ["مقهى", "مطعم", "كافيه", "مخبز", "حانة", "مطعم بيتزا", "صالون تصفيف شعر", "صالون حلاقة", "صالون أظافر", "سبا", "معالج تدليك", "صالة رياضية", "استوديو يوغا", "طبيب أسنان", "طبيب", "صيدلية", "طبيب بيطري", "ورشة سيارات", "مغسلة سيارات", "محل زهور", "متجر حيوانات أليفة", "مكتبة", "متجر ملابس", "متجر مجوهرات", "متجر أثاث", "متجر أدوات", "مكتب محاماة", "مكتب محاسبة", "وكالة عقارية", "وكالة تأمين", "استوديو تصوير", "محل وشم", "مغسلة ملابس", "محل أقفال", "متجر إلكتروني", "شركة SaaS", "وكالة تسويق", "مستشار مستقل", "التدوين", "الترفيه"],
-  hi: ["कॉफी शॉप", "रेस्तरां", "कैफे", "बेकरी", "बार", "पिज़्ज़ा रेस्तरां", "हेयर सैलून", "बार्बरशॉप", "नेल सैलून", "स्पा", "मालिश चिकित्सक", "जिम", "योगा स्टूडियो", "दंत चिकित्सक", "डॉक्टर", "फार्मेसी", "पशु चिकित्सक", "ऑटो रिपेयर शॉप", "कार वॉश", "फूल की दुकान", "पालतू पशु स्टोर", "किताबों की दुकान", "कपड़ों की दुकान", "ज्वेलरी स्टोर", "फर्नीचर स्टोर", "हार्डवेयर स्टोर", "लॉ फर्म", "अकाउंटिंग फर्म", "रियल एस्टेट एजेंसी", "बीमा एजेंसी", "फोटोग्राफी स्टूडियो", "टैटू शॉप", "ड्राई क्लीनर", "लॉकस्मिथ", "ई-कॉमर्स स्टोर", "SaaS कंपनी", "मार्केटिंग एजेंसी", "फ्रीलांस सलाहकार", "ब्लॉगिंग", "मनोरंजन"],
-  vi: ["Quán cà phê", "Nhà hàng", "Cafe", "Tiệm bánh", "Quán bar", "Nhà hàng pizza", "Salon tóc", "Tiệm cắt tóc nam", "Tiệm nail", "Spa", "Chuyên viên massage", "Phòng gym", "Studio yoga", "Nha sĩ", "Bác sĩ", "Hiệu thuốc", "Bác sĩ thú y", "Tiệm sửa xe", "Rửa xe", "Cửa hàng hoa", "Cửa hàng thú cưng", "Hiệu sách", "Cửa hàng quần áo", "Cửa hàng trang sức", "Cửa hàng nội thất", "Cửa hàng dụng cụ", "Văn phòng luật", "Văn phòng kế toán", "Công ty bất động sản", "Đại lý bảo hiểm", "Studio nhiếp ảnh", "Tiệm xăm hình", "Tiệm giặt khô", "Thợ khóa", "Cửa hàng thương mại điện tử", "Công ty SaaS", "Công ty marketing", "Tư vấn tự do", "Viết blog", "Giải trí"],
-  tr: ["Kahve dükkanı", "Restoran", "Kafe", "Fırın", "Bar", "Pizza restoranı", "Kuaför salonu", "Berber", "Nail art salonu", "Spa", "Masaj terapisti", "Spor salonu", "Yoga stüdyosu", "Diş hekimi", "Doktor", "Eczane", "Veteriner", "Oto tamir dükkanı", "Araç yıkama", "Çiçekçi", "Petshop", "Kitapçı", "Giyim mağazası", "Kuyumcu", "Mobilya mağazası", "Hırdavat dükkanı", "Hukuk bürosu", "Muhasebe bürosu", "Emlak ofisi", "Sigorta acentesi", "Fotoğraf stüdyosu", "Dövme stüdyosu", "Kuru temizleme", "Çilingir", "E-ticaret mağazası", "SaaS şirketi", "Pazarlama ajansı", "Serbest danışman", "Blog yazarlığı", "Eğlence"],
-  fa: ["کافی‌شاپ", "رستوران", "کافه", "نانوایی", "بار", "پیتزافروشی", "آرایشگاه", "سلمانی", "سالن ناخن", "اسپا", "ماساژور", "باشگاه ورزشی", "استودیو یوگا", "دندانپزشک", "پزشک", "داروخانه", "دامپزشک", "تعمیرگاه خودرو", "کارواش", "گل‌فروشی", "فروشگاه حیوانات خانگی", "کتاب‌فروشی", "فروشگاه پوشاک", "جواهرفروشی", "فروشگاه مبلمان", "فروشگاه ابزار", "دفتر وکالت", "دفتر حسابداری", "آژانس املاک", "آژانس بیمه", "استودیو عکاسی", "استودیو خالکوبی", "خشکشویی", "کلیدسازی", "فروشگاه اینترنتی", "شرکت SaaS", "آژانس بازاریابی", "مشاور مستقل", "وبلاگ‌نویسی", "سرگرمی"],
-  uk: ["Кав’ярня", "Ресторан", "Кафе", "Пекарня", "Бар", "Піцерія", "Перукарня", "Барбершоп", "Салон манікюру", "Спа", "Масажист", "Спортзал", "Йога-студія", "Стоматолог", "Лікар", "Аптека", "Ветеринар", "Автосервіс", "Автомийка", "Квітковий магазин", "Зоомагазин", "Книгарня", "Магазин одягу", "Ювелірний магазин", "Меблевий магазин", "Господарський магазин", "Юридична фірма", "Бухгалтерська фірма", "Агентство нерухомості", "Страхова агенція", "Фотостудія", "Тату-салон", "Хімчистка", "Служба замків", "Інтернет-магазин", "SaaS-компанія", "Маркетингова агенція", "Фріланс-консультант", "Блогінг", "Розваги"],
-  th: ["ร้านกาแฟ", "ร้านอาหาร", "คาเฟ่", "ร้านเบเกอรี่", "บาร์", "ร้านพิซซ่า", "ร้านทำผม", "ร้านตัดผมชาย", "ร้านทำเล็บ", "สปา", "นักนวด", "ฟิตเนส", "สตูดิโอโยคะ", "ทันตแพทย์", "แพทย์", "ร้านขายยา", "สัตวแพทย์", "อู่ซ่อมรถ", "ร้านล้างรถ", "ร้านดอกไม้", "ร้านขายสัตว์เลี้ยง", "ร้านหนังสือ", "ร้านเสื้อผ้า", "ร้านเครื่องประดับ", "ร้านเฟอร์นิเจอร์", "ร้านฮาร์ดแวร์", "สำนักงานกฎหมาย", "สำนักงานบัญชี", "บริษัทอสังหาริมทรัพย์", "ตัวแทนประกันภัย", "สตูดิโอถ่ายภาพ", "ร้านสัก", "ร้านซักแห้ง", "ร้านทำกุญแจ", "ร้านค้าออนไลน์", "บริษัท SaaS", "เอเจนซี่การตลาด", "ที่ปรึกษาอิสระ", "การเขียนบล็อก", "ความบันเทิง"],
-  id: ["Kedai kopi", "Restoran", "Kafe", "Toko roti", "Bar", "Restoran pizza", "Salon rambut", "Barbershop", "Salon kuku", "Spa", "Terapis pijat", "Gym", "Studio yoga", "Dokter gigi", "Dokter", "Apotek", "Dokter hewan", "Bengkel mobil", "Cuci mobil", "Toko bunga", "Toko hewan peliharaan", "Toko buku", "Toko pakaian", "Toko perhiasan", "Toko furnitur", "Toko perkakas", "Firma hukum", "Firma akuntansi", "Agen properti", "Agen asuransi", "Studio foto", "Studio tato", "Dry cleaner", "Tukang kunci", "Toko online", "Perusahaan SaaS", "Agensi pemasaran", "Konsultan lepas", "Blogging", "Hiburan"],
-  el: ["Καφετέρια", "Εστιατόριο", "Καφέ", "Αρτοποιείο", "Μπαρ", "Πιτσαρία", "Κομμωτήριο", "Κουρείο", "Σαλόνι νυχιών", "Σπα", "Μασέρ", "Γυμναστήριο", "Στούντιο γιόγκα", "Οδοντίατρος", "Γιατρός", "Φαρμακείο", "Κτηνίατρος", "Συνεργείο αυτοκινήτων", "Πλυντήριο αυτοκινήτων", "Ανθοπωλείο", "Κατάστημα κατοικίδιων", "Βιβλιοπωλείο", "Κατάστημα ρούχων", "Κοσμηματοπωλείο", "Κατάστημα επίπλων", "Κατάστημα εργαλείων", "Δικηγορικό γραφείο", "Λογιστικό γραφείο", "Μεσιτικό γραφείο", "Ασφαλιστικός πράκτορας", "Φωτογραφικό στούντιο", "Κατάστημα τατουάζ", "Στεγνοκαθαριστήριο", "Κλειδαράς", "Ηλεκτρονικό κατάστημα", "Εταιρεία SaaS", "Διαφημιστική εταιρεία", "Ανεξάρτητος σύμβουλος", "Blogging", "Ψυχαγωγία"],
-  sv: ["Kafé", "Restaurang", "Café", "Bageri", "Bar", "Pizzeria", "Frisersalong", "Barberare", "Nagelsalong", "Spa", "Massageterapeut", "Gym", "Yogastudio", "Tandläkare", "Läkare", "Apotek", "Veterinär", "Bilverkstad", "Biltvätt", "Blomsteraffär", "Djuraffär", "Bokhandel", "Klädaffär", "Juvelerare", "Möbelaffär", "Järnaffär", "Advokatbyrå", "Revisionsbyrå", "Fastighetsmäklare", "Försäkringsbolag", "Fotostudio", "Tatueringsstudio", "Kemtvätt", "Låssmed", "Nätbutik", "SaaS-företag", "Marknadsföringsbyrå", "Frilanskonsult", "Blogging", "Underhållning"],
-  da: ["Café", "Restaurant", "Kaffebar", "Bageri", "Bar", "Pizzeria", "Frisørsalon", "Barber", "Neglesalon", "Spa", "Massageterapeut", "Fitnesscenter", "Yogastudie", "Tandlæge", "Læge", "Apotek", "Dyrlæge", "Autoværksted", "Bilvask", "Blomsterbutik", "Dyrehandel", "Boghandel", "Tøjbutik", "Guldsmed", "Møbelbutik", "Isenkræmmer", "Advokatfirma", "Revisionsfirma", "Ejendomsmæglerkontor", "Forsikringsagentur", "Fotostudie", "Tatoveringsbutik", "Renseri", "Låsesmed", "Netbutik", "SaaS-virksomhed", "Marketingbureau", "Freelancekonsulent", "Blogging", "Underholdning"],
-  no: ["Kaffebar", "Restaurant", "Café", "Bakeri", "Bar", "Pizzarestaurant", "Frisørsalong", "Barbershop", "Neglesalong", "Spa", "Massøse", "Treningssenter", "Yogastudio", "Tannlege", "Lege", "Apotek", "Veterinær", "Bilverksted", "Bilvask", "Blomsterbutikk", "Dyrebutikk", "Bokhandel", "Klesbutikk", "Gullsmed", "Møbelbutikk", "Jernvarehandel", "Advokatfirma", "Regnskapsfirma", "Eiendomsmegler", "Forsikringsagent", "Fotostudio", "Tatoveringsstudio", "Renseri", "Låsesmed", "Nettbutikk", "SaaS-selskap", "Markedsføringsbyrå", "Frilanskonsulent", "Blogging", "Underholdning"],
-  fi: ["Kahvila", "Ravintola", "Kahvibaari", "Leipomo", "Baari", "Pizzeria", "Kampaamo", "Parturi", "Kynsistudio", "Spa", "Hieroja", "Kuntosali", "Joogastudio", "Hammaslääkäri", "Lääkäri", "Apteekki", "Eläinlääkäri", "Autokorjaamo", "Autopesu", "Kukkakauppa", "Lemmikkikauppa", "Kirjakauppa", "Vaatekauppa", "Kultaseppä", "Huonekalukauppa", "Rautakauppa", "Asianajotoimisto", "Tilitoimisto", "Kiinteistönvälitys", "Vakuutusedustaja", "Valokuvausstudio", "Tatuointiliike", "Kuivapesula", "Lukkoseppä", "Verkkokauppa", "SaaS-yritys", "Markkinointitoimisto", "Freelance-konsultti", "Bloggaus", "Viihde"],
-};
-
-const OCCASION_OPTIONS_BY_LANG = {
-  en: ["Holiday season", "Back to school", "New Year", "Valentine’s Day", "Spring launch", "Summer sale", "Black Friday", "Anniversary", "Grand opening", "Seasonal menu change", "Product launch", "Local festival", "Weekly routine, no occasion"],
-  ru: ["Праздничный сезон", "Начало учебного года", "Новый год", "День всех влюблённых", "Весенний запуск", "Летняя распродажа", "Чёрная пятница", "Годовщина", "Открытие", "Смена сезонного меню", "Запуск продукта", "Местный фестиваль", "Обычная неделя, без повода"],
-  es: ["Temporada festiva", "Vuelta al cole", "Año Nuevo", "San Valentín", "Lanzamiento de primavera", "Rebajas de verano", "Black Friday", "Aniversario", "Gran apertura", "Cambio de menú de temporada", "Lanzamiento de producto", "Festival local", "Semana normal, sin ocasión"],
-  fr: ["Période des fêtes", "Rentrée scolaire", "Nouvel An", "Saint-Valentin", "Lancement printanier", "Soldes d’été", "Black Friday", "Anniversaire", "Grande ouverture", "Changement de menu saisonnier", "Lancement de produit", "Festival local", "Semaine normale, sans occasion"],
-  de: ["Feiertagssaison", "Schulanfang", "Neujahr", "Valentinstag", "Frühlingsstart", "Sommerschlussverkauf", "Black Friday", "Jubiläum", "Neueröffnung", "Saisonale Menüänderung", "Produkteinführung", "Lokales Fest", "Normale Woche, kein Anlass"],
-  pt: ["Temporada de festas", "Volta às aulas", "Ano Novo", "Dia dos Namorados", "Lançamento de primavera", "Liquidação de verão", "Black Friday", "Aniversário", "Grande inauguração", "Mudança de cardápio sazonal", "Lançamento de produto", "Festival local", "Semana normal, sem ocasião"],
-  it: ["Periodo festivo", "Ritorno a scuola", "Capodanno", "San Valentino", "Lancio primaverile", "Saldi estivi", "Black Friday", "Anniversario", "Grande apertura", "Cambio menu stagionale", "Lancio prodotto", "Festival locale", "Settimana normale, nessuna occasione"],
-  nl: ["Feestdagen", "Terug naar school", "Nieuwjaar", "Valentijnsdag", "Voorjaarslancering", "Zomeruitverkoop", "Black Friday", "Jubileum", "Grote opening", "Seizoensmenu-wijziging", "Productlancering", "Lokaal festival", "Gewone week, geen aanleiding"],
-  pl: ["Sezon świąteczny", "Powrót do szkoły", "Nowy Rok", "Walentynki", "Wiosenna premiera", "Letnia wyprzedaż", "Czarny Piątek", "Rocznica", "Wielkie otwarcie", "Sezonowa zmiana menu", "Premiera produktu", "Lokalny festyn", "Zwykły tydzień, bez okazji"],
-  zh: ["节日季", "开学季", "新年", "情人节", "春季上新", "夏季促销", "黑色星期五", "周年纪念", "盛大开业", "季节菜单更新", "产品发布", "本地节日", "普通一周，无特殊活动"],
-  ja: ["ホリデーシーズン", "新学期", "新年", "バレンタインデー", "春の新商品", "夏のセール", "ブラックフライデー", "記念日", "グランドオープン", "季節メニュー変更", "新製品発売", "地元のお祭り", "特別な予定のない通常週"],
-  ko: ["연휴 시즌", "개학 시즌", "새해", "발렌타인데이", "봄 신제품 출시", "여름 세일", "블랙프라이데이", "기념일", "개업식", "계절 메뉴 변경", "제품 출시", "지역 축제", "특별한 일 없는 평범한 주"],
-  ar: ["موسم الأعياد", "العودة إلى المدرسة", "رأس السنة", "عيد الحب", "إطلاق الربيع", "تخفيضات الصيف", "الجمعة السوداء", "ذكرى سنوية", "افتتاح كبير", "تغيير القائمة الموسمية", "إطلاق منتج", "مهرجان محلي", "أسبوع عادي بلا مناسبة"],
-  hi: ["त्योहारी सीज़न", "स्कूल की वापसी", "नया साल", "वेलेंटाइन डे", "वसंत लॉन्च", "गर्मी की बिक्री", "ब्लैक फ्राइडे", "वर्षगांठ", "भव्य उद्घाटन", "मौसमी मेनू परिवर्तन", "उत्पाद लॉन्च", "स्थानीय उत्सव", "सामान्य सप्ताह, कोई अवसर नहीं"],
-  vi: ["Mùa lễ hội", "Tựu trường", "Năm mới", "Ngày lễ tình nhân", "Ra mắt mùa xuân", "Giảm giá mùa hè", "Black Friday", "Kỷ niệm", "Khai trương", "Đổi thực đơn theo mùa", "Ra mắt sản phẩm", "Lễ hội địa phương", "Tuần bình thường, không có dịp đặc biệt"],
-  tr: ["Tatil sezonu", "Okula dönüş", "Yılbaşı", "Sevgililer Günü", "Bahar lansmanı", "Yaz indirimi", "Kara Cuma", "Yıl dönümü", "Büyük açılış", "Sezonluk menü değişikliği", "Ürün lansmanı", "Yerel festival", "Sıradan hafta, özel bir vesile yok"],
-  fa: ["فصل تعطیلات", "بازگشایی مدارس", "سال نو", "روز ولنتاین", "راه‌اندازی بهاره", "حراج تابستانی", "جمعه سیاه", "سالگرد", "افتتاحیه بزرگ", "تغییر منوی فصلی", "عرضه محصول", "جشنواره محلی", "هفته عادی، بدون مناسبت"],
-  uk: ["Святковий сезон", "Початок навчального року", "Новий рік", "День закоханих", "Весняний запуск", "Літній розпродаж", "Чорна п’ятниця", "Річниця", "Відкриття", "Зміна сезонного меню", "Запуск продукту", "Місцевий фестиваль", "Звичайний тиждень, без приводу"],
-  th: ["ช่วงเทศกาล", "เปิดเทอม", "ปีใหม่", "วันวาเลนไทน์", "เปิดตัวฤดูใบไม้ผลิ", "ลดราคาช่วงซัมเมอร์", "แบล็กฟรายเดย์", "วันครบรอบ", "เปิดร้านใหม่", "เปลี่ยนเมนูตามฤดูกาล", "เปิดตัวสินค้า", "เทศกาลท้องถิ่น", "สัปดาห์ปกติ ไม่มีโอกาสพิเศษ"],
-  id: ["Musim liburan", "Kembali ke sekolah", "Tahun Baru", "Hari Valentine", "Peluncuran musim semi", "Diskon musim panas", "Black Friday", "Hari jadi", "Pembukaan besar", "Perubahan menu musiman", "Peluncuran produk", "Festival lokal", "Minggu biasa, tanpa acara khusus"],
-  el: ["Εορταστική περίοδος", "Επιστροφή στο σχολείο", "Πρωτοχρονιά", "Ημέρα του Αγίου Βαλεντίνου", "Ανοιξιάτικη κυκλοφορία", "Καλοκαιρινές εκπτώσεις", "Black Friday", "Επέτειος", "Μεγάλα εγκαίνια", "Εποχιακή αλλαγή μενού", "Κυκλοφορία προϊόντος", "Τοπικό φεστιβάλ", "Συνηθισμένη εβδομάδα, χωρίς αφορμή"],
-  sv: ["Högtidssäsong", "Skolstart", "Nyår", "Alla hjärtans dag", "Vårlansering", "Sommarrea", "Black Friday", "Jubileum", "Stor öppning", "Säsongsmenybyte", "Produktlansering", "Lokal festival", "Vanlig vecka, ingen särskild anledning"],
-  da: ["Højtidssæson", "Skolestart", "Nytår", "Valentinsdag", "Forårslancering", "Sommerudsalg", "Black Friday", "Jubilæum", "Stor åbning", "Sæsonbestemt menuændring", "Produktlancering", "Lokal festival", "Almindelig uge, ingen anledning"],
-  no: ["Høytidssesong", "Skolestart", "Nyttår", "Alle hjerters dag", "Vårlansering", "Sommersalg", "Black Friday", "Jubileum", "Stor åpning", "Sesongbasert menyendring", "Produktlansering", "Lokal festival", "Vanlig uke, ingen anledning"],
-  fi: ["Juhlakausi", "Koulun alku", "Uusivuosi", "Ystävänpäivä", "Kevätlanseeraus", "Kesäalennukset", "Musta perjantai", "Vuosipäivä", "Suuravajaiset", "Kausittainen menumuutos", "Tuotelanseeraus", "Paikallinen festivaali", "Tavallinen viikko, ei erityistä syytä"],
-};
-
-const AUDIENCE_OPTIONS_BY_LANG = {
-  en: ["Young professionals", "Parents with children", "College students", "Retirees", "Local residents", "Tourists and visitors", "Small business owners", "Fitness enthusiasts", "Pet owners", "Budget-conscious shoppers", "Luxury-focused customers", "B2B decision-makers", "Enterprise companies", "Corporate executives", "Startup founders", "Freelancers", "Content creators", "Influencers and bloggers", "Marketing teams", "HR departments"],
-  ru: ["Молодые специалисты", "Родители с детьми", "Студенты", "Пенсионеры", "Местные жители", "Туристы и гости", "Владельцы малого бизнеса", "Любители фитнеса", "Владельцы питомцев", "Экономные покупатели", "Клиенты премиум-сегмента", "B2B-заказчики", "Крупные компании", "Топ-менеджеры", "Основатели стартапов", "Фрилансеры", "Создатели контента", "Блогеры и инфлюенсеры", "Маркетинговые команды", "HR-отделы"],
-  es: ["Jóvenes profesionales", "Padres con hijos", "Estudiantes universitarios", "Jubilados", "Residentes locales", "Turistas y visitantes", "Dueños de pequeñas empresas", "Entusiastas del fitness", "Dueños de mascotas", "Compradores con presupuesto ajustado", "Clientes de lujo", "Tomadores de decisiones B2B", "Grandes empresas", "Ejecutivos corporativos", "Fundadores de startups", "Freelancers", "Creadores de contenido", "Influencers y blogueros", "Equipos de marketing", "Departamentos de RRHH"],
-  fr: ["Jeunes professionnels", "Parents avec enfants", "Étudiants", "Retraités", "Résidents locaux", "Touristes et visiteurs", "Petits entrepreneurs", "Passionnés de fitness", "Propriétaires d’animaux", "Acheteurs soucieux du budget", "Clients haut de gamme", "Décideurs B2B", "Grandes entreprises", "Cadres dirigeants", "Fondateurs de startups", "Freelances", "Créateurs de contenu", "Influenceurs et blogueurs", "Équipes marketing", "Services RH"],
-  de: ["Junge Berufstätige", "Eltern mit Kindern", "Studenten", "Rentner", "Ortsansässige", "Touristen und Besucher", "Kleinunternehmer", "Fitness-Enthusiasten", "Haustierbesitzer", "Budgetbewusste Käufer", "Luxusorientierte Kunden", "B2B-Entscheider", "Großunternehmen", "Führungskräfte", "Startup-Gründer", "Freiberufler", "Content-Creator", "Influencer und Blogger", "Marketing-Teams", "HR-Abteilungen"],
-  pt: ["Jovens profissionais", "Pais com filhos", "Estudantes universitários", "Aposentados", "Moradores locais", "Turistas e visitantes", "Donos de pequenas empresas", "Entusiastas de fitness", "Donos de pets", "Compradores econômicos", "Clientes de luxo", "Tomadores de decisão B2B", "Grandes empresas", "Executivos corporativos", "Fundadores de startups", "Freelancers", "Criadores de conteúdo", "Influenciadores e blogueiros", "Equipes de marketing", "Departamentos de RH"],
-  it: ["Giovani professionisti", "Genitori con figli", "Studenti universitari", "Pensionati", "Residenti locali", "Turisti e visitatori", "Piccoli imprenditori", "Appassionati di fitness", "Proprietari di animali", "Acquirenti attenti al budget", "Clienti di lusso", "Decision maker B2B", "Grandi aziende", "Dirigenti aziendali", "Fondatori di startup", "Liberi professionisti", "Content creator", "Influencer e blogger", "Team di marketing", "Reparti HR"],
-  nl: ["Jonge professionals", "Ouders met kinderen", "Studenten", "Gepensioneerden", "Lokale bewoners", "Toeristen en bezoekers", "Kleine ondernemers", "Fitnessliefhebbers", "Huisdiereigenaren", "Prijsbewuste shoppers", "Luxe klanten", "B2B-besluitvormers", "Grote bedrijven", "Directieleden", "Startup-oprichters", "Freelancers", "Content creators", "Influencers en bloggers", "Marketingteams", "HR-afdelingen"],
-  pl: ["Młodzi profesjonaliści", "Rodzice z dziećmi", "Studenci", "Emeryci", "Mieszkańcy lokalni", "Turyści i goście", "Właściciele małych firm", "Entuzjaści fitnessu", "Właściciele zwierząt", "Klienci dbający o budżet", "Klienci luksusowi", "Decydenci B2B", "Duże firmy", "Kadra zarządzająca", "Założyciele startupów", "Freelancerzy", "Twórcy treści", "Influencerzy i blogerzy", "Zespoły marketingowe", "Działy HR"],
-  zh: ["年轻职场人士", "有孩子的父母", "大学生", "退休人员", "本地居民", "游客和访客", "小企业主", "健身爱好者", "宠物主人", "注重预算的顾客", "注重奢华的顾客", "B2B决策者", "大型企业", "企业高管", "初创公司创始人", "自由职业者", "内容创作者", "网红和博主", "营销团队", "人力资源部门"],
-  ja: ["若手プロフェッショナル", "子育て中の親", "大学生", "退職者", "地元住民", "観光客と訪問者", "中小企業経営者", "フィットネス愛好家", "ペットオーナー", "予算重視の買い物客", "高級志向の顧客", "B2B意思決定者", "大企業", "経営幹部", "スタートアップ創業者", "フリーランサー", "コンテンツクリエイター", "インフルエンサーとブロガー", "マーケティングチーム", "人事部門"],
-  ko: ["젊은 전문직 종사자", "자녀가 있는 부모", "대학생", "은퇴자", "지역 주민", "관광객 및 방문객", "소상공인", "피트니스 애호가", "반려동물 소유자", "예산을 중시하는 쇼핑객", "럭셔리 지향 고객", "B2B 의사결정자", "대기업", "기업 임원", "스타트업 창업자", "프리랜서", "콘텐츠 크리에이터", "인플루언서 및 블로거", "마케팅 팀", "인사팀"],
-  ar: ["محترفون شباب", "آباء لديهم أطفال", "طلاب جامعيون", "متقاعدون", "سكان محليون", "سياح وزوار", "أصحاب أعمال صغيرة", "عشاق اللياقة البدنية", "أصحاب حيوانات أليفة", "مشترون واعون بالميزانية", "عملاء يفضلون الفخامة", "صناع القرار B2B", "شركات كبرى", "مدراء تنفيذيون", "مؤسسو شركات ناشئة", "مستقلون", "صناع محتوى", "مؤثرون ومدونون", "فرق تسويق", "أقسام الموارد البشرية"],
-  hi: ["युवा पेशेवर", "बच्चों वाले माता-पिता", "कॉलेज छात्र", "सेवानिवृत्त", "स्थानीय निवासी", "पर्यटक और आगंतुक", "छोटे व्यवसाय के मालिक", "फिटनेस उत्साही", "पालतू पशु मालिक", "बजट के प्रति सचेत खरीदार", "लक्जरी-केंद्रित ग्राहक", "B2B निर्णयकर्ता", "बड़ी कंपनियां", "कॉर्पोरेट अधिकारी", "स्टार्टअप संस्थापक", "फ्रीलांसर", "कंटेंट क्रिएटर", "इन्फ्लुएंसर और ब्लॉगर", "मार्केटिंग टीमें", "HR विभाग"],
-  vi: ["Chuyên gia trẻ", "Phụ huynh có con", "Sinh viên đại học", "Người nghỉ hưu", "Cư dân địa phương", "Khách du lịch", "Chủ doanh nghiệp nhỏ", "Người đam mê thể hình", "Chủ vật nuôi", "Người mua có ngân sách hạn chế", "Khách hàng cao cấp", "Người ra quyết định B2B", "Doanh nghiệp lớn", "Giám đốc điều hành", "Nhà sáng lập startup", "Freelancer", "Nhà sáng tạo nội dung", "Người ảnh hưởng và blogger", "Đội ngũ marketing", "Phòng nhân sự"],
-  tr: ["Genç profesyoneller", "Çocuklu ebeveynler", "Üniversite öğrencileri", "Emekliler", "Yerel sakinler", "Turistler ve ziyaretçiler", "Küçük işletme sahipleri", "Fitness tutkunları", "Evcil hayvan sahipleri", "Bütçe bilincine sahip alışverişçiler", "Lüks odaklı müşteriler", "B2B karar vericiler", "Büyük şirketler", "Kurumsal yöneticiler", "Girişim kurucuları", "Serbest çalışanlar", "İçerik üreticileri", "Influencer’lar ve bloggerlar", "Pazarlama ekipleri", "İK departmanları"],
-  fa: ["متخصصان جوان", "والدین دارای فرزند", "دانشجویان", "بازنشستگان", "ساکنان محلی", "گردشگران و بازدیدکنندگان", "صاحبان کسب‌وکار کوچک", "علاقه‌مندان به تناسب اندام", "صاحبان حیوانات خانگی", "خریداران حساس به بودجه", "مشتریان لوکس‌پسند", "تصمیم‌گیرندگان B2B", "شرکت‌های بزرگ", "مدیران اجرایی", "بنیان‌گذاران استارتاپ", "فریلنسرها", "تولیدکنندگان محتوا", "اینفلوئنسرها و وبلاگ‌نویسان", "تیم‌های بازاریابی", "بخش‌های منابع انسانی"],
-  uk: ["Молоді фахівці", "Батьки з дітьми", "Студенти", "Пенсіонери", "Місцеві жителі", "Туристи та гості", "Власники малого бізнесу", "Любителі фітнесу", "Власники домашніх тварин", "Економні покупці", "Клієнти преміум-сегменту", "B2B-замовники", "Великі компанії", "Топ-менеджери", "Засновники стартапів", "Фрілансери", "Творці контенту", "Блогери та інфлюенсери", "Маркетингові команди", "HR-відділи"],
-  th: ["คนทำงานรุ่นใหม่", "พ่อแม่ที่มีลูก", "นักศึกษามหาวิทยาลัย", "ผู้เกษียณอายุ", "ผู้อยู่อาศัยในพื้นที่", "นักท่องเที่ยวและผู้มาเยือน", "เจ้าของธุรกิจขนาดเล็ก", "ผู้ที่ชื่นชอบการออกกำลังกาย", "เจ้าของสัตว์เลี้ยง", "ผู้ซื้อที่คำนึงถึงงบประมาณ", "ลูกค้าสายหรู", "ผู้ตัดสินใจ B2B", "บริษัทขนาดใหญ่", "ผู้บริหารระดับสูง", "ผู้ก่อตั้งสตาร์ทอัพ", "ฟรีแลนซ์", "ผู้สร้างคอนเทนต์", "อินฟลูเอนเซอร์และบล็อกเกอร์", "ทีมการตลาด", "ฝ่ายทรัพยากรบุคคล"],
-  id: ["Profesional muda", "Orang tua dengan anak", "Mahasiswa", "Pensiunan", "Penduduk lokal", "Turis dan pengunjung", "Pemilik usaha kecil", "Penggemar kebugaran", "Pemilik hewan peliharaan", "Pembeli sadar anggaran", "Pelanggan mewah", "Pengambil keputusan B2B", "Perusahaan besar", "Eksekutif perusahaan", "Pendiri startup", "Pekerja lepas", "Kreator konten", "Influencer dan blogger", "Tim pemasaran", "Departemen HR"],
-  el: ["Νέοι επαγγελματίες", "Γονείς με παιδιά", "Φοιτητές", "Συνταξιούχοι", "Τοπικοί κάτοικοι", "Τουρίστες και επισκέπτες", "Ιδιοκτήτες μικρών επιχειρήσεων", "Λάτρεις του fitness", "Ιδιοκτήτες κατοικίδιων", "Αγοραστές με προσοχή στον προϋπολογισμό", "Πελάτες πολυτελείας", "Λήπτες αποφάσεων B2B", "Μεγάλες εταιρείες", "Στελέχη επιχειρήσεων", "Ιδρυτές startup", "Ελεύθεροι επαγγελματίες", "Δημιουργοί περιεχομένου", "Influencers και bloggers", "Ομάδες μάρκετινγκ", "Τμήματα ανθρώπινου δυναμικού"],
-  sv: ["Unga yrkesverksamma", "Föräldrar med barn", "Studenter", "Pensionärer", "Lokala invånare", "Turister och besökare", "Småföretagare", "Träningsentusiaster", "Husdjursägare", "Budgetmedvetna shoppare", "Lyxinriktade kunder", "B2B-beslutsfattare", "Stora företag", "Företagsledare", "Startup-grundare", "Frilansare", "Innehållsskapare", "Influencers och bloggare", "Marknadsföringsteam", "HR-avdelningar"],
-  da: ["Unge professionelle", "Forældre med børn", "Studerende", "Pensionister", "Lokale beboere", "Turister og besøgende", "Små virksomhedsejere", "Fitnessentusiaster", "Kæledyrsejere", "Budgetbevidste shoppere", "Luksusorienterede kunder", "B2B-beslutningstagere", "Store virksomheder", "Virksomhedsledere", "Startup-stiftere", "Freelancere", "Indholdsskabere", "Influencere og bloggere", "Marketingteams", "HR-afdelinger"],
-  no: ["Unge fagfolk", "Foreldre med barn", "Studenter", "Pensjonister", "Lokale innbyggere", "Turister og besøkende", "Småbedriftseiere", "Treningsentusiaster", "Kjæledyreiere", "Budsjettbevisste kjøpere", "Luksusorienterte kunder", "B2B-beslutningstakere", "Store selskaper", "Bedriftsledere", "Startup-grundere", "Frilansere", "Innholdsskapere", "Influencere og bloggere", "Markedsføringsteam", "HR-avdelinger"],
-  fi: ["Nuoret ammattilaiset", "Vanhemmat lapsineen", "Yliopisto-opiskelijat", "Eläkeläiset", "Paikalliset asukkaat", "Turistit ja vierailijat", "Pienyrittäjät", "Kuntoilun harrastajat", "Lemmikinomistajat", "Budjettitietoiset ostajat", "Ylellisyyteen keskittyvät asiakkaat", "B2B-päättäjät", "Suuryritykset", "Yritysjohtajat", "Startup-perustajat", "Freelancerit", "Sisällöntuottajat", "Vaikuttajat ja bloggaajat", "Markkinointitiimit", "HR-osastot"],
-};
+const capabilities = [
+  {
+    label: { en: 'AI integration', ru: 'AI-интеграция', es: 'Integraci\u00f3n de IA', fr: 'Int\u00e9gration IA', de: 'KI-Integration', pt: 'Integra\u00e7\u00e3o de IA', zh: 'AI\u96c6\u6210', ja: 'AI\u7d71\u5408' },
+    body: { en: 'Every tool is built around the Claude API -- prompt design, structured output, and multimodal input like photo understanding.', ru: 'Каждый инструмент построен вокруг Claude API — дизайн промптов, структурированный вывод и мультимодальный ввод, например понимание фото.', es: 'Cada herramienta se construye sobre la API de Claude: dise\u00f1o de prompts, salida estructurada y entrada multimodal como comprensi\u00f3n de fotos.', fr: 'Chaque outil est con\u00e7u autour de l\u2019API Claude -- conception de prompts, sortie structur\u00e9e et entr\u00e9e multimodale comme la compr\u00e9hension de photos.', de: 'Jedes Tool basiert auf der Claude API -- Prompt-Design, strukturierte Ausgabe und multimodale Eingabe wie Bildverst\u00e4ndnis.', pt: 'Cada ferramenta \u00e9 constru\u00edda em torno da API Claude -- design de prompts, sa\u00edda estruturada e entrada multimodal como compreens\u00e3o de fotos.', zh: '\u6bcf\u4e2a\u5de5\u5177\u90fd\u57fa\u4e8eClaude API\u6784\u5efa\u2014\u2014\u63d0\u793a\u8bcd\u8bbe\u8ba1\u3001\u7ed3\u6784\u5316\u8f93\u51fa\u4ee5\u53ca\u7167\u7247\u7406\u89e3\u7b49\u591a\u6a21\u6001\u8f93\u5165\u3002', ja: '\u5404\u30c4\u30fc\u30eb\u306fClaude API\u3092\u57fa\u76e4\u306b\u69cb\u7bc9\u2014\u2014\u30d7\u30ed\u30f3\u30d7\u30c8\u8a2d\u8a08\u3001\u69cb\u9020\u5316\u3055\u308c\u305f\u51fa\u529b\u3001\u5199\u771f\u7406\u89e3\u306a\u3069\u306e\u30de\u30eb\u30c1\u30e2\u30fc\u30c0\u30eb\u5165\u529b\u3002' },
+  },
+  {
+    label: { en: 'Localization', ru: 'Локализация', es: 'Localizaci\u00f3n', fr: 'Localisation', de: 'Lokalisierung', pt: 'Localiza\u00e7\u00e3o', zh: '\u672c\u5730\u5316', ja: '\u30ed\u30fc\u30ab\u30e9\u30a4\u30ba' },
+    body: { en: '20 languages across all products, including full right-to-left layouts for Arabic and Persian.', ru: '20 языков во всех продуктах, включая полную поддержку справа-налево для арабского и персидского.', es: '20 idiomas en todos los productos, incluyendo dise\u00f1o completo de derecha a izquierda para \u00e1rabe y persa.', fr: '20 langues sur tous les produits, y compris une mise en page compl\u00e8te de droite \u00e0 gauche pour l\u2019arabe et le persan.', de: '20 Sprachen in allen Produkten, inklusive vollst\u00e4ndigem Rechts-nach-links-Layout f\u00fcr Arabisch und Persisch.', pt: '20 idiomas em todos os produtos, incluindo layout completo da direita para a esquerda para \u00e1rabe e persa.', zh: '\u6240\u6709\u4ea7\u54c1\u652f\u628120\u79cd\u8bed\u8a00\uff0c\u5305\u62ec\u963f\u62c9\u4f2f\u8bed\u548c\u6ce2\u65af\u8bed\u7684\u5b8c\u6574\u53f3\u5411\u5de6\u5e03\u5c40\u3002', ja: '\u5168\u88fd\u54c1\u306720\u8a00\u8a9e\u306b\u5bfe\u5fdc\u3002\u30a2\u30e9\u30d3\u30a2\u8a9e\u30fb\u30da\u30eb\u30b7\u30a2\u8a9e\u306e\u53f3\u304b\u3089\u5de6\u30ec\u30a4\u30a2\u30a6\u30c8\u3082\u5b8c\u5168\u5bfe\u5fdc\u3002' },
+  },
+  {
+    label: { en: 'Payment infrastructure', ru: 'Платёжная инфраструктура', es: 'Infraestructura de pagos', fr: 'Infrastructure de paiement', de: 'Zahlungsinfrastruktur', pt: 'Infraestrutura de pagamentos', zh: '\u652f\u4ed8\u57fa\u7840\u8bbe\u65bd', ja: '\u6c7a\u6e08\u30a4\u30f3\u30d5\u30e9' },
+    body: { en: 'Card checkout via an embedded widget, license-code gating, and marketplace-ready redemption systems for platforms like AppSumo.', ru: 'Оплата картой через встроенный виджет, доступ по кодам, и системы активации для маркетплейсов вроде AppSumo.', es: 'Pago con tarjeta v\u00eda widget integrado, acceso por c\u00f3digo de licencia y sistemas de canje listos para marketplaces como AppSumo.', fr: 'Paiement par carte via un widget int\u00e9gr\u00e9, acc\u00e8s par code de licence, et syst\u00e8mes d\u2019activation pr\u00eats pour des marketplaces comme AppSumo.', de: 'Kartenzahlung \u00fcber ein eingebettetes Widget, Lizenzcode-Zugang und marktplatzfertige Einl\u00f6sesysteme f\u00fcr Plattformen wie AppSumo.', pt: 'Pagamento por cart\u00e3o via widget incorporado, acesso por c\u00f3digo de licen\u00e7a e sistemas de resgate prontos para marketplaces como AppSumo.', zh: '\u901a\u8fc7\u5d4c\u5165\u5f0f\u63a7\u4ef6\u5b8c\u6210\u5361\u652f\u4ed8\u3001\u8bb8\u53ef\u8bc1\u4ee3\u7801\u9650\u5236\u8bbf\u95ee\uff0c\u4ee5\u53caAppSumo\u7b49\u5e73\u53f0\u7684\u5151\u6362\u7cfb\u7edf\u3002', ja: '\u57cb\u3081\u8fbc\u307f\u30a6\u30a3\u30b8\u30a7\u30c3\u30c8\u3067\u306e\u30ab\u30fc\u30c9\u6c7a\u6e08\u3001\u30e9\u30a4\u30bb\u30f3\u30b9\u30b3\u30fc\u30c9\u3067\u306e\u30a2\u30af\u30bb\u30b9\u5236\u9650\u3001AppSumo\u306a\u3069\u306e\u30de\u30fc\u30b1\u30c3\u30c8\u5411\u3051\u5f15\u63db\u3048\u30b7\u30b9\u30c6\u30e0\u3002' },
+  },
+  {
+    label: { en: 'Maps & geolocation', ru: 'Карты и геолокация', es: 'Mapas y geolocalizaci\u00f3n', fr: 'Cartes et g\u00e9olocalisation', de: 'Karten & Geolokalisierung', pt: 'Mapas e geolocaliza\u00e7\u00e3o', zh: '\u5730\u56fe\u4e0e\u5730\u7406\u5b9a\u4f4d', ja: '\u5730\u56f3\u3068\u4f4d\u7f6e\u60c5\u5831' },
+    body: { en: 'Interactive maps, live address autocomplete, and geocoding -- built on open data, no vendor lock-in.', ru: 'Интерактивные карты, автоподсказки адреса и геокодирование — на открытых данных, без привязки к одному поставщику.', es: 'Mapas interactivos, autocompletado de direcciones en vivo y geocodificaci\u00f3n, todo sobre datos abiertos, sin dependencia de un proveedor.', fr: 'Cartes interactives, autocompl\u00e9tion d\u2019adresse en direct et g\u00e9ocodage -- sur des donn\u00e9es ouvertes, sans d\u00e9pendance \u00e0 un fournisseur.', de: 'Interaktive Karten, Live-Adressvorschl\u00e4ge und Geocoding -- auf offenen Daten, ohne Anbieterbindung.', pt: 'Mapas interativos, autocompletar de endere\u00e7o em tempo real e geocodifica\u00e7\u00e3o -- sobre dados abertos, sem depend\u00eancia de fornecedor.', zh: '\u4ea4\u4e92\u5f0f\u5730\u56fe\u3001\u5b9e\u65f6\u5730\u5740\u81ea\u52a8\u8865\u5168\u548c\u5730\u7406\u7f16\u7801\u2014\u2014\u57fa\u4e8e\u5f00\u653e\u6570\u636e\uff0c\u4e0d\u4f9d\u8d56\u5355\u4e00\u4f9b\u5e94\u5546\u3002', ja: '\u30a4\u30f3\u30bf\u30e9\u30af\u30c6\u30a3\u30d6\u5730\u56f3\u3001\u4f4f\u6240\u306e\u30aa\u30fc\u30c8\u30b3\u30f3\u30d7\u30ea\u30fc\u30c8\u3001\u30b8\u30aa\u30b3\u30fc\u30c7\u30a3\u30f3\u30b0\u2014\u2014\u30aa\u30fc\u30d7\u30f3\u30c7\u30fc\u30bf\u306b\u57fa\u3065\u304d\u3001\u30d9\u30f3\u30c0\u30fc\u4f9d\u5b58\u306a\u3057\u3002' },
+  },
+  {
+    label: { en: 'Fast, focused builds', ru: 'Быстрая, сфокусированная разработка', es: 'Desarrollo r\u00e1pido y enfocado', fr: 'D\u00e9veloppement rapide et cibl\u00e9', de: 'Schnelle, fokussierte Entwicklung', pt: 'Desenvolvimento r\u00e1pido e focado', zh: '\u5feb\u901f\u4e13\u6ce8\u7684\u5f00\u53d1', ja: '\u8ff5\u901f\u3067\u96c6\u4e2d\u3057\u305f\u958b\u767a' },
+    body: { en: 'React and Vite, deployed the same day an idea is validated. No months-long roadmap before something ships.', ru: 'React и Vite, деплой в тот же день, когда идея подтверждена. Никаких месяцев планирования до запуска.', es: 'React y Vite, desplegado el mismo d\u00eda en que una idea se valida. Sin hojas de ruta de meses antes de lanzar algo.', fr: 'React et Vite, d\u00e9ploy\u00e9 le jour m\u00eame o\u00f9 une id\u00e9e est valid\u00e9e. Pas de feuille de route de plusieurs mois avant de sortir quelque chose.', de: 'React und Vite, am selben Tag deployed, an dem eine Idee validiert wird. Keine monatelange Roadmap vor dem Launch.', pt: 'React e Vite, implantado no mesmo dia em que uma ideia \u00e9 validada. Sem roadmap de meses antes de algo ser lan\u00e7ado.', zh: '\u4f7f\u7528React\u548cVite\uff0c\u60f3\u6cd5\u9a8c\u8bc1\u5f53\u5929\u5373\u53ef\u4e0a\u7ebf\u3002\u65e0\u9700\u6570\u6708\u957f\u7684\u8def\u7ebf\u56fe\u89c4\u5212\u3002', ja: 'React\u3068Vite\u3067\u3001\u30a2\u30a4\u30c7\u30a2\u691c\u8a3c\u5f53\u65e5\u306b\u30c7\u30d7\u30ed\u30a4\u3002\u6570\u30f6\u6708\u5358\u4f4d\u306e\u30ed\u30fc\u30c9\u30de\u30c3\u30d7\u306f\u4e0d\u8981\u3002' },
+  },
+  {
+    label: { en: 'End-to-end ownership', ru: 'Полная ответственность', es: 'Responsabilidad total', fr: 'Responsabilit\u00e9 de bout en bout', de: 'Ganzheitliche Verantwortung', pt: 'Responsabilidade total', zh: '\u5168\u7a0b\u8d1f\u8d23', ja: '\u30a8\u30f3\u30c9\u30c4\u30fc\u30a8\u30f3\u30c9\u306e\u8cac\u4efb' },
+    body: { en: 'Product, backend, infrastructure, and support -- one person, one accountable point of contact. Deployed on Vercel, the same platform behind Next.js sites for Walmart, Apple, Nike, and Netflix.', ru: 'Продукт, бэкенд, инфраструктура и поддержка — один человек, один ответственный контакт. Деплой на Vercel — той же платформе, на которой работают Next.js-сайты Walmart, Apple, Nike и Netflix.', es: 'Producto, backend, infraestructura y soporte: una sola persona, un solo punto de contacto responsable. Desplegado en Vercel, la misma plataforma detr\u00e1s de sitios Next.js de Walmart, Apple, Nike y Netflix.', fr: 'Produit, backend, infrastructure et support -- une seule personne, un seul point de contact responsable. D\u00e9ploy\u00e9 sur Vercel, la m\u00eame plateforme que les sites Next.js de Walmart, Apple, Nike et Netflix.', de: 'Produkt, Backend, Infrastruktur und Support -- eine Person, ein verantwortlicher Ansprechpartner. Deployed auf Vercel, derselben Plattform hinter Next.js-Seiten von Walmart, Apple, Nike und Netflix.', pt: 'Produto, backend, infraestrutura e suporte -- uma pessoa, um ponto de contato respons\u00e1vel. Implantado na Vercel, a mesma plataforma por tr\u00e1s dos sites Next.js da Walmart, Apple, Nike e Netflix.', zh: '\u4ea7\u54c1\u3001\u540e\u7aef\u3001\u57fa\u7840\u8bbe\u65bd\u548c\u652f\u6301\u2014\u2014\u4e00\u4e2a\u4eba\uff0c\u4e00\u4e2a\u8d1f\u8d23\u4eba\u3002\u90e8\u7f72\u5728Vercel\u4e0a\uff0c\u4e0eWalmart\u3001Apple\u3001Nike\u548cNetflix\u7684Next.js\u7ad9\u70b9\u540c\u4e00\u5e73\u53f0\u3002', ja: '\u88fd\u54c1\u3001\u30d0\u30c3\u30af\u30a8\u30f3\u30c9\u3001\u30a4\u30f3\u30d5\u30e9\u3001\u30b5\u30dd\u30fc\u30c8\u5168\u3066\u3092\u4e00\u4eba\u304c\u62c5\u5f53\u3002Walmart\u3001Apple\u3001Nike\u3001Netflix\u306eNext.js\u30b5\u30a4\u30c8\u3068\u540c\u3058Vercel\u4e0a\u3067\u7a3c\u50cd\u3002' },
+  },
+];
 
 const LANGS = [
-  { code: 'en', label: 'English' }, { code: 'ru', label: '\u0420\u0443\u0441\u0441\u043a\u0438\u0439' }, { code: 'es', label: 'Espa\u00f1ol' },
-  { code: 'zh', label: '\u4e2d\u6587' }, { code: 'ar', label: '\u0627\u0644\u0639\u0631\u0628\u064a\u0629' }, { code: 'pt', label: 'Portugu\u00eas' },
-  { code: 'hi', label: '\u0939\u093f\u0928\u094d\u0926\u0940' }, { code: 'fr', label: 'Fran\u00e7ais' }, { code: 'vi', label: 'Ti\u1ebfng Vi\u1ec7t' },
-  { code: 'ko', label: '\ud55c\uad6d\uc5b4' }, { code: 'tr', label: 'T\u00fcrk\u00e7e' }, { code: 'de', label: 'Deutsch' },
-  { code: 'ja', label: '\u65e5\u672c\u8a9e' }, { code: 'it', label: 'Italiano' }, { code: 'pl', label: 'Polski' },
-  { code: 'fa', label: '\u0641\u0627\u0631\u0633\u06cc' }, { code: 'uk', label: '\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430' }, { code: 'nl', label: 'Nederlands' },
-  { code: 'th', label: '\u0e44\u0e17\u0e22' }, { code: 'id', label: 'Bahasa Indonesia' },
-  { code: 'el', label: '\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac' }, { code: 'sv', label: 'Svenska' }, { code: 'da', label: 'Dansk' },
-  { code: 'no', label: 'Norsk' }, { code: 'fi', label: 'Suomi' },
+  { code: 'en', label: 'EN' },
+  { code: 'ru', label: '\u0420\u0423' },
+  { code: 'es', label: 'ES' },
+  { code: 'fr', label: 'FR' },
+  { code: 'de', label: 'DE' },
+  { code: 'pt', label: 'PT' },
+  { code: 'zh', label: '\u4e2d\u6587' },
+  { code: 'ja', label: '\u65e5\u672c\u8a9e' },
 ];
 
-// Английские названия языков — для промпта к Claude (модель точнее
-// понимает "Russian", чем кириллическое "Русский" в системной инструкции)
-const LANG_ENGLISH_NAMES = {
-  en: 'English', ru: 'Russian', es: 'Spanish', zh: 'Chinese', ar: 'Arabic',
-  pt: 'Portuguese', hi: 'Hindi', fr: 'French', vi: 'Vietnamese', ko: 'Korean',
-  tr: 'Turkish', de: 'German', ja: 'Japanese', it: 'Italian', pl: 'Polish',
-  fa: 'Persian', uk: 'Ukrainian', nl: 'Dutch', th: 'Thai', id: 'Indonesian',
-  el: 'Greek', sv: 'Swedish', da: 'Danish', no: 'Norwegian', fi: 'Finnish',
-};
-
-function getStatCubes(t) {
-  return [
-    { n: '08', label: t.statPlatforms, desc: t.descPlatforms },
-    { n: '05', label: t.statPillars, desc: t.descPillars },
-    { n: '25', label: t.statLanguages, desc: t.descLanguages },
-    { n: '50', label: t.statDailyLimit, desc: t.descDailyLimit },
-    { n: '1', label: t.statFreeTrial, desc: t.descFreeTrial },
-    { n: 'Once', label: t.statPayment, desc: t.descPayment },
-  ];
-}
-
-const UI_TEXT = {
+const T = {
   en: {
-    customPlatformPlaceholder: "Or type your own platform...",
-    addPlatform: "Add",
-    labelWeekTopic: "WHAT'S THIS WEEK ACTUALLY ABOUT",
-    placeholderWeekTopic: "e.g. launching our new espresso blend, opening a second location...",
-    subtitle: "A week of ideas, considered per platform. For teams who plan with intention.",
-    about: "Content Strategist AI builds a week of post ideas at a time -- not captions, but the underlying topic for each day, matched to what actually works on that specific platform. Choose one platform, or plan across several at once. Paste a competitor’s post to find the gap you can fill.",
-    tabSingle: "Single platform",
-    tabCross: "Cross-platform",
-    tabCompetitor: "Competitor gap",
-    labelBusiness: "WHAT DOES YOUR BUSINESS DO",
-    placeholderBusiness: "Neighborhood coffee shop",
-    labelOccasion: "SEASON OR OCCASION",
-    optional: "(OPTIONAL)",
-    placeholderOccasion: "Holiday season",
-    labelAudience: "YOUR AUDIENCE",
-    placeholderAudience: "Young professionals",
-    labelPlatform: "PLATFORM",
-    labelPlatformsMulti: "PLATFORMS",
-    pickTwo: "(PICK 2 OR MORE)",
-    labelCompetitorPost: "COMPETITOR’S POST OR PROFILE",
-    placeholderCompetitorPost: "Paste it here...",
-    errBusiness: "Tell us what your business does first.",
-    errPlatforms: "Pick at least 2 platforms.",
-    errCompetitor: "Paste a competitor’s post first.",
-    errTrialUsed: "Free preview used. Enter your access code to continue.",
-    errInvalidCode: "Invalid or expired access code.",
-    errGeneric: "Something went wrong.",
-    errRegenerate: "Could not regenerate that day.",
-    limitReached: "Today’s allowance is complete.",
-    limitTomorrow: "Fifty more await tomorrow.",
-    btnThinking: "CONSIDERING...",
-    btnBuildWeek: "BUILD THE WEEK",
-    btnFindGap: "FIND THE GAP",
-    dailyAllowance: "DAILY ALLOWANCE",
-    theWeek: "The Week",
-    copied: "COPIED",
-    copyAll: "COPY ALL",
-    whatMissing: "WHAT THEY’RE MISSING",
-    yourAngle: "YOUR ANGLE",
-    tryThis: "TRY THIS",
-    bestTime: "Best time",
-    regenerating: "REGENERATING...",
-    tryAnother: "TRY ANOTHER",
-    trialUsedMsg: "Your complimentary preview has been used. Enter your code to continue.",
-    enterCode: "ENTER YOUR CODE",
-    noCode: "No code? Get access",
-    trialFreeMsg: "Your first generation is complimentary. No code required.",
-    statPlatforms: "Platforms",
-    statPillars: "Pillars",
-    statLanguages: "Languages",
-    statDailyLimit: "Daily Limit",
-    statFreeTrial: "Free Trial",
-    statPayment: "Payment",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit, and YouTube -- each platform gets ideas tailored to what actually works there.",
-    descPillars: "Educational, Behind-the-scenes, Social proof, Promotional, and Entertaining -- automatically balanced across your week.",
-    descLanguages: "Explanations and ideas available in 25 languages, including right-to-left support for Arabic and Persian.",
-    descDailyLimit: "Fifty generations per day -- enough for real, ongoing use, without opening the door to abuse.",
-    descFreeTrial: "Try one full generation before you buy. No code, no commitment.",
-    descPayment: "A single one-time payment. No subscription, no recurring charge, ever.",
-    welcomeTitle: "Welcome",
-    welcomeSub: "Unlimited generations, from here on.",
-    support: "Support",
-    terms: "Terms",
-    privacy: "Privacy",
+    tagline: 'Plainwork Studio',
+    heroTitle: 'Small, useful tools for people running a business alone.',
+    heroBody: 'Plainwork builds focused AI tools that solve one repetitive task each -- writing captions, replying to reviews, staying visible on Google -- so there\u2019s a little more time left for the parts of the business that actually need a person.',
+    heroNote: 'Five tools live so far. More on the way.',
+    manifesto1: 'I build AI tools that do your marketing for you. Each product solves one job: content, reputation, visibility, language. You just upload your data -- the AI does the rest.',
+    manifesto2: 'Plainwork is for people tired of being slaves to their own to-do list. We give you back your time, your confidence, and your visibility in front of customers.',
+    statProducts: 'products shipped', statLangs: 'languages supported', statPeople: 'person building it',
+    workHeading: 'The Work', workSub: 'Everything currently live, in order of release.',
+    capHeading: 'Capabilities', capSub: 'What\u2019s actually running under the three products above.',
+    approachHeading: 'How things get built here',
+    aboutHeading: 'About',
+    aboutLead: 'I\u2019m Ksenia, and I build every part of Plainwork myself -- the products, the infrastructure behind them, and the support inbox.',
+    aboutBody: 'I kept noticing the same pattern with small business owners: a handful of small, repetitive writing tasks -- a caption, a reply to a review, a Google post -- that never got done because there was always something more urgent. Plainwork is my answer to that: tools narrow enough to actually finish, built by one person who reads every support email personally.',
+    basedIn: 'Based in', city: 'Houston, TX',
+    footerTag: 'Plainwork \u00b7 built solo, end to end',
+    terms: 'Terms of Service', privacy: 'Privacy Policy',
   },
   ru: {
-    customPlatformPlaceholder: "Или впиши свою платформу...",
-    addPlatform: "Добавить",
-    labelWeekTopic: "О ЧЁМ ЭТА НЕДЕЛЯ НА САМОМ ДЕЛЕ",
-    placeholderWeekTopic: "например: запуск нового вкуса эспрессо, открытие второй точки...",
-    subtitle: "Неделя идей, продуманных под платформу. Для команд, которые планируют осознанно.",
-    about: "Content Strategist AI строит неделю идей для постов за раз — не подписи, а саму тему на каждый день, подобранную под то, что реально работает именно на этой платформе. Выбери одну платформу или планируй сразу по нескольким. Вставь пост конкурента, чтобы найти пробел, который можно занять.",
-    tabSingle: "Одна платформа",
-    tabCross: "Кросс-платформа",
-    tabCompetitor: "Анализ конкурента",
-    labelBusiness: "ЧЕМ ЗАНИМАЕТСЯ ТВОЙ БИЗНЕС",
-    placeholderBusiness: "Кофейня по соседству",
-    labelOccasion: "СЕЗОН ИЛИ ПОВОД",
-    optional: "(НЕОБЯЗАТЕЛЬНО)",
-    placeholderOccasion: "Праздничный сезон",
-    labelAudience: "ТВОЯ АУДИТОРИЯ",
-    placeholderAudience: "Молодые специалисты",
-    labelPlatform: "ПЛАТФОРМА",
-    labelPlatformsMulti: "ПЛАТФОРМЫ",
-    pickTwo: "(ВЫБЕРИ 2 ИЛИ БОЛЬШЕ)",
-    labelCompetitorPost: "ПОСТ ИЛИ ПРОФИЛЬ КОНКУРЕНТА",
-    placeholderCompetitorPost: "Вставь сюда...",
-    errBusiness: "Сначала расскажи, чем занимается бизнес.",
-    errPlatforms: "Выбери минимум 2 платформы.",
-    errCompetitor: "Сначала вставь пост конкурента.",
-    errTrialUsed: "Бесплатный просмотр использован. Введи код доступа, чтобы продолжить.",
-    errInvalidCode: "Неверный или истёкший код доступа.",
-    errGeneric: "Что-то пошло не так.",
-    errRegenerate: "Не удалось перегенерировать этот день.",
-    limitReached: "Лимит на сегодня исчерпан.",
-    limitTomorrow: "Ещё пятьдесят будут ждать завтра.",
-    btnThinking: "ДУМАЮ...",
-    btnBuildWeek: "СОБРАТЬ НЕДЕЛЮ",
-    btnFindGap: "НАЙТИ ПРОБЕЛ",
-    dailyAllowance: "ДНЕВНОЙ ЛИМИТ",
-    theWeek: "Неделя",
-    copied: "СКОПИРОВАНО",
-    copyAll: "СКОПИРОВАТЬ ВСЁ",
-    whatMissing: "ЧЕГО ЕМУ НЕ ХВАТАЕТ",
-    yourAngle: "ТВОЙ УГОЛ",
-    tryThis: "ПОПРОБУЙ ЭТО",
-    bestTime: "Лучшее время",
-    regenerating: "ПЕРЕГЕНЕРАЦИЯ...",
-    tryAnother: "ДРУГОЙ ВАРИАНТ",
-    trialUsedMsg: "Бесплатный просмотр уже использован. Введи код, когда будешь готова продолжить.",
-    enterCode: "ВВЕСТИ КОД",
-    noCode: "Нет кода? Получить доступ",
-    trialFreeMsg: "Первая генерация бесплатна. Код не нужен.",
-    statPlatforms: "Платформ",
-    statPillars: "Категорий",
-    statLanguages: "Языков",
-    statDailyLimit: "Лимит в день",
-    statFreeTrial: "Бесплатно",
-    statPayment: "Оплата",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit и YouTube — под каждую платформу идеи подбираются с учётом того, что там реально работает.",
-    descPillars: "Обучающий, закулисье, отзывы, продающий и развлекательный — автоматически сбалансированы по неделе.",
-    descLanguages: "Объяснения и идеи доступны на 25 языках, включая поддержку письма справа налево для арабского и персидского.",
-    descDailyLimit: "Пятьдесят генераций в день — достаточно для настоящего постоянного использования, но не открывает дверь для злоупотреблений.",
-    descFreeTrial: "Попробуй одну полную генерацию перед покупкой. Без кода, без обязательств.",
-    descPayment: "Разовый платёж. Без подписки, без повторных списаний — никогда.",
-    welcomeTitle: "Добро пожаловать",
-    welcomeSub: "Отныне — безлимитные генерации.",
-    support: "Поддержка",
-    terms: "Условия",
-    privacy: "Конфиденциальность",
+    tagline: 'Студия Plainwork',
+    heroTitle: 'Небольшие, полезные инструменты для тех, кто ведёт бизнес один.',
+    heroBody: 'Plainwork создаёт сфокусированные AI-инструменты, каждый из которых решает одну повторяющуюся задачу — написать подпись, ответить на отзыв, остаться заметным в Google — чтобы оставалось чуть больше времени на то, что реально требует человека.',
+    heroNote: 'Пока три живых инструмента. Дальше — больше.',
+    statProducts: 'продукта запущено', statLangs: 'языков поддерживается', statPeople: 'человек строит',
+    workHeading: 'Работы', workSub: 'Всё, что сейчас живо, в порядке выпуска.',
+    capHeading: 'Возможности', capSub: 'Что реально работает под капотом у трёх продуктов выше.',
+    approachHeading: 'Как здесь всё строится',
+    aboutHeading: 'Обо мне',
+    aboutLead: 'Я Ксения, и я сама строю каждую часть Plainwork — продукты, инфраструктуру за ними, и отвечаю на письма в поддержку.',
+    aboutBody: 'Я замечала один и тот же паттерн у владельцев малого бизнеса: небольшие, повторяющиеся задачи написания текста — подпись, ответ на отзыв, пост в Google — так и оставались несделанными, потому что всегда находилось что-то срочнее. Plainwork — мой ответ на это: инструменты достаточно узкие, чтобы их реально доводили до конца, построенные одним человеком, который лично читает каждое письмо в поддержку.',
+    basedIn: 'Находимся в', city: '\u0425ьюстон, США',
+    footerTag: 'Plainwork \u00b7 сделано одним человеком, от начала до конца',
+    terms: 'Пользовательское соглашение', privacy: 'Политика конфиденциальности',
   },
   es: {
-    labelWeekTopic: "QUÉ ES REALMENTE ESTA SEMANA",
-    placeholderWeekTopic: "ej. lanzamos nuestra nueva mezcla de espresso, abrimos una segunda sucursal...",
-    subtitle: "Una semana de ideas, pensadas por plataforma. Para equipos que planifican con intención.",
-    about: "Content Strategist AI construye una semana de ideas de publicaciones a la vez -- no subtítulos, sino el tema de cada día, ajustado a lo que realmente funciona en esa plataforma. Elige una plataforma, o planifica varias a la vez.",
-    tabSingle: "Una plataforma",
-    tabCross: "Multiplataforma",
-    tabCompetitor: "Análisis de competencia",
-    labelBusiness: "QUÉ HACE TU NEGOCIO",
-    placeholderBusiness: "Cafetería de barrio",
-    labelOccasion: "TEMPORADA U OCASIÓN",
-    optional: "(OPCIONAL)",
-    placeholderOccasion: "Temporada festiva",
-    labelAudience: "TU AUDIENCIA",
-    placeholderAudience: "Jóvenes profesionales",
-    labelPlatform: "PLATAFORMA",
-    labelPlatformsMulti: "PLATAFORMAS",
-    pickTwo: "(ELIGE 2 O MÁS)",
-    labelCompetitorPost: "PUBLICACIÓN O PERFIL DEL COMPETIDOR",
-    placeholderCompetitorPost: "Pégalo aquí...",
-    errBusiness: "Primero cuéntanos a qué se dedica tu negocio.",
-    errPlatforms: "Elige al menos 2 plataformas.",
-    errCompetitor: "Pega primero la publicación del competidor.",
-    errTrialUsed: "Vista previa gratuita usada. Introduce tu código para continuar.",
-    errInvalidCode: "Código de acceso inválido o caducado.",
-    errGeneric: "Algo salió mal.",
-    errRegenerate: "No se pudo regenerar ese día.",
-    limitReached: "Tu cuota de hoy se ha completado.",
-    limitTomorrow: "Cincuenta más te esperan mañana.",
-    btnThinking: "PENSANDO...",
-    btnBuildWeek: "CONSTRUIR LA SEMANA",
-    btnFindGap: "ENCONTRAR EL HUECO",
-    dailyAllowance: "CUOTA DIARIA",
-    theWeek: "La Semana",
-    copied: "COPIADO",
-    copyAll: "COPIAR TODO",
-    whatMissing: "LO QUE LES FALTA",
-    yourAngle: "TU ENFOQUE",
-    tryThis: "PRUEBA ESTO",
-    bestTime: "Mejor hora",
-    regenerating: "REGENERANDO...",
-    tryAnother: "PROBAR OTRA",
-    trialUsedMsg: "Tu vista previa gratuita ya se ha usado. Introduce tu código cuando quieras continuar.",
-    enterCode: "INTRODUCE TU CÓDIGO",
-    noCode: "¿Sin código? Obtén acceso",
-    trialFreeMsg: "Tu primera generación es gratuita. No se necesita código.",
-    statPlatforms: "Plataformas",
-    statPillars: "Pilares",
-    statLanguages: "Idiomas",
-    statDailyLimit: "Límite Diario",
-    statFreeTrial: "Prueba Gratis",
-    statPayment: "Pago",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit y YouTube -- cada plataforma recibe ideas ajustadas a lo que realmente funciona allí.",
-    descPillars: "Educativo, entre bastidores, prueba social, promocional y entretenido -- equilibrados automáticamente durante tu semana.",
-    descLanguages: "Explicaciones e ideas disponibles en 25 idiomas, incluido soporte de derecha a izquierda para árabe y persa.",
-    descDailyLimit: "Cincuenta generaciones al día -- suficiente para un uso real y continuo, sin abrir la puerta al abuso.",
-    descFreeTrial: "Prueba una generación completa antes de comprar. Sin código, sin compromiso.",
-    descPayment: "Un único pago. Sin suscripción, sin cargos recurrentes, nunca.",
-    welcomeTitle: "Bienvenido",
-    welcomeSub: "Generaciones ilimitadas, de ahora en adelante.",
-    support: "Soporte",
-    terms: "Términos",
-    privacy: "Privacidad",
+    tagline: 'Estudio Plainwork',
+    heroTitle: 'Herramientas peque\u00f1as y \u00fatiles para quienes llevan un negocio solos.',
+    heroBody: 'Plainwork crea herramientas de IA enfocadas que resuelven una tarea repetitiva cada una -- escribir subt\u00edtulos, responder rese\u00f1as, mantenerse visible en Google -- para que quede un poco m\u00e1s de tiempo para lo que realmente necesita una persona.',
+    heroNote: 'Tres herramientas activas por ahora. Vienen m\u00e1s.',
+    statProducts: 'productos lanzados', statLangs: 'idiomas soportados', statPeople: 'persona construy\u00e9ndolo',
+    workHeading: 'El trabajo', workSub: 'Todo lo que est\u00e1 activo ahora, en orden de lanzamiento.',
+    capHeading: 'Capacidades', capSub: 'Lo que realmente funciona detr\u00e1s de los tres productos de arriba.',
+    approachHeading: 'C\u00f3mo se construye todo aqu\u00ed',
+    aboutHeading: 'Sobre m\u00ed',
+    aboutLead: 'Soy Ksenia, y construyo cada parte de Plainwork yo misma -- los productos, la infraestructura detr\u00e1s de ellos, y el buz\u00f3n de soporte.',
+    aboutBody: 'Segu\u00eda notando el mismo patr\u00f3n en due\u00f1os de peque\u00f1os negocios: un pu\u00f1ado de tareas de escritura peque\u00f1as y repetitivas -- un subt\u00edtulo, una respuesta a una rese\u00f1a, un post de Google -- que nunca se hac\u00edan porque siempre hab\u00eda algo m\u00e1s urgente. Plainwork es mi respuesta a eso: herramientas lo bastante acotadas para realmente terminarse, construidas por una sola persona que lee cada correo de soporte personalmente.',
+    basedIn: 'Con base en', city: 'Houston, TX',
+    footerTag: 'Plainwork \u00b7 hecho en solitario, de principio a fin',
+    terms: 'T\u00e9rminos de Servicio', privacy: 'Pol\u00edtica de Privacidad',
   },
   fr: {
-    labelWeekTopic: "DE QUOI PARLE VRAIMENT CETTE SEMAINE",
-    placeholderWeekTopic: "ex. lancement de notre nouveau mélange espresso, ouverture d'une deuxième adresse...",
-    subtitle: "Une semaine d’idées, pensées par plateforme. Pour les équipes qui planifient avec intention.",
-    about: "Content Strategist AI construit une semaine d’idées de publication à la fois -- pas des légendes, mais le sujet central de chaque jour, adapté à ce qui fonctionne vraiment sur cette plateforme.",
-    tabSingle: "Une plateforme",
-    tabCross: "Multiplateforme",
-    tabCompetitor: "Analyse concurrent",
-    labelBusiness: "QUE FAIT VOTRE ENTREPRISE",
-    placeholderBusiness: "Café de quartier",
-    labelOccasion: "SAISON OU OCCASION",
-    optional: "(OPTIONNEL)",
-    placeholderOccasion: "Période des fêtes",
-    labelAudience: "VOTRE AUDIENCE",
-    placeholderAudience: "Jeunes professionnels",
-    labelPlatform: "PLATEFORME",
-    labelPlatformsMulti: "PLATEFORMES",
-    pickTwo: "(CHOISISSEZ-EN 2 OU PLUS)",
-    labelCompetitorPost: "PUBLICATION OU PROFIL DU CONCURRENT",
-    placeholderCompetitorPost: "Collez ici...",
-    errBusiness: "Dites-nous d’abord ce que fait votre entreprise.",
-    errPlatforms: "Choisissez au moins 2 plateformes.",
-    errCompetitor: "Collez d’abord la publication du concurrent.",
-    errTrialUsed: "Aperçu gratuit utilisé. Entrez votre code pour continuer.",
-    errInvalidCode: "Code d’accès invalide ou expiré.",
-    errGeneric: "Une erreur est survenue.",
-    errRegenerate: "Impossible de régénérer ce jour.",
-    limitReached: "Votre quota du jour est atteint.",
-    limitTomorrow: "Cinquante autres vous attendent demain.",
-    btnThinking: "RÉFLEXION...",
-    btnBuildWeek: "CONSTRUIRE LA SEMAINE",
-    btnFindGap: "TROUVER LE VIDE",
-    dailyAllowance: "QUOTA QUOTIDIEN",
-    theWeek: "La Semaine",
-    copied: "COPIÉ",
-    copyAll: "TOUT COPIER",
-    whatMissing: "CE QUI LEUR MANQUE",
-    yourAngle: "VOTRE ANGLE",
-    tryThis: "ESSAYEZ CECI",
-    bestTime: "Meilleur moment",
-    regenerating: "RÉGÉNÉRATION...",
-    tryAnother: "EN ESSAYER UNE AUTRE",
-    trialUsedMsg: "Votre aperçu gratuit a déjà été utilisé. Entrez votre code quand vous êtes prêt.",
-    enterCode: "ENTREZ VOTRE CODE",
-    noCode: "Pas de code ? Obtenir l’accès",
-    trialFreeMsg: "Votre première génération est gratuite. Aucun code requis.",
-    statPlatforms: "Plateformes",
-    statPillars: "Piliers",
-    statLanguages: "Langues",
-    statDailyLimit: "Limite Quotidienne",
-    statFreeTrial: "Essai Gratuit",
-    statPayment: "Paiement",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit et YouTube -- chaque plateforme reçoit des idées adaptées à ce qui y fonctionne vraiment.",
-    descPillars: "Éducatif, coulisses, preuve sociale, promotionnel et divertissant -- automatiquement équilibrés sur votre semaine.",
-    descLanguages: "Explications et idées disponibles en 25 langues, avec support droite-à-gauche pour l’arabe et le persan.",
-    descDailyLimit: "Cinquante générations par jour -- suffisant pour un usage réel et continu, sans ouvrir la porte aux abus.",
-    descFreeTrial: "Essayez une génération complète avant d’acheter. Aucun code, aucun engagement.",
-    descPayment: "Un paiement unique. Aucun abonnement, aucun frais récurrent, jamais.",
-    welcomeTitle: "Bienvenue",
-    welcomeSub: "Désormais, générations illimitées.",
-    support: "Support",
-    terms: "Conditions",
-    privacy: "Confidentialité",
+    tagline: 'Studio Plainwork',
+    heroTitle: 'De petits outils utiles pour ceux qui g\u00e8rent une entreprise seuls.',
+    heroBody: 'Plainwork cr\u00e9e des outils IA cibl\u00e9s qui r\u00e9solvent chacun une t\u00e2che r\u00e9p\u00e9titive -- r\u00e9diger des l\u00e9gendes, r\u00e9pondre aux avis, rester visible sur Google -- pour qu\u2019il reste un peu plus de temps pour ce qui n\u00e9cessite vraiment une personne.',
+    heroNote: 'Trois outils actifs pour l\u2019instant. D\u2019autres arrivent.',
+    statProducts: 'produits lanc\u00e9s', statLangs: 'langues prises en charge', statPeople: 'personne qui construit',
+    workHeading: 'Le travail', workSub: 'Tout ce qui est actif actuellement, dans l\u2019ordre de sortie.',
+    capHeading: 'Capacit\u00e9s', capSub: 'Ce qui tourne vraiment sous les trois produits ci-dessus.',
+    approachHeading: 'Comment tout est construit ici',
+    aboutHeading: '\u00c0 propos',
+    aboutLead: 'Je suis Ksenia, et je construis chaque partie de Plainwork moi-m\u00eame -- les produits, l\u2019infrastructure derri\u00e8re eux, et la boîte de support.',
+    aboutBody: 'Je remarquais toujours le m\u00eame sch\u00e9ma chez les propri\u00e9taires de petites entreprises : une poign\u00e9e de petites t\u00e2ches d\u2019\u00e9criture r\u00e9p\u00e9titives -- une l\u00e9gende, une r\u00e9ponse \u00e0 un avis, un post Google -- qui ne se faisaient jamais parce qu\u2019il y avait toujours quelque chose de plus urgent. Plainwork est ma r\u00e9ponse \u00e0 \u00e7a : des outils assez cibl\u00e9s pour \u00eatre vraiment termin\u00e9s, construits par une seule personne qui lit personnellement chaque email de support.',
+    basedIn: 'Bas\u00e9e \u00e0', city: 'Houston, TX',
+    footerTag: 'Plainwork \u00b7 construit en solo, de bout en bout',
+    terms: 'Conditions d\u2019utilisation', privacy: 'Politique de confidentialit\u00e9',
   },
   de: {
-    labelWeekTopic: "WORUM ES DIESE WOCHE WIRKLICH GEHT",
-    placeholderWeekTopic: "z.B. Einführung unserer neuen Espresso-Mischung, Eröffnung einer zweiten Filiale...",
-    subtitle: "Eine Woche voller Ideen, durchdacht pro Plattform. Für Teams, die mit Absicht planen.",
-    about: "Content Strategist AI erstellt eine Woche Post-Ideen auf einmal -- keine Bildunterschriften, sondern das zentrale Thema jedes Tages, abgestimmt darauf, was auf dieser Plattform wirklich funktioniert.",
-    tabSingle: "Eine Plattform",
-    tabCross: "Plattformübergreifend",
-    tabCompetitor: "Konkurrenzanalyse",
-    labelBusiness: "WAS MACHT DEIN UNTERNEHMEN",
-    placeholderBusiness: "Café in der Nachbarschaft",
-    labelOccasion: "SAISON ODER ANLASS",
-    optional: "(OPTIONAL)",
-    placeholderOccasion: "Feiertagssaison",
-    labelAudience: "DEINE ZIELGRUPPE",
-    placeholderAudience: "Junge Berufstätige",
-    labelPlatform: "PLATTFORM",
-    labelPlatformsMulti: "PLATTFORMEN",
-    pickTwo: "(WÄHLE 2 ODER MEHR)",
-    labelCompetitorPost: "BEITRAG ODER PROFIL DES WETTBEWERBERS",
-    placeholderCompetitorPost: "Hier einfügen...",
-    errBusiness: "Sag uns zuerst, was dein Unternehmen macht.",
-    errPlatforms: "Wähle mindestens 2 Plattformen.",
-    errCompetitor: "Füge zuerst den Beitrag des Wettbewerbers ein.",
-    errTrialUsed: "Kostenlose Vorschau verwendet. Gib deinen Code ein, um fortzufahren.",
-    errInvalidCode: "Ungültiger oder abgelaufener Zugangscode.",
-    errGeneric: "Etwas ist schiefgelaufen.",
-    errRegenerate: "Dieser Tag konnte nicht neu generiert werden.",
-    limitReached: "Dein heutiges Kontingent ist aufgebraucht.",
-    limitTomorrow: "Fünfzig weitere warten morgen.",
-    btnThinking: "ÜBERLEGE...",
-    btnBuildWeek: "WOCHE ERSTELLEN",
-    btnFindGap: "LÜCKE FINDEN",
-    dailyAllowance: "TAGESKONTINGENT",
-    theWeek: "Die Woche",
-    copied: "KOPIERT",
-    copyAll: "ALLES KOPIEREN",
-    whatMissing: "WAS IHNEN FEHLT",
-    yourAngle: "DEIN ANSATZ",
-    tryThis: "PROBIER DAS",
-    bestTime: "Beste Zeit",
-    regenerating: "NEU GENERIEREN...",
-    tryAnother: "ANDERE PROBIEREN",
-    trialUsedMsg: "Deine kostenlose Vorschau wurde bereits verwendet. Gib deinen Code ein, wenn du bereit bist.",
-    enterCode: "CODE EINGEBEN",
-    noCode: "Kein Code? Zugang erhalten",
-    trialFreeMsg: "Deine erste Generierung ist kostenlos. Kein Code erforderlich.",
-    statPlatforms: "Plattformen",
-    statPillars: "Säulen",
-    statLanguages: "Sprachen",
-    statDailyLimit: "Tageslimit",
-    statFreeTrial: "Kostenlos Testen",
-    statPayment: "Zahlung",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit und YouTube -- jede Plattform erhält Ideen, die dort wirklich funktionieren.",
-    descPillars: "Lehrreich, Hinter-den-Kulissen, Sozialer Beweis, Werblich und Unterhaltsam -- automatisch über deine Woche ausbalanciert.",
-    descLanguages: "Erklärungen und Ideen in 25 Sprachen verfügbar, inklusive Rechts-nach-links-Unterstützung für Arabisch und Persisch.",
-    descDailyLimit: "Fünfzig Generierungen pro Tag -- genug für echte, fortlaufende Nutzung, ohne Missbrauch Tür und Tor zu öffnen.",
-    descFreeTrial: "Probiere eine vollständige Generierung vor dem Kauf. Kein Code, keine Verpflichtung.",
-    descPayment: "Eine einmalige Zahlung. Kein Abo, keine wiederkehrenden Kosten, niemals.",
-    welcomeTitle: "Willkommen",
-    welcomeSub: "Ab jetzt unbegrenzte Generierungen.",
-    support: "Support",
-    terms: "AGB",
-    privacy: "Datenschutz",
+    tagline: 'Plainwork Studio',
+    heroTitle: 'Kleine, n\u00fctzliche Tools f\u00fcr Menschen, die ihr Business allein f\u00fchren.',
+    heroBody: 'Plainwork baut fokussierte KI-Tools, die jeweils eine wiederkehrende Aufgabe l\u00f6sen -- Bildunterschriften schreiben, auf Bewertungen antworten, bei Google sichtbar bleiben -- damit etwas mehr Zeit f\u00fcr die Teile des Business bleibt, die wirklich einen Menschen brauchen.',
+    heroNote: 'Bisher drei aktive Tools. Mehr folgt.',
+    statProducts: 'Produkte ver\u00f6ffentlicht', statLangs: 'unterst\u00fctzte Sprachen', statPeople: 'Person baut es',
+    workHeading: 'Die Arbeit', workSub: 'Alles, was aktuell live ist, in Reihenfolge der Ver\u00f6ffentlichung.',
+    capHeading: 'F\u00e4higkeiten', capSub: 'Was tats\u00e4chlich unter den drei Produkten oben l\u00e4uft.',
+    approachHeading: 'Wie hier alles gebaut wird',
+    aboutHeading: '\u00dcber mich',
+    aboutLead: 'Ich bin Ksenia, und ich baue jeden Teil von Plainwork selbst -- die Produkte, die Infrastruktur dahinter, und den Support-Posteingang.',
+    aboutBody: 'Ich bemerkte immer wieder dasselbe Muster bei Kleinunternehmern: eine Handvoll kleiner, sich wiederholender Schreibaufgaben -- eine Bildunterschrift, eine Antwort auf eine Bewertung, ein Google-Beitrag -- die nie erledigt wurden, weil immer etwas Dringenderes anlag. Plainwork ist meine Antwort darauf: Tools schmal genug, um wirklich fertig zu werden, gebaut von einer einzigen Person, die jede Support-E-Mail pers\u00f6nlich liest.',
+    basedIn: 'Ansässig in', city: 'Houston, TX',
+    footerTag: 'Plainwork \u00b7 solo gebaut, von Anfang bis Ende',
+    terms: 'Nutzungsbedingungen', privacy: 'Datenschutzrichtlinie',
   },
   pt: {
-    labelWeekTopic: "SOBRE O QUE É ESTA SEMANA DE VERDADE",
-    placeholderWeekTopic: "ex. lançamento da nossa nova mistura de espresso, abertura de uma segunda unidade...",
-    subtitle: "Uma semana de ideias, pensadas por plataforma. Para equipes que planejam com intenção.",
-    about: "Content Strategist AI constrói uma semana de ideias de posts de cada vez -- não legendas, mas o tema central de cada dia, ajustado ao que realmente funciona naquela plataforma.",
-    tabSingle: "Uma plataforma",
-    tabCross: "Multiplataforma",
-    tabCompetitor: "Análise de concorrente",
-    labelBusiness: "O QUE SEU NEGÓCIO FAZ",
-    placeholderBusiness: "Cafeteria de bairro",
-    labelOccasion: "TEMPORADA OU OCASIÃO",
-    optional: "(OPCIONAL)",
-    placeholderOccasion: "Temporada de festas",
-    labelAudience: "SEU PÚBLICO",
-    placeholderAudience: "Jovens profissionais",
-    labelPlatform: "PLATAFORMA",
-    labelPlatformsMulti: "PLATAFORMAS",
-    pickTwo: "(ESCOLHA 2 OU MAIS)",
-    labelCompetitorPost: "POST OU PERFIL DO CONCORRENTE",
-    placeholderCompetitorPost: "Cole aqui...",
-    errBusiness: "Primeiro nos diga o que seu negócio faz.",
-    errPlatforms: "Escolha pelo menos 2 plataformas.",
-    errCompetitor: "Cole primeiro o post do concorrente.",
-    errTrialUsed: "Prévia gratuita usada. Digite seu código para continuar.",
-    errInvalidCode: "Código de acesso inválido ou expirado.",
-    errGeneric: "Algo deu errado.",
-    errRegenerate: "Não foi possível regenerar esse dia.",
-    limitReached: "Sua cota de hoje foi concluida.",
-    limitTomorrow: "Mais cinquenta esperam amanhã.",
-    btnThinking: "PENSANDO...",
-    btnBuildWeek: "CONSTRUIR A SEMANA",
-    btnFindGap: "ENCONTRAR A LACUNA",
-    dailyAllowance: "COTA DIÁRIA",
-    theWeek: "A Semana",
-    copied: "COPIADO",
-    copyAll: "COPIAR TUDO",
-    whatMissing: "O QUE ESTÁ FALTANDO",
-    yourAngle: "SEU ÂNGULO",
-    tryThis: "TENTE ISSO",
-    bestTime: "Melhor horário",
-    regenerating: "REGENERANDO...",
-    tryAnother: "TENTAR OUTRA",
-    trialUsedMsg: "Sua prévia gratuita já foi usada. Digite seu código quando estiver pronto.",
-    enterCode: "DIGITE SEU CÓDIGO",
-    noCode: "Sem código? Obtenha acesso",
-    trialFreeMsg: "Sua primeira geração é gratuita. Nenhum código necessário.",
-    statPlatforms: "Plataformas",
-    statPillars: "Pilares",
-    statLanguages: "Idiomas",
-    statDailyLimit: "Limite Diário",
-    statFreeTrial: "Teste Grátis",
-    statPayment: "Pagamento",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit e YouTube -- cada plataforma recebe ideias ajustadas ao que realmente funciona lá.",
-    descPillars: "Educativo, bastidores, prova social, promocional e divertido -- automaticamente equilibrados ao longo da semana.",
-    descLanguages: "Explicações e ideias disponíveis em 25 idiomas, incluindo suporte direita-para-esquerda para árabe e persa.",
-    descDailyLimit: "Cinquenta gerações por dia -- suficiente para uso real e contínuo, sem abrir a porta para abusos.",
-    descFreeTrial: "Experimente uma geração completa antes de comprar. Sem código, sem compromisso.",
-    descPayment: "Um único pagamento. Sem assinatura, sem cobrança recorrente, nunca.",
-    welcomeTitle: "Bem-vindo",
-    welcomeSub: "Gerações ilimitadas, a partir de agora.",
-    support: "Suporte",
-    terms: "Termos",
-    privacy: "Privacidade",
-  },
-  it: {
-    labelWeekTopic: "DI COSA SI TRATTA DAVVERO QUESTA SETTIMANA",
-    placeholderWeekTopic: "es. lancio della nostra nuova miscela espresso, apertura di una seconda sede...",
-    subtitle: "Una settimana di idee, pensate per piattaforma. Per team che pianificano con intenzione.",
-    about: "Content Strategist AI costruisce una settimana di idee per post alla volta -- non didascalie, ma l’argomento centrale di ogni giorno, adattato a ciò che funziona davvero su quella piattaforma.",
-    tabSingle: "Una piattaforma",
-    tabCross: "Multipiattaforma",
-    tabCompetitor: "Analisi concorrente",
-    labelBusiness: "COSA FA LA TUA ATTIVITÀ",
-    placeholderBusiness: "Caffè di quartiere",
-    labelOccasion: "STAGIONE O OCCASIONE",
-    optional: "(OPZIONALE)",
-    placeholderOccasion: "Periodo festivo",
-    labelAudience: "IL TUO PUBBLICO",
-    placeholderAudience: "Giovani professionisti",
-    labelPlatform: "PIATTAFORMA",
-    labelPlatformsMulti: "PIATTAFORME",
-    pickTwo: "(SCEGLINE 2 O PIÙ)",
-    labelCompetitorPost: "POST O PROFILO DEL CONCORRENTE",
-    placeholderCompetitorPost: "Incolla qui...",
-    errBusiness: "Dicci prima cosa fa la tua attività.",
-    errPlatforms: "Scegli almeno 2 piattaforme.",
-    errCompetitor: "Incolla prima il post del concorrente.",
-    errTrialUsed: "Anteprima gratuita utilizzata. Inserisci il tuo codice per continuare.",
-    errInvalidCode: "Codice di accesso non valido o scaduto.",
-    errGeneric: "Qualcosa è andato storto.",
-    errRegenerate: "Impossibile rigenerare quel giorno.",
-    limitReached: "La tua quota di oggi è completa.",
-    limitTomorrow: "Altre cinquanta ti aspettano domani.",
-    btnThinking: "STO PENSANDO...",
-    btnBuildWeek: "COSTRUISCI LA SETTIMANA",
-    btnFindGap: "TROVA IL VUOTO",
-    dailyAllowance: "QUOTA GIORNALIERA",
-    theWeek: "La Settimana",
-    copied: "COPIATO",
-    copyAll: "COPIA TUTTO",
-    whatMissing: "COSA GLI MANCA",
-    yourAngle: "IL TUO ANGOLO",
-    tryThis: "PROVA QUESTO",
-    bestTime: "Momento migliore",
-    regenerating: "RIGENERAZIONE...",
-    tryAnother: "PROVANE UN’ALTRA",
-    trialUsedMsg: "La tua anteprima gratuita è già stata usata. Inserisci il codice quando sei pronto.",
-    enterCode: "INSERISCI IL CODICE",
-    noCode: "Nessun codice? Ottieni accesso",
-    trialFreeMsg: "La tua prima generazione è gratuita. Nessun codice richiesto.",
-    statPlatforms: "Piattaforme",
-    statPillars: "Pilastri",
-    statLanguages: "Lingue",
-    statDailyLimit: "Limite Giornaliero",
-    statFreeTrial: "Prova Gratis",
-    statPayment: "Pagamento",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit e YouTube -- ogni piattaforma riceve idee adattate a ciò che funziona davvero lì.",
-    descPillars: "Educativo, dietro le quinte, riprova sociale, promozionale e divertente -- bilanciati automaticamente durante la settimana.",
-    descLanguages: "Spiegazioni e idee disponibili in 25 lingue, incluso il supporto destra-sinistra per arabo e persiano.",
-    descDailyLimit: "Cinquanta generazioni al giorno -- sufficienti per un uso reale e continuo, senza aprire la porta agli abusi.",
-    descFreeTrial: "Prova una generazione completa prima di acquistare. Nessun codice, nessun impegno.",
-    descPayment: "Un unico pagamento. Nessun abbonamento, nessun addebito ricorrente, mai.",
-    welcomeTitle: "Benvenuto",
-    welcomeSub: "Generazioni illimitate, da ora in poi.",
-    support: "Supporto",
-    terms: "Termini",
-    privacy: "Privacy",
-  },
-  nl: {
-    labelWeekTopic: "WAAR DEZE WEEK ECHT OVER GAAT",
-    placeholderWeekTopic: "bijv. lancering van onze nieuwe espressoblend, opening van een tweede vestiging...",
-    subtitle: "Een week aan ideeën, per platform doordacht. Voor teams die met intentie plannen.",
-    about: "Content Strategist AI bouwt een week aan post-ideeën tegelijk -- geen bijschriften, maar het kernonderwerp van elke dag, afgestemd op wat echt werkt op dat platform.",
-    tabSingle: "Eén platform",
-    tabCross: "Platformoverstijgend",
-    tabCompetitor: "Concurrentieanalyse",
-    labelBusiness: "WAT DOET JE BEDRIJF",
-    placeholderBusiness: "Buurtcafé",
-    labelOccasion: "SEIZOEN OF GELEGENHEID",
-    optional: "(OPTIONEEL)",
-    placeholderOccasion: "Feestdagenseizoen",
-    labelAudience: "JE DOELGROEP",
-    placeholderAudience: "Jonge professionals",
-    labelPlatform: "PLATFORM",
-    labelPlatformsMulti: "PLATFORMS",
-    pickTwo: "(KIES ER 2 OF MEER)",
-    labelCompetitorPost: "POST OF PROFIEL VAN CONCURRENT",
-    placeholderCompetitorPost: "Plak hier...",
-    errBusiness: "Vertel ons eerst wat je bedrijf doet.",
-    errPlatforms: "Kies minstens 2 platforms.",
-    errCompetitor: "Plak eerst de post van de concurrent.",
-    errTrialUsed: "Gratis voorbeeld gebruikt. Voer je code in om door te gaan.",
-    errInvalidCode: "Ongeldige of verlopen toegangscode.",
-    errGeneric: "Er is iets misgegaan.",
-    errRegenerate: "Kon die dag niet opnieuw genereren.",
-    limitReached: "Je dagelijkse limiet is bereikt.",
-    limitTomorrow: "Morgen wachten er nog vijftig.",
-    btnThinking: "BEZIG...",
-    btnBuildWeek: "BOUW DE WEEK",
-    btnFindGap: "VIND HET GAT",
-    dailyAllowance: "DAGELIJKSE LIMIET",
-    theWeek: "De Week",
-    copied: "GEKOPIEERD",
-    copyAll: "ALLES KOPIËREN",
-    whatMissing: "WAT ZE MISSEN",
-    yourAngle: "JOUW INVALSHOEK",
-    tryThis: "PROBEER DIT",
-    bestTime: "Beste tijd",
-    regenerating: "OPNIEUW GENEREREN...",
-    tryAnother: "PROBEER EEN ANDERE",
-    trialUsedMsg: "Je gratis voorbeeld is al gebruikt. Voer je code in wanneer je klaar bent.",
-    enterCode: "VOER JE CODE IN",
-    noCode: "Geen code? Krijg toegang",
-    trialFreeMsg: "Je eerste generatie is gratis. Geen code nodig.",
-    statPlatforms: "Platforms",
-    statPillars: "Pijlers",
-    statLanguages: "Talen",
-    statDailyLimit: "Dageli​jkse Limiet",
-    statFreeTrial: "Gratis Proberen",
-    statPayment: "Betaling",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit en YouTube -- elk platform krijgt ideeën die daar echt werken.",
-    descPillars: "Educatief, achter de schermen, sociaal bewijs, promotioneel en vermakelijk -- automatisch in balans over je week.",
-    descLanguages: "Uitleg en ideeën beschikbaar in 25 talen, inclusief rechts-naar-links ondersteuning voor Arabisch en Perzisch.",
-    descDailyLimit: "Vijftig generaties per dag -- genoeg voor echt, doorlopend gebruik, zonder de deur open te zetten voor misbruik.",
-    descFreeTrial: "Probeer een volledige generatie voordat je koopt. Geen code, geen verplichting.",
-    descPayment: "Eén eenmalige betaling. Geen abonnement, nooit terugkerende kosten.",
-    welcomeTitle: "Welkom",
-    welcomeSub: "Vanaf nu onbeperkte generaties.",
-    support: "Ondersteuning",
-    terms: "Voorwaarden",
-    privacy: "Privacy",
-  },
-  pl: {
-    labelWeekTopic: "O CZYM NAPRAWDĘ JEST TEN TYDZIEŃ",
-    placeholderWeekTopic: "np. premiera naszej nowej mieszanki espresso, otwarcie drugiej lokalizacji...",
-    subtitle: "Tydzień pomysłów, dopasowanych do platformy. Dla zespołów, które planują świadomie.",
-    about: "Content Strategist AI buduje tydzień pomysłów na posty naraz -- nie podpisy, ale główny temat każdego dnia, dopasowany do tego, co naprawdę działa na danej platformie.",
-    tabSingle: "Jedna platforma",
-    tabCross: "Wieloplatformowo",
-    tabCompetitor: "Analiza konkurencji",
-    labelBusiness: "CZYM ZAJMUJE SIĘ TWOJA FIRMA",
-    placeholderBusiness: "Kawiarnia os³ku owa",
-    labelOccasion: "SEZON LUB OKAZJA",
-    optional: "(OPCJONALNIE)",
-    placeholderOccasion: "Sezon świąteczny",
-    labelAudience: "TWOJA GRUPA ODBIORCÓW",
-    placeholderAudience: "Młodzi profesjonaliści",
-    labelPlatform: "PLATFORMA",
-    labelPlatformsMulti: "PLATFORMY",
-    pickTwo: "(WYBIERZ 2 LUB WIĘCEJ)",
-    labelCompetitorPost: "POST LUB PROFIL KONKURENCJI",
-    placeholderCompetitorPost: "Wklej tutaj...",
-    errBusiness: "Najpierw powiedz nam, czym zajmuje się Twoja firma.",
-    errPlatforms: "Wybierz co najmniej 2 platformy.",
-    errCompetitor: "Najpierw wklej post konkurencji.",
-    errTrialUsed: "Bezpłatny podgląd wykorzystany. Wprowadź kod, aby kontynuować.",
-    errInvalidCode: "Nieprawidłowy lub wygasły kod dostępu.",
-    errGeneric: "Coś poszło nie tak.",
-    errRegenerate: "Nie udało się wygenerować tego dnia ponownie.",
-    limitReached: "Twój dzisiejszy limit został wykorzystany.",
-    limitTomorrow: "Kolejne pięćdziesiąt czeka jutro.",
-    btnThinking: "MYŚlE...",
-    btnBuildWeek: "ZBUDUJ TYDZIEŃ",
-    btnFindGap: "ZNAJDŹ LUKĘ",
-    dailyAllowance: "DZIENNY LIMIT",
-    theWeek: "Tydzień",
-    copied: "SKOPIOWANO",
-    copyAll: "KOPIUJ WSZYSTKO",
-    whatMissing: "CZEGO IM BRAKUJE",
-    yourAngle: "TWOJE PODEJŚCIE",
-    tryThis: "WYPRÓBUJ TO",
-    bestTime: "Najlepsza pora",
-    regenerating: "REGENERACJA...",
-    tryAnother: "WYPRÓBUJ INNY",
-    trialUsedMsg: "Twój bezpłatny podgląd został już wykorzystany. Wprowadź kod, gdy będziesz gotowa.",
-    enterCode: "WPROWADŹ KOD",
-    noCode: "Brak kodu? Uzyskaj dostęp",
-    trialFreeMsg: "Twoja pierwsza generacja jest bezpłatna. Kod nie jest wymagany.",
-    statPlatforms: "Platformy",
-    statPillars: "Filary",
-    statLanguages: "Języki",
-    statDailyLimit: "Dzienny Limit",
-    statFreeTrial: "Darmowa Próba",
-    statPayment: "Płatność",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit i YouTube -- każda platforma otrzymuje pomysły dopasowane do tego, co tam naprawdę działa.",
-    descPillars: "Edukacyjny, zza kulis, dowód społeczny, promocyjny i rozrywkowy -- automatycznie zbalansowane w ciągu tygodnia.",
-    descLanguages: "Wyjaśnienia i pomysły dostępne w 25 językach, w tym wsparcie od prawej do lewej dla arabskiego i perskiego.",
-    descDailyLimit: "Pięćdziesiąt generacji dziennie -- wystarczająco dużo na realne, ciągłe użytkowanie, bez otwierania drzwi na nadużycia.",
-    descFreeTrial: "Wypróbuj jedną pełną generację przed zakupem. Bez kodu, bez zobowiązań.",
-    descPayment: "Jedna jednorazowa płatność. Bez subskrypcji, bez cyklicznych opłat, nigdy.",
-    welcomeTitle: "Witamy",
-    welcomeSub: "Od teraz nieograniczone generacje.",
-    support: "Wsparcie",
-    terms: "Warunki",
-    privacy: "Prywatność",
+    tagline: 'Estúdio Plainwork',
+    heroTitle: 'Ferramentas pequenas e úteis para quem toca um negócio sozinho.',
+    heroBody: 'A Plainwork cria ferramentas de IA focadas que resolvem uma tarefa repetitiva cada -- escrever legendas, responder avalia\u00e7\u00f5es, permanecer vis\u00edvel no Google -- para sobrar um pouco mais de tempo para as partes do neg\u00f3cio que realmente precisam de uma pessoa.',
+    heroNote: 'Três ferramentas ativas até agora. Mais estão a caminho.',
+    statProducts: 'produtos lan\u00e7ados', statLangs: 'idiomas suportados', statPeople: 'pessoa construindo',
+    workHeading: 'O trabalho', workSub: 'Tudo que está ativo agora, em ordem de lan\u00e7amento.',
+    capHeading: 'Capacidades', capSub: 'O que realmente roda por baixo dos tr\u00eas produtos acima.',
+    approachHeading: 'Como tudo é construído aqui',
+    aboutHeading: 'Sobre',
+    aboutLead: 'Sou a Ksenia, e eu mesma construo cada parte da Plainwork -- os produtos, a infraestrutura por tr\u00e1s deles, e a caixa de suporte.',
+    aboutBody: 'Eu continuava notando o mesmo padr\u00e3o em donos de pequenos neg\u00f3cios: um punhado de tarefas de escrita pequenas e repetitivas -- uma legenda, uma resposta a uma avalia\u00e7\u00e3o, um post no Google -- que nunca eram feitas porque sempre havia algo mais urgente. A Plainwork \u00e9 minha resposta a isso: ferramentas estreitas o suficiente para realmente serem conclu\u00eddas, constru\u00eddas por uma \u00fanica pessoa que l\u00ea pessoalmente cada e-mail de suporte.',
+    basedIn: 'Sediada em', city: 'Houston, TX',
+    footerTag: 'Plainwork \u00b7 feito sozinha, do in\u00edcio ao fim',
+    terms: 'Termos de Servi\u00e7o', privacy: 'Pol\u00edtica de Privacidade',
   },
   zh: {
-    labelWeekTopic: "这周真正的主题是什么",
-    placeholderWeekTopic: "例如：推出新的浓缩咖啡拼配、开设第二家门店...",
-    subtitle: "每周的内容想法，根据平台量身定制。为真正有计划地规划的团队而建。",
-    about: "Content Strategist AI 一次性构建一周的帖文想法——不是文案，而是每天的核心主题，匹配该平台真正有效的内容。",
-    tabSingle: "单一平台",
-    tabCross: "跨平台",
-    tabCompetitor: "竞争对手分析",
-    labelBusiness: "你的业务是什么",
-    placeholderBusiness: "社区咖啡馆",
-    labelOccasion: "季节或场合",
-    optional: "（可选）",
-    placeholderOccasion: "节日季",
-    labelAudience: "你的受众",
-    placeholderAudience: "年轻职场人士",
-    labelPlatform: "平台",
-    labelPlatformsMulti: "平台",
-    pickTwo: "（选择2个或以上）",
-    labelCompetitorPost: "竞争对手的帖子或主页",
-    placeholderCompetitorPost: "粘贴到这里...",
-    errBusiness: "请先告诉我们你的业务是什么。",
-    errPlatforms: "请至少选择2个平台。",
-    errCompetitor: "请先粘贴竞争对手的帖子。",
-    errTrialUsed: "免费预览已使用。请输入访问代码以继续。",
-    errInvalidCode: "访问代码无效或已过期。",
-    errGeneric: "出了点问题。",
-    errRegenerate: "无法重新生成该天。",
-    limitReached: "今天的额度已用完。",
-    limitTomorrow: "明天还有五十次等着你。",
-    btnThinking: "思考中...",
-    btnBuildWeek: "构建本周计划",
-    btnFindGap: "找到空白",
-    dailyAllowance: "每日额度",
-    theWeek: "本周",
-    copied: "已复制",
-    copyAll: "全部复制",
-    whatMissing: "他们缺少什么",
-    yourAngle: "你的角度",
-    tryThis: "试试这个",
-    bestTime: "最佳时间",
-    regenerating: "重新生成中...",
-    tryAnother: "换一个",
-    trialUsedMsg: "你的免费预览已使用。准备好后请输入代码。",
-    enterCode: "输入代码",
-    noCode: "没有代码？获取访问权限",
-    trialFreeMsg: "你的第一次生成是免费的。无需代码。",
-    statPlatforms: "平台",
-    statPillars: "支柱",
-    statLanguages: "语言",
-    statDailyLimit: "每日限制",
-    statFreeTrial: "免费试用",
-    statPayment: "付款",
-    descPlatforms: "Instagram、TikTok、LinkedIn、Facebook、Telegram、X、Reddit和YouTube——每个平台都会获得适合该平台的想法。",
-    descPillars: "教育、幕后花绝、社会证据、促销和娱乐——自动在一周内平衡分布。",
-    descLanguages: "支持25种语言的解释和想法，包括阿拉伯语和波斯语的从右到左支持。",
-    descDailyLimit: "每天五十次生成——足以满足真实、持续的使用需求，同时不会开启滥用的大门。",
-    descFreeTrial: "购买前先试用一次完整生成。无需代码，无需承诺。",
-    descPayment: "一次性付款。无订阅，永远无循环收费。",
-    welcomeTitle: "欢迎",
-    welcomeSub: "从现在起，无限生成。",
-    support: "支持",
-    terms: "条款",
-    privacy: "隐私",
+    tagline: 'Plainwork \u5de5\u4f5c\u5ba4',
+    heroTitle: '\u4e3a\u72ec\u81ea\u7ecf\u8425\u4e1a\u52a1\u7684\u4eba\u6253\u9020\u7684\u5c0f\u800c\u5b9e\u7528\u7684\u5de5\u5177\u3002',
+    heroBody: 'Plainwork \u6253\u9020\u4e13\u6ce8\u7684AI\u5de5\u5177\uff0c\u6bcf\u4e2a\u5de5\u5177\u53ea\u89e3\u51b3\u4e00\u4e2a\u91cd\u590d\u6027\u4efb\u52a1\u2014\u2014\u5199\u914d\u6587\u3001\u56de\u590d\u8bc4\u4ef7\u3001\u5728Google\u4fdd\u6301\u53ef\u89c1\u5ea6\u2014\u2014\u8ba9\u4f60\u6709\u66f4\u591a\u65f6\u95f4\u53bb\u505a\u771f\u6b63\u9700\u8981\u4eba\u624b\u7684\u4e8b\u60c5\u3002',
+    heroNote: '\u76ee\u524d\u4e09\u4e2a\u5de5\u5177\u5df2\u4e0a\u7ebf\u3002\u66f4\u591a\u5373\u5c06\u63a8\u51fa\u3002',
+    statProducts: '\u4e2a\u4ea7\u54c1\u5df2\u4e0a\u7ebf', statLangs: '\u79cd\u8bed\u8a00\u652f\u6301', statPeople: '\u4e2a\u4eba\u5728\u6784\u5efa',
+    workHeading: '\u4f5c\u54c1', workSub: '\u76ee\u524d\u6240\u6709\u4e0a\u7ebf\u9879\u76ee\uff0c\u6309\u53d1\u5e03\u987a\u5e8f\u6392\u5217\u3002',
+    capHeading: '\u80fd\u529b', capSub: '\u4e0a\u8ff0\u4e09\u4e2a\u4ea7\u54c1\u80cc\u540e\u771f\u6b63\u8fd0\u884c\u7684\u6280\u672f\u3002',
+    approachHeading: '\u8fd9\u91cc\u662f\u600e\u4e48\u6784\u5efa\u4e00\u5207\u7684',
+    aboutHeading: '\u5173\u4e8e',
+    aboutLead: '\u6211\u662fKsenia\uff0c\u6211\u4eb2\u81ea\u6784\u5efaPlainwork\u7684\u6bcf\u4e00\u90e8\u5206\u2014\u2014\u4ea7\u54c1\u3001\u80cc\u540e\u7684\u57fa\u7840\u8bbe\u65bd\uff0c\u4ee5\u53ca\u5ba2\u670d\u90ae\u7bb1\u3002',
+    aboutBody: '\u6211\u4e00\u76f4\u6ce8\u610f\u5230\u5c0f\u4f01\u4e1a\u4e3b\u4eec\u7684\u76f8\u540c\u6a21\u5f0f\uff1a\u4e00\u4e9b\u5c0f\u800c\u91cd\u590d\u7684\u5199\u4f5c\u4efb\u52a1\u2014\u2014\u4e00\u6761\u914d\u6587\u3001\u4e00\u6761\u8bc4\u4ef7\u56de\u590d\u3001\u4e00\u6761Google\u5e16\u6587\u2014\u2014\u603b\u662f\u56e0\u4e3a\u603b\u6709\u66f4\u7d27\u8feb\u7684\u4e8b\u800c\u65e0\u6cd5\u5b8c\u6210\u3002Plainwork\u5c31\u662f\u6211\u5bf9\u6b64\u7684\u56de\u7b54\uff1a\u8db3\u591f\u805a\u7126\u3001\u771f\u6b63\u80fd\u5b8c\u6210\u7684\u5de5\u5177\uff0c\u7531\u4e00\u4e2a\u4eb2\u81ea\u9605\u8bfb\u6bcf\u5c01\u5ba2\u670d\u90ae\u4ef6\u7684\u4eba\u6784\u5efa\u3002',
+    basedIn: '\u603b\u90e8\u4f4d\u4e8e', city: '\u7f8e\u56fd\u4f11\u65af\u987f',
+    footerTag: 'Plainwork \u00b7 \u4e00\u4eba\u4ece\u5934\u5230\u5c3e\u6253\u9020',
+    terms: '\u670d\u52a1\u6761\u6b3e', privacy: '\u9690\u79c1\u653f\u7b56',
   },
   ja: {
-    labelWeekTopic: "今週の本当のテーマは何か",
-    placeholderWeekTopic: "例：新しいエスプレッソブレンドの発売、2号店のオープンなど...",
-    subtitle: "プラットフォームごとに考えられた一週間分のアイデア。意図を持って計画するチームのために。",
-    about: "Content Strategist AIは一度に一週間分の投稿アイデアを作成します——キャプションではなく、そのプラットフォームで実際に機能する内容に合わせた、毎日の中心テーマです。",
-    tabSingle: "単一プラットフォーム",
-    tabCross: "クロスプラットフォーム",
-    tabCompetitor: "竞合分析",
-    labelBusiness: "あなたのビジネスは何ですか",
-    placeholderBusiness: "地元のカフェ",
-    labelOccasion: "季節または機会",
-    optional: "（任意）",
-    placeholderOccasion: "ホリデーシーズン",
-    labelAudience: "ターゲット層",
-    placeholderAudience: "若手のプロフェッショナル",
-    labelPlatform: "プラットフォーム",
-    labelPlatformsMulti: "プラットフォーム",
-    pickTwo: "（2つ以上選択）",
-    labelCompetitorPost: "竞合他社の投稿またはプロフィール",
-    placeholderCompetitorPost: "ここに貼り付け...",
-    errBusiness: "まずあなたのビジネス内容を教えてください。",
-    errPlatforms: "2つ以上のプラットフォームを選択してください。",
-    errCompetitor: "まず竞合他社の投稿を貼り付けてください。",
-    errTrialUsed: "無料プレビューは使用済みです。続けるにはアクセスコードを入力してください。",
-    errInvalidCode: "アクセスコードが無効か期限切れです。",
-    errGeneric: "何か問題が発生しました。",
-    errRegenerate: "その日を再生成できませんでした。",
-    limitReached: "今日の利用上限に達しました。",
-    limitTomorrow: "明日さらに50回ご利用いただけます。",
-    btnThinking: "考中...",
-    btnBuildWeek: "1週間分を作成",
-    btnFindGap: "ギャップを見つける",
-    dailyAllowance: "1日の利用上限",
-    theWeek: "今週",
-    copied: "コピーしました",
-    copyAll: "すべてコピー",
-    whatMissing: "不足している点",
-    yourAngle: "あなたの切り口",
-    tryThis: "これを試す",
-    bestTime: "最適な時間",
-    regenerating: "再生成中...",
-    tryAnother: "別の案を試す",
-    trialUsedMsg: "無料プレビューはすでに使用されています。準備ができたらコードを入力してください。",
-    enterCode: "コードを入力",
-    noCode: "コードがない場合は",
-    trialFreeMsg: "初回の生成は無料です。コードは不要です。",
-    statPlatforms: "プラットフォーム",
-    statPillars: "ピラー",
-    statLanguages: "言語",
-    statDailyLimit: "1日の上限",
-    statFreeTrial: "無料体験",
-    statPayment: "支払い",
-    descPlatforms: "Instagram、TikTok、LinkedIn、Facebook、Telegram、X、Reddit、YouTube——各プラットフォームで実際に機能するアイデアを提供。",
-    descPillars: "教育、裏側、社会的証拠、宣伝、エンタメ——週間を通じて自動でバランスを取ります。",
-    descLanguages: "25言語での説明とアイデアを提供、アラビア語・ペルシア語の右から左表記も対応。",
-    descDailyLimit: "1日50回の生成——実際の継続利用に十分で、乱用を防ぐ適切な上限です。",
-    descFreeTrial: "購入前に1回分を完全無料でお試しいただけます。コードも約束も不要。",
-    descPayment: "一回きりの支払い。サブスクなし、定期課金なし。",
-    welcomeTitle: "ようこそ",
-    welcomeSub: "今後は無制限で生成できます。",
-    support: "サポート",
-    terms: "利用規約",
-    privacy: "プライバシー",
-  },
-  ar: {
-    labelWeekTopic: "عمّا يدور هذا الأسبوع فعليًا",
-    placeholderWeekTopic: "مثال: إطلاق مزيج الإسبريسو الجديد، افتتاح فرع ثانٍ...",
-    subtitle: "أسبوع من الأفكار، مدروسة لكل منصة. للفرق التي تخطط بوعي.",
-    about: "Content Strategist AI يبني أسبوعًا من أفكار المنشورات في كل مرة -- ليس التسميات، بل الموضوع الأساسي لكل يوم.",
-    tabSingle: "منصة واحدة",
-    tabCross: "متعدد المنصات",
-    tabCompetitor: "تحليل المنافس",
-    labelBusiness: "ماذا يفعل عملك",
-    placeholderBusiness: "مقهى في الحي",
-    labelOccasion: "الموسم أو المناسبة",
-    optional: "(اختياري)",
-    placeholderOccasion: "موسم الأعياد",
-    labelAudience: "جمهورك",
-    placeholderAudience: "المهنيون الشباب",
-    labelPlatform: "المنصة",
-    labelPlatformsMulti: "المنصات",
-    pickTwo: "(اختر 2 أو أكثر)",
-    labelCompetitorPost: "منشور أو ملف المنافس",
-    placeholderCompetitorPost: "الصق هنا...",
-    errBusiness: "أخبرنا أولاً بماذا يقوم عملك.",
-    errPlatforms: "اختر منصتين على الأقل.",
-    errCompetitor: "الصق منشور المنافس أولاً.",
-    errTrialUsed: "تم استخدام المعاينة المجانية. أدخل رمز الوصول للمتابعة.",
-    errInvalidCode: "رمز الوصول غير صالح أو منتهي الصلاحية.",
-    errGeneric: "حدث خطأ ما.",
-    errRegenerate: "تعذر إعادة إنشاء ذلك اليوم.",
-    limitReached: "اكتملت حصتك اليومية.",
-    limitTomorrow: "خمسون أخرى في انتظارك غدًا.",
-    btnThinking: "جارٍ التفكير...",
-    btnBuildWeek: "بناء الأسبوع",
-    btnFindGap: "ابحث عن الفجوة",
-    dailyAllowance: "الحصة اليومية",
-    theWeek: "الأسبوع",
-    copied: "تم النسخ",
-    copyAll: "نسخ الكل",
-    whatMissing: "ما يفتقدونه",
-    yourAngle: "زاويتك",
-    tryThis: "جرب هذا",
-    bestTime: "أفضل وقت",
-    regenerating: "إعادة الإنشاء...",
-    tryAnother: "جرب فكرة أخرى",
-    trialUsedMsg: "تم بالفعل استخدام معاينتك المجانية. أدخل رمزك عندما تكون جاهزًا.",
-    enterCode: "أدخل رمزك",
-    noCode: "لا تملك رمزًا؟ احصل على الوصول",
-    trialFreeMsg: "أول إنشاء مجاني. لا حاجة لرمز.",
-    statPlatforms: "منصات",
-    statPillars: "ركائز",
-    statLanguages: "لغات",
-    statDailyLimit: "الحد اليومي",
-    statFreeTrial: "تجربة مجانية",
-    statPayment: "الدفع",
-    descPlatforms: "Instagram، TikTok، LinkedIn، Facebook، Telegram، X، Reddit، وYouTube -- كل منصة تحصل على أفكار مصممة خصيصًا لما ينجح فيها فعلًا.",
-    descPillars: "تعليمي، خلف الكواليس، إثبات اجتماعي، ترويجي، وترفيهي -- متوازنة تلقائيًا على مدار أسبوعك.",
-    descLanguages: "الشروحات والأفكار متاحة بـ 25 لغة، بما في ذلك دعم الكتابة من اليمين إلى اليسار للعربية والفارسية.",
-    descDailyLimit: "خمسون إنشاءًا يوميًا -- يكفي للاستخدام الحقيقي المستمر، دون فتح الباب للإساءة.",
-    descFreeTrial: "جرب إنشاءًا كاملًا قبل الشراء. بدون رمز، بدون التزام.",
-    descPayment: "دفعة واحدة فقط. لا اشتراك، لا رسوم متكررة، أبدًا.",
-    welcomeTitle: "أهلاً بك",
-    welcomeSub: "إنشاءات غير محدودة من الآن.",
-    support: "الدعم",
-    terms: "الشروط",
-    privacy: "الخصوصية",
-  },
-  hi: {
-    labelWeekTopic: "यह सप्ताह वास्तव में किस बारे में है",
-    placeholderWeekTopic: "जैसे: नया एस्प्रेसो ब्लेंड लॉन्च करना, दूसरी शाखा खोलना...",
-    subtitle: "प्लेटफॉर्म के अनुसार एक सप्ताह के आइडिया। उन टीमों के लिए जो वाकई योजना बनाते हैं।",
-    about: "Content Strategist AI एक समय में एक सप्ताह के पोस्ट आइडिया बनाता है।",
-    tabSingle: "एक प्लेटफॉर्म",
-    tabCross: "क्रॉस-प्लेटफॉर्म",
-    tabCompetitor: "प्रतिस्पर्धी विश्लेषण",
-    labelBusiness: "आपका बिज़नेस क्या करता है",
-    placeholderBusiness: "पड़ोस की कॉफी शॉप",
-    labelOccasion: "मौसम या अवसर",
-    optional: "(ऐच्छिक)",
-    placeholderOccasion: "त्यौहार का मौसम",
-    labelAudience: "आपकी ऑडिएंस",
-    placeholderAudience: "युवा पेशेवर",
-    labelPlatform: "प्लेटफॉर्म",
-    labelPlatformsMulti: "प्लेटफॉर्म",
-    pickTwo: "(2 या अधिक चुनें)",
-    labelCompetitorPost: "प्रतिस्पर्धी की पोस्ट या प्रोफ़ाइल",
-    placeholderCompetitorPost: "यहां पेस्ट करें...",
-    errBusiness: "पहले बताएं आपका बिज़नेस क्या करता है।",
-    errPlatforms: "कम से कम 2 प्लेटफॉर्म चुनें।",
-    errCompetitor: "पहले प्रतिस्पर्धी की पोस्ट पेस्ट करें।",
-    errTrialUsed: "मुफ्त प्रीव्यू इस्तेमाल हो चुका है। जारी रखने के लिए अपना कोड डालें।",
-    errInvalidCode: "अमान्य या समाप्त एक्सेस कोड।",
-    errGeneric: "कुछ गलत हो गया।",
-    errRegenerate: "उस दिन को फिर से नहीं बनाया जा सका।",
-    limitReached: "आज की सीमा पूरी हो गई है।",
-    limitTomorrow: "कल पचास और इंतजार कर रहे हैं।",
-    btnThinking: "सोच रहे हैं...",
-    btnBuildWeek: "सप्ताह बनाएं",
-    btnFindGap: "खाली जगह खोजें",
-    dailyAllowance: "दैनिक सीमा",
-    theWeek: "सप्ताह",
-    copied: "कॉपी हो गया",
-    copyAll: "सब कॉपी करें",
-    whatMissing: "उनमें क्या कमी है",
-    yourAngle: "आपका एंगल",
-    tryThis: "यह आजबाएं",
-    bestTime: "सर्वश्रेष्ठ समय",
-    regenerating: "पुनः निर्माण...",
-    tryAnother: "कोई और आजबाएं",
-    trialUsedMsg: "आपका मुफ्त प्रीव्यू पहले ही इस्तेमाल हो चुका है। तैयार होने पर कोड डालें।",
-    enterCode: "कोड डालें",
-    noCode: "कोड नहीं है? एक्सेस प्राप्त करें",
-    trialFreeMsg: "आपका पहला जनरेशन मुफ्त है। कोड की जरूरत नहीं।",
-    statPlatforms: "प्लेटफॉर्म",
-    statPillars: "स्तंभ",
-    statLanguages: "भाषाएं",
-    statDailyLimit: "दैनिक सीमा",
-    statFreeTrial: "मुफ्त ट्रायल",
-    statPayment: "भुगतान",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit और YouTube -- हर प्लेटफॉर्म के लिए वहां वास्तव में काम करने वाले आइडिया।",
-    descPillars: "शैक्षिक, परदे के पीछे, सामाजिक प्रमाण, प्रचारात्मक और मनोरंजक — सप्ताह भर स्वचालित रूप से संतुलित।",
-    descLanguages: "25 भाषाओं में स्पष्टीकरण और आइडियाओं सहित।",
-    descDailyLimit: "प्रतिदिन 50 जनरेशन — वास्तविक, जारी उपयोग के लिए पर्याप्त।",
-    descFreeTrial: "खरीदने से पहले एक पूर्ण जनरेशन आजबाएं। कोई कोड नहीं।",
-    descPayment: "एक बार का भुगतान। कोई सब्सक्रिप्शन नहीं।",
-    welcomeTitle: "स्वागत है",
-    welcomeSub: "अब से असीमित जनरेशन।",
-    support: "सपोर्ट",
-    terms: "नियम",
-    privacy: "गोपनीयता",
-  },
-  ko: {
-    labelWeekTopic: "이번 주는 실제로 무엇에 관한 것인가요",
-    placeholderWeekTopic: "예: 새로운 에스프레소 블렌드 출시, 2호점 오픈 등...",
-    subtitle: "플랫폼별로 고려된 일주일 아이디어. 진지하게 계획하는 팀을 위해.",
-    about: "Content Strategist AI는 한 번에 일주일치 게시물 아이디어를 만듭니다.",
-    tabSingle: "단일 플랫폼",
-    tabCross: "크로스플랫폼",
-    tabCompetitor: "경쟁사 분석",
-    labelBusiness: "비즈니스가 무엇인가요",
-    placeholderBusiness: "동네 카페",
-    labelOccasion: "시즘 또는 계기",
-    optional: "(선택)",
-    placeholderOccasion: "연말연시 시즘",
-    labelAudience: "대상 고객",
-    placeholderAudience: "젊은 전문직 종사자",
-    labelPlatform: "플랫폼",
-    labelPlatformsMulti: "플랫폼",
-    pickTwo: "(2개 이상 선택)",
-    labelCompetitorPost: "경쟁사 게시물 또는 프로필",
-    placeholderCompetitorPost: "여기에 붙여넣기...",
-    errBusiness: "먼저 비즈니스 내용을 알려주세요.",
-    errPlatforms: "최소 2개 플랫폼을 선택하세요.",
-    errCompetitor: "먼저 경쟁사 게시물을 붙여넣으세요.",
-    errTrialUsed: "무료 미리보기를 이미 사용했습니다. 계속하려면 액세스 코드를 입력하세요.",
-    errInvalidCode: "유효하지 않거나 만료된 액세스 코드입니다.",
-    errGeneric: "문제가 발생했습니다.",
-    errRegenerate: "해당 일을 재생성할 수 없었습니다.",
-    limitReached: "오늘의 한도를 모두 사용했습니다.",
-    limitTomorrow: "내일 50회가 다시 제공됩니다.",
-    btnThinking: "생각 중...",
-    btnBuildWeek: "일주일 생성하기",
-    btnFindGap: "공백 찾기",
-    dailyAllowance: "일일 한도",
-    theWeek: "이번 주",
-    copied: "복사됨",
-    copyAll: "모두 복사",
-    whatMissing: "부족한 점",
-    yourAngle: "당신의 각도",
-    tryThis: "이것을 시도해보세요",
-    bestTime: "최적 시간",
-    regenerating: "재생성 중...",
-    tryAnother: "다른 것 시도",
-    trialUsedMsg: "무료 미리보기를 이미 사용했습니다. 준비가 되면 코드를 입력하세요.",
-    enterCode: "코드 입력",
-    noCode: "코드가 없나요? 액세스 얻기",
-    trialFreeMsg: "첫 생성은 무료입니다. 코드가 필요 없습니다.",
-    statPlatforms: "플랫폼",
-    statPillars: "컨텐츠 카테고리",
-    statLanguages: "언어",
-    statDailyLimit: "일일 한도",
-    statFreeTrial: "무료 체험",
-    statPayment: "결제",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit, YouTube -- 각 플랫폼에서 실제로 효과적인 아이디어를 제공합니다.",
-    descPillars: "교육, 비하인드, 사회적 증거, 홍보, 엔터테인먼트 -- 일주일 동안 자동으로 균형을 맞춥니다.",
-    descLanguages: "25개 언어로 설명과 아이디어 제공, 아랍어와 페르시아어의 오른쪽에서 왼쪽 지원 포함.",
-    descDailyLimit: "하루 50회 생성 -- 실제적이고 지속적인 사용에 충분하면서 남용은 막습니다.",
-    descFreeTrial: "구매 전에 완전한 생성 1회를 무료로 체험해보세요. 코드나 약정 없이.",
-    descPayment: "단 한 번의 결제. 구독 없음, 반복 청구 없음, 영구히.",
-    welcomeTitle: "환영합니다",
-    welcomeSub: "이제부터 무제한 생성이 가능합니다.",
-    support: "지원",
-    terms: "약관",
-    privacy: "개인정보",
-  },
-  vi: {
-    labelWeekTopic: "TUẦN NÀY THỰC SỰ NÓI VỀ ĐIỀU GÌ",
-    placeholderWeekTopic: "vd. ra mắt hỗn hợp espresso mới, khai trương chi nhánh thứ hai...",
-    subtitle: "Một tuần ý tưởng, được cân nhắc theo từng nền tảng. Dành cho các nhóm lập kế hoạch có chủ đích.",
-    about: "Content Strategist AI xây dựng một tuần ý tưởng bài đăng mỗi lần.",
-    tabSingle: "Một nền tảng",
-    tabCross: "Đa nền tảng",
-    tabCompetitor: "Phân tích đối thủ",
-    labelBusiness: "DOANH NGHIỆP CủA BạN LÀM GÌ",
-    placeholderBusiness: "Quán cà phê khu phố",
-    labelOccasion: "MÙA HOẶC DỊP",
-    optional: "(TÙY CHỌN)",
-    placeholderOccasion: "Mùa lễ hội",
-    labelAudience: "ĐốI TƯỢNG CỦA BạN",
-    placeholderAudience: "Chuyên gia trẻ",
-    labelPlatform: "NỀN TẢNG",
-    labelPlatformsMulti: "NỀN TẢNG",
-    pickTwo: "(CHỌN 2 HOẶC NHIỀU HƠN)",
-    labelCompetitorPost: "BÀI ĐĂNG HOẶC Hồ SƠ ĐỖI THỦ",
-    placeholderCompetitorPost: "Dán vào đây...",
-    errBusiness: "Hãy cho chúng tôi biết doanh nghiệp của bạn làm gì trước.",
-    errPlatforms: "Chọn ít nhất 2 nền tảng.",
-    errCompetitor: "Dán bài đăng của đối thủ trước.",
-    errTrialUsed: "Đã dùng bản xem trước miễn phí. Nhập mã truy cập để tiếp tục.",
-    errInvalidCode: "Mã truy cập không hợp lệ hoặc đã hết hạn.",
-    errGeneric: "Đã có lỗi xảy ra.",
-    errRegenerate: "Không thể tạo lại ngày đó.",
-    limitReached: "Hạn mức hôm nay đã hết.",
-    limitTomorrow: "Năm mươi lượt nữa đang chờ vào ngày mai.",
-    btnThinking: "ĐANG SUY NGHĨ...",
-    btnBuildWeek: "XÂY DỰNG TUẦN",
-    btnFindGap: "TÌM KHOẢNG TRốNG",
-    dailyAllowance: "HẠN MỨC HÀNG NGÀY",
-    theWeek: "Tuần Này",
-    copied: "Đã SAO CHÉP",
-    copyAll: "SAO CHÉP TẤT CẢ",
-    whatMissing: "HỌ ĐANG THIẾU Gì",
-    yourAngle: "GÓC ĐỘ CỦA BẠN",
-    tryThis: "THử CÁI NÀY",
-    bestTime: "Thời điểm tốt nhất",
-    regenerating: "ĐANG TẠO LẠI...",
-    tryAnother: "THử Ý TƯỞNG KHÁC",
-    trialUsedMsg: "Bản xem trước miễn phí đã được dùng. Nhập mã khi bạn sẵn sàng.",
-    enterCode: "NHẬP MÃ",
-    noCode: "Không có mã? Nhận quyền truy cập",
-    trialFreeMsg: "Lượt tạo đầu tiên miễn phí. Không cần mã.",
-    statPlatforms: "Nền tảng",
-    statPillars: "Trụ cột",
-    statLanguages: "Ngôn ngữ",
-    statDailyLimit: "Hạn Mức Ngày",
-    statFreeTrial: "Dùng Thử",
-    statPayment: "Thanh Toán",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit và YouTube -- mỗi nền tảng nhận được ý tưởng phù hợp.",
-    descPillars: "Giáo dục, hậu trường, bằng chứng xã hội, quảng bá và giải trí -- tự động cân bằng trong tuần.",
-    descLanguages: "Giải thích và ý tưởng có sẵn bằng 25 ngôn ngữ.",
-    descDailyLimit: "Năm mươi lượt tạo mỗi ngày -- đủ cho việc sử dụng thực tế.",
-    descFreeTrial: "Dùng thử một lượt đầy đủ trước khi mua. Không cần mã.",
-    descPayment: "Một lần thanh toán duy nhất. Không đăng ký, không phí định kỳ.",
-    welcomeTitle: "Chào mừng",
-    welcomeSub: "Từ giờ, tạo không giới hạn.",
-    support: "Hỗ trợ",
-    terms: "Điều khoản",
-    privacy: "Quyền riêng tư",
-  },
-  tr: {
-    labelWeekTopic: "BU HAFTA GERÇEKTEN NE HAKKINDA",
-    placeholderWeekTopic: "örn. yeni espresso karışımımızın lansmanı, ikinci şubenin açılışı...",
-    subtitle: "Platforma göre düşünülmüş bir haftalık fikirler. Kasıtlı planlayan ekipler için.",
-    about: "Content Strategist AI, bir seferde bir haftalık gönderi fikri oluşturur.",
-    tabSingle: "Tek platform",
-    tabCross: "Çapraz platform",
-    tabCompetitor: "Rakip analizi",
-    labelBusiness: "İşLETMENİZ NE YAPIYOR",
-    placeholderBusiness: "Mahalle kahve dükkanı",
-    labelOccasion: "SEZON VEYA VESİLE",
-    optional: "(İSTEĞE BAĞLI)",
-    placeholderOccasion: "Tatil sezonu",
-    labelAudience: "HEDEF KİTLENİZ",
-    placeholderAudience: "Genç profesyoneller",
-    labelPlatform: "PLATFORM",
-    labelPlatformsMulti: "PLATFORMLAR",
-    pickTwo: "(2 VEYA DAHA FAZLA SEÇİN)",
-    labelCompetitorPost: "RAKİBİN GÖNDERİSİ VEYA PROFİLİ",
-    placeholderCompetitorPost: "Buraya yapıştırın...",
-    errBusiness: "Önce işletmenizin ne yaptığını söyleyin.",
-    errPlatforms: "En az 2 platform seçin.",
-    errCompetitor: "Önce rakibin gönderisini yapıştırın.",
-    errTrialUsed: "Ücretsiz önizleme kullanıldı. Devam etmek için kodunuzu girin.",
-    errInvalidCode: "Geçersiz veya süresi dolmuş erişim kodu.",
-    errGeneric: "Bir şeyler ters gitti.",
-    errRegenerate: "O gün yeniden oluşturulamadı.",
-    limitReached: "Bugünkü hakkınız tamamlandı.",
-    limitTomorrow: "Yarın elli tane daha sizi bekliyor.",
-    btnThinking: "DÜŞÜNÜYOR...",
-    btnBuildWeek: "HAFTAYI OLUŞTUR",
-    btnFindGap: "BOŞLUĞU BUL",
-    dailyAllowance: "GÜNLÜK HAK",
-    theWeek: "Bu Hafta",
-    copied: "KOPYALANDI",
-    copyAll: "HEPSİNİ KOPYALA",
-    whatMissing: "NEYİ EKSİK",
-    yourAngle: "SENİN AÇIN",
-    tryThis: "BUNU DENE",
-    bestTime: "En iyi zaman",
-    regenerating: "YENİDEN OLUŞTURULUYOR...",
-    tryAnother: "BAŞKASINI DENE",
-    trialUsedMsg: "Ücretsiz önizlemeniz zaten kullanıldı. Hazır olduğunuzda kodunuzu girin.",
-    enterCode: "KODUNUZU GİRİN",
-    noCode: "Kodunuz yok mu? Erişim alın",
-    trialFreeMsg: "İlk oluşturmanız ücretsiz. Kod gerekmez.",
-    statPlatforms: "Platform",
-    statPillars: "Sütun",
-    statLanguages: "Dil",
-    statDailyLimit: "Günlük Limit",
-    statFreeTrial: "Ücretsiz Deneme",
-    statPayment: "Ödeme",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit ve YouTube -- her platform orada gerçekten işe yarayan fikirler alır.",
-    descPillars: "Eğitici, perde arkası, sosyal kanıt, tanıtıcı ve eğlenceli -- haftanız boyunca otomatik dengelenir.",
-    descLanguages: "Açıklamalar ve fikirler 25 dilde mevcut.",
-    descDailyLimit: "Günde elli oluşturma -- gerçek, sürekli kullanım için yeterli.",
-    descFreeTrial: "Satın almadan önce tam bir oluşturma deneyin. Kod yok, taahhüt yok.",
-    descPayment: "Tek seferlik ödeme. Abonelik yok, tekrarlayan ücret yok, asla.",
-    welcomeTitle: "Hoş geldiniz",
-    welcomeSub: "Bundan sonra sınırsız oluşturma.",
-    support: "Destek",
-    terms: "Şartlar",
-    privacy: "Gizlilik",
-  },
-  fa: {
-    labelWeekTopic: "این هفته واقعاً درباره چیست",
-    placeholderWeekTopic: "مثلاً: عرضه ترکیب اسپرسوی جدید، افتتاح شعبه دوم...",
-    subtitle: "یک هفته ایده، متناسب با هر پلتفرم. برای تیم‌هایی که با قصد برنامه‌ریزی می‌کنند.",
-    about: "Content Strategist AI یک هفته ایده پست در یک زمان می‌سازد.",
-    tabSingle: "یک پلتفرم",
-    tabCross: "چندپلتفرمی",
-    tabCompetitor: "تحلیل رقیب",
-    labelBusiness: "کسب‌وکار شما چیست",
-    placeholderBusiness: "کافی شاپ محله",
-    labelOccasion: "فصل یا مناسبت",
-    optional: "(اختیاری)",
-    placeholderOccasion: "فصل تعطیلات",
-    labelAudience: "مخاطبان شما",
-    placeholderAudience: "متخصصان جوان",
-    labelPlatform: "پلتفرم",
-    labelPlatformsMulti: "پلتفرم‌ها",
-    pickTwo: "(2 یا بیشتر انتخاب کنید)",
-    labelCompetitorPost: "پست یا پروفایل رقیب",
-    placeholderCompetitorPost: "اینجا بچسبانید...",
-    errBusiness: "ابتدا بگویید کسب‌وکارتان چیست.",
-    errPlatforms: "حداقل 2 پلتفرم انتخاب کنید.",
-    errCompetitor: "ابتدا پست رقیب را بچسبانید.",
-    errTrialUsed: "پیش‌نمایش رایگان استفاده شد. کد دسترسی خود را وارد کنید.",
-    errInvalidCode: "کد دسترسی نامعتبر یا منقضی شده.",
-    errGeneric: "مشکلی پیش آمد.",
-    errRegenerate: "نتوانستیم آن روز را دوباره بسازیم.",
-    limitReached: "سهمیه امروز شما تکمیل شد.",
-    limitTomorrow: "فردا تا دیگر فردا منتظر شماست.",
-    btnThinking: "در حال فکر...",
-    btnBuildWeek: "ساخت هفته",
-    btnFindGap: "یافتن خلاء",
-    dailyAllowance: "سهمیه روزانه",
-    theWeek: "این هفته",
-    copied: "کپی شد",
-    copyAll: "کپی همه",
-    whatMissing: "چه چیزی کم دارند",
-    yourAngle: "زاویه شما",
-    tryThis: "این را امتحان کنید",
-    bestTime: "بهترین زمان",
-    regenerating: "در حال بازسازی...",
-    tryAnother: "یکی دیگر را امتحان کنید",
-    trialUsedMsg: "پیش‌نمایش رایگان شما قبلاً استفاده شده. وقتی آماده بودید کد را وارد کنید.",
-    enterCode: "کد را وارد کنید",
-    noCode: "کد ندارید؟ دسترسی بگیرید",
-    trialFreeMsg: "اولین تولید شما رایگان است. نیازی به کد نیست.",
-    statPlatforms: "پلتفرم‌ها",
-    statPillars: "ارکان",
-    statLanguages: "زبان‌ها",
-    statDailyLimit: "سقف روزانه",
-    statFreeTrial: "آزمایش رایگان",
-    statPayment: "پرداخت",
-    descPlatforms: "Instagram، TikTok، LinkedIn، Facebook، Telegram، X، Reddit و YouTube.",
-    descPillars: "آموزشی، پشت صحنه، اثبات اجتماعی، تبلیغاتی و سرگرمی‌کننده.",
-    descLanguages: "توضیحات و ایده‌ها به 25 زبان موجود است.",
-    descDailyLimit: "پنجاه تولید در روز.",
-    descFreeTrial: "قبل از خرید یک تولید کامل را امتحان کنید.",
-    descPayment: "یک پرداخت یکجا. بدون اشتراک.",
-    welcomeTitle: "خوش آمدید",
-    welcomeSub: "از این پس، تولید نامحدود.",
-    support: "پشتیبانی",
-    terms: "شرایط",
-    privacy: "حریم خصوصی",
-  },
-  uk: {
-    labelWeekTopic: "ПРО ЩО НАСПРАВДІ ЦЕЙ ТИЖДЕНЬ",
-    placeholderWeekTopic: "напр. запуск нової суміші еспресо, відкриття другої точки...",
-    subtitle: "Тиждень ідей, продуманих під платформу. Для команд, які планують за задумом.",
-    about: "Content Strategist AI будує тиждень ідей для постів за раз.",
-    tabSingle: "Одна платформа",
-    tabCross: "Крос-платформа",
-    tabCompetitor: "Аналіз конкурента",
-    labelBusiness: "ЧИМ ЗАЙМАЄТЬСЯ ТВІЙ БІЗНЕС",
-    placeholderBusiness: "Кав’ярня поруч",
-    labelOccasion: "СЕЗОН АБО ПРИВІД",
-    optional: "(НЕОБОВ’ЯЗКОВО)",
-    placeholderOccasion: "Святковий сезон",
-    labelAudience: "ВАША АУДИТОРІЯ",
-    placeholderAudience: "Молоді фахівці",
-    labelPlatform: "ПЛАТФОРМА",
-    labelPlatformsMulti: "ПЛАТФОРМИ",
-    pickTwo: "(ОБЕРІТЬ 2 АБО БІЛЬШЕ)",
-    labelCompetitorPost: "ПОСТ АБО ПРОФІЛЬ КОНКУРЕНТА",
-    placeholderCompetitorPost: "Вставте сюди...",
-    errBusiness: "Спочатку розкажіть, чим займається ваш бізнес.",
-    errPlatforms: "Оберіть мінімум 2 платформи.",
-    errCompetitor: "Спочатку вставте пост конкурента.",
-    errTrialUsed: "Безкоштовний перегляд використано. Введіть код доступу, щоб продовжити.",
-    errInvalidCode: "Невірний або прострочений код доступу.",
-    errGeneric: "Щось пішло не так.",
-    errRegenerate: "Не вдалося перегенерувати цей день.",
-    limitReached: "Сьогоднішній ліміт вичерпано.",
-    limitTomorrow: "Ще п’ятдесят чекають завтра.",
-    btnThinking: "МІРКУЮ...",
-    btnBuildWeek: "СФОРМУВАТИ ТИЖДЕНЬ",
-    btnFindGap: "ЗНАЙТИ ПРОГАЛИНУ",
-    dailyAllowance: "ЩОДЕННИЙ ЛІМІТ",
-    theWeek: "Цього Тижня",
-    copied: "СКОПІЙОВАНО",
-    copyAll: "КОПІЮВАТИ ВСЕ",
-    whatMissing: "ЧОГО ЙОМУ БРАКУЄ",
-    yourAngle: "ВАШ КУТ",
-    tryThis: "СПРОБУЙ ЦЕ",
-    bestTime: "Найкращий час",
-    regenerating: "ПЕРЕГЕНЕРАЦІЯ...",
-    tryAnother: "СПРОБУЙ ІНШИЙ",
-    trialUsedMsg: "Ваш безкоштовний перегляд вже використано. Введіть код, коли будете готові.",
-    enterCode: "ВВЕСТИ КОД",
-    noCode: "Немає коду? Отримати доступ",
-    trialFreeMsg: "Ваша перша генерація безкоштовна. Код не потрібен.",
-    statPlatforms: "Платформ",
-    statPillars: "Категорій",
-    statLanguages: "Мов",
-    statDailyLimit: "Ліміт на день",
-    statFreeTrial: "Безкоштовно",
-    statPayment: "Оплата",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit та YouTube.",
-    descPillars: "Освітній, закулісся, відгуки, продаючий та розважальний -- автоматично збалансовані протягом тижня.",
-    descLanguages: "Пояснення та ідеї доступні 25 мовами.",
-    descDailyLimit: "П’ятдесят генерацій на день.",
-    descFreeTrial: "Спробуйте одну повну генерацію перед покупкою.",
-    descPayment: "Одинаразова оплата. Без підписки.",
-    welcomeTitle: "Ласкаво просимо",
-    welcomeSub: "Відтепер — безлімітні генерації.",
-    support: "Підтримка",
-    terms: "Умови",
-    privacy: "Конфіденційність",
-  },
-  th: {
-    labelWeekTopic: "สัปดาห์นี้เกี่ยวกับอะไรจริงๆ",
-    placeholderWeekTopic: "เช่น เปิดตัวเอสเพรสโซ่สูตรใหม่ เปิดสาขาที่สอง...",
-    subtitle: "ไอเดียหนึ่งสัปดาห์ ที่คิดมาตามแต่ละแพลตฟอร์ม สำหรับทีมที่วางแผนอย่างตั้งใจ",
-    about: "Content Strategist AI สร้างไอเดียโพสต์หนึ่งสัปดาห์ในคราวเดียว.",
-    tabSingle: "แพลตฟอร์มเดียว",
-    tabCross: "ข้ามแพลตฟอร์ม",
-    tabCompetitor: "วิเคราะห์คู่แข่ง",
-    labelBusiness: "ธุรกิจของคุณคืออะไร",
-    placeholderBusiness: "ร้านกาแฟในชุมชน",
-    labelOccasion: "ฤดูกาลหรือโอกาส",
-    optional: "(ไม่บังคับ)",
-    placeholderOccasion: "เทศกาลวันหยุด",
-    labelAudience: "กลุ่มเป้าหมายของคุณ",
-    placeholderAudience: "คนทำงานรุ่นใหม่",
-    labelPlatform: "แพลตฟอร์ม",
-    labelPlatformsMulti: "แพลตฟอร์ม",
-    pickTwo: "(เลือก 2 อันขึ้นไป)",
-    labelCompetitorPost: "โพสต์หรือโปรไฟล์ของคู่แข่ง",
-    placeholderCompetitorPost: "วางที่นี่...",
-    errBusiness: "กรุณาบอกก่อนว่าธุรกิจของคุณคืออะไร",
-    errPlatforms: "เลือกอย่างน้อย 2 แพลตฟอร์ม",
-    errCompetitor: "วางโพสต์ของคู่แข่งก่อน",
-    errTrialUsed: "ใช้ตัวอย่างฟรีแล้ว กรอกรหัสเข้าใช้เพื่อดำเนินการต่อ",
-    errInvalidCode: "รหัสเข้าใช้ไม่ถูกต้องหรือหมดอายุ",
-    errGeneric: "เกิดข้อผิดพลาด",
-    errRegenerate: "ไม่สามารถสร้างวันนั้นใหม่ได้",
-    limitReached: "โควตาของวันนี้เต็มแล้ว",
-    limitTomorrow: "อีก 50 ครั้งรอคุณพรุ่งนี้",
-    btnThinking: "กำลังคิด...",
-    btnBuildWeek: "สร้างสัปดาห์",
-    btnFindGap: "ค้นหาช่องว่าง",
-    dailyAllowance: "โควตารายวัน",
-    theWeek: "สัปดาห์นี้",
-    copied: "คัดลอกแล้ว",
-    copyAll: "คัดลอกทั้งหมด",
-    whatMissing: "สิ่งที่ขาดหายไป",
-    yourAngle: "มุมมองของคุณ",
-    tryThis: "ลองนี้ดู",
-    bestTime: "เวลาที่ดีที่สุด",
-    regenerating: "กำลังสร้างใหม่...",
-    tryAnother: "ลองอันอื่น",
-    trialUsedMsg: "ใช้ตัวอย่างฟรีไปแล้ว กรอกรหัสเมื่อพร้อม",
-    enterCode: "กรอกรหัส",
-    noCode: "ไม่มีรหัส? รับการเข้าถึง",
-    trialFreeMsg: "การสร้างครั้งแรกฟรี ไม่ต้องใช้รหัส",
-    statPlatforms: "แพลตฟอร์ม",
-    statPillars: "เสาหลัก",
-    statLanguages: "ภาษา",
-    statDailyLimit: "โควตารายวัน",
-    statFreeTrial: "ทดลองฟรี",
-    statPayment: "การชำระเงิน",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit และ YouTube",
-    descPillars: "เชิงการศึกษา เบื้องหลัง ข้อมูลสังคม โปรโมท และความบันเทิง",
-    descLanguages: "คำอธิบายและไอเดียมีให้ใน 25 ภาษา",
-    descDailyLimit: "สร้างได้ 50 ครั้งต่อวัน",
-    descFreeTrial: "ทดลองสร้างเต็มรูปแบบก่อนซื้อ",
-    descPayment: "จ่ายครั้งเดียว ไม่มีการสมัครสมาชิก",
-    welcomeTitle: "ยินดีต้อนรับ",
-    welcomeSub: "สร้างได้ไม่จำกัดตั้งแต่นี้ไป",
-    support: "การสนับสนุน",
-    terms: "ข้อกำหนด",
-    privacy: "ความเป็นส่วนตัว",
-  },
-  id: {
-    labelWeekTopic: "SEBENARNYA MINGGU INI TENTANG APA",
-    placeholderWeekTopic: "mis. peluncuran campuran espresso baru, pembukaan cabang kedua...",
-    subtitle: "Seminggu ide, dipikirkan per platform. Untuk tim yang merencanakan dengan sengaja.",
-    about: "Content Strategist AI membangun seminggu ide postingan sekaligus.",
-    tabSingle: "Satu platform",
-    tabCross: "Lintas platform",
-    tabCompetitor: "Analisis pesaing",
-    labelBusiness: "BISNIS ANDA BERGERAK DI BIDANG APA",
-    placeholderBusiness: "Kedai kopi lokal",
-    labelOccasion: "MUSIM ATAU ACARA",
-    optional: "(OPSIONAL)",
-    placeholderOccasion: "Musim liburan",
-    labelAudience: "AUDIENS ANDA",
-    placeholderAudience: "Profesional muda",
-    labelPlatform: "PLATFORM",
-    labelPlatformsMulti: "PLATFORM",
-    pickTwo: "(PILIH 2 ATAU LEBIH)",
-    labelCompetitorPost: "POSTINGAN ATAU PROFIL PESAING",
-    placeholderCompetitorPost: "Tempel di sini...",
-    errBusiness: "Beri tahu kami dulu bisnis Anda bergerak di bidang apa.",
-    errPlatforms: "Pilih minimal 2 platform.",
-    errCompetitor: "Tempel dulu postingan pesaing.",
-    errTrialUsed: "Pratinjau gratis telah digunakan. Masukkan kode akses untuk melanjutkan.",
-    errInvalidCode: "Kode akses tidak valid atau kedaluwarsa.",
-    errGeneric: "Terjadi kesalahan.",
-    errRegenerate: "Tidak dapat membuat ulang hari itu.",
-    limitReached: "Jatah hari ini sudah habis.",
-    limitTomorrow: "Lima puluh lagi menunggu besok.",
-    btnThinking: "MEMIKIRKAN...",
-    btnBuildWeek: "BANGUN MINGGU INI",
-    btnFindGap: "TEMUKAN CELAH",
-    dailyAllowance: "JATAH HARIAN",
-    theWeek: "Minggu Ini",
-    copied: "TERSALIN",
-    copyAll: "SALIN SEMUA",
-    whatMissing: "APA YANG KURANG",
-    yourAngle: "SUDUT PANDANG ANDA",
-    tryThis: "COBA INI",
-    bestTime: "Waktu terbaik",
-    regenerating: "MEMBUAT ULANG...",
-    tryAnother: "COBA YANG LAIN",
-    trialUsedMsg: "Pratinjau gratis Anda sudah digunakan. Masukkan kode saat Anda siap.",
-    enterCode: "MASUKKAN KODE",
-    noCode: "Tidak punya kode? Dapatkan akses",
-    trialFreeMsg: "Generasi pertama Anda gratis. Tidak perlu kode.",
-    statPlatforms: "Platform",
-    statPillars: "Pilar",
-    statLanguages: "Bahasa",
-    statDailyLimit: "Batas Harian",
-    statFreeTrial: "Uji Coba Gratis",
-    statPayment: "Pembayaran",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit, dan YouTube.",
-    descPillars: "Edukatif, di balik layar, bukti sosial, promosi, dan hiburan -- seimbang otomatis sepanjang minggu.",
-    descLanguages: "Penjelasan dan ide tersedia dalam 25 bahasa.",
-    descDailyLimit: "Lima puluh generasi per hari -- cukup untuk penggunaan nyata dan berkelanjutan.",
-    descFreeTrial: "Coba satu generasi lengkap sebelum membeli. Tanpa kode, tanpa komitmen.",
-    descPayment: "Satu kali pembayaran. Tanpa langganan, tanpa biaya berulang, selamanya.",
-    welcomeTitle: "Selamat datang",
-    welcomeSub: "Mulai sekarang, generasi tanpa batas.",
-    support: "Dukungan",
-    terms: "Ketentuan",
-    privacy: "Privasi",
-  },
-  el: {
-    labelWeekTopic: "ΓΙΑ ΤΙ ΑΦΟΡΑ ΠΡΑΓΜΑΤΙΚΑ ΑΥΤΗ Η ΕΒΔΟΜΑΔΑ",
-    placeholderWeekTopic: "π.χ. κυκλοφορία του νέου μείγματος espresso, άνοιγμα δεύτερου καταστήματος...",
-    subtitle: "Μία εβδομάδα ιδεών, προσαρμοσμένη ανά πλατφόρμα. Για ομάδες που σχεδιάζουν με πρόθεση.",
-    about: "Το Content Strategist AI δημιουργεί μία εβδομάδα ιδεών δημοσιεύσεων κάθε φορά.",
-    tabSingle: "Μία πλατφόρμα",
-    tabCross: "Πολυπλατφορμικά",
-    tabCompetitor: "Ανάλυση ανταγωνιστή",
-    labelBusiness: "ΤΙ ΚΑΝΕΙ Η ΕΠΙΧΕΙΡΗΣΗ ΣΑΣ",
-    placeholderBusiness: "Γειτονιά της γειτονιάς",
-    labelOccasion: "ΕΠΟΧΗ Η ΑΦΟΡΜΗ",
-    optional: "(ΠΡΟΑΙΡΕΤΙΚΟ)",
-    placeholderOccasion: "Εορταστική περίοδος",
-    labelAudience: "ΤΟ ΚΟΙΝΟ ΣΑΣ",
-    placeholderAudience: "Νέοι επαγγελματίες",
-    labelPlatform: "ΠΛΑΤΦΟΡΜΑ",
-    labelPlatformsMulti: "ΠΛΑΤΦΟΡΜΕΣ",
-    pickTwo: "(ΕΠΙΛΕΞΤΕ 2 Η ΠΕΡΙΣΣΟΤΕΡΕΣ)",
-    labelCompetitorPost: "ΔΗΜΟΣΙΕΥΣΗ Η ΠΡΟΦΙΛ ΑΝΤΑΓΩΝΙΣΤΗ",
-    placeholderCompetitorPost: "Επικολλήστε εδώ...",
-    errBusiness: "Πείτε μας πρώτα τι κάνει η επιχείρησή σας.",
-    errPlatforms: "Επιλέξτε τουλάχιστον 2 πλατφόρμες.",
-    errCompetitor: "Επικολλήστε πρώτα τη δημοσίευση του ανταγωνιστή.",
-    errTrialUsed: "Η δωρεάν επισκόπηση χρησιμοποιήθηκε. Εισάγετε τον κωδικό πρόσβασης.",
-    errInvalidCode: "Μη έγκυρος ή ληγμένος κωδικός πρόσβασης.",
-    errGeneric: "Κάτι πήγε στραβά.",
-    errRegenerate: "Δεν ήταν δυνατή η αναδημιουργία αυτής της ημέρας.",
-    limitReached: "Το όριό σας για σήμερα συμπληρώθηκε.",
-    limitTomorrow: "Ακόμα πενήντα σας περιμένουν αύριο.",
-    btnThinking: "ΣΚΕΦΤΟΜΑΙ...",
-    btnBuildWeek: "ΔΗΜΙΟΥΡΓΙΑ ΕΒΔΟΜΑΔΑΣ",
-    btnFindGap: "ΒΡΕΣΕ ΤΟ ΚΕΝΟ",
-    dailyAllowance: "ΗΜΕΡΗΣΙΟ ΟΡΙΟ",
-    theWeek: "Η Εβδομάδα",
-    copied: "ΑΝΤΙΓΡΑΦΗΚΕ",
-    copyAll: "ΑΝΤΙΓΡΑΨΕ ΟΛΑ",
-    whatMissing: "ΤΙ ΤΟΥΣ ΛΕΙΠΕΙ",
-    yourAngle: "Η ΓΩΝΙΑ ΣΑΣ",
-    tryThis: "ΔΟΚΙΜΑΣΕ ΑΥΤΟ",
-    bestTime: "Καλύτερη ώρα",
-    regenerating: "ΑΝΑΔΗΜΙΟΥΡΓΙΑ...",
-    tryAnother: "ΔΟΚΙΜΑΣΕ ΑΛΛΟ",
-    trialUsedMsg: "Η δωρεάν δοκιμή σας έχει ήδη χρησιμοποιηθεί. Εισάγετε τον κωδικό όταν είστε έτοιμοι.",
-    enterCode: "ΕΙΣΑΓΕΤΕ ΚΩΔΙΚΟ",
-    noCode: "Δεν έχετε κώδικο; Αποκτήστε πρόσβαση",
-    trialFreeMsg: "Η πρώτη σας δημιουργία είναι δωρεάν. Δεν απαιτείται κώδικος.",
-    statPlatforms: "Πλατφόρμες",
-    statPillars: "Πυλώνες",
-    statLanguages: "Γλώσσες",
-    statDailyLimit: "Ημερήσιο Όριο",
-    statFreeTrial: "Δωρεάν Δοκιμή",
-    statPayment: "Πληρωμή",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit και YouTube -- κάθε πλατφόρμα λαμβάνει ιδέες που λειτουργούν πραγματικά εκεί.",
-    descPillars: "Εκπαιδευτικό, πίσω από τις σκηνές, κοινωνική απόδειξη, προωθητικό και ψυχαγωγό -- αυτόματα ισορροπημένα στην εβδομάδα σας.",
-    descLanguages: "Εξηγήσεις και ιδέες διαθέσιμες σε 25 γλώσσες.",
-    descDailyLimit: "Πενήντα δημιουργίες την ημέρα -- αρκετό για πραγματική, συνεχόμενη χρήση.",
-    descFreeTrial: "Δοκιμάστε μία πλήρη δημιουργία πριν αγοράσετε. Χωρίς κωδικό, χωρίς δέσμευση.",
-    descPayment: "Μία εφάπαξ πληρωμή. Χωρίς συνδρομή, χωρίς επαναλαμβανόμενες χρεώσεις.",
-    welcomeTitle: "Καλώς ήρθατε",
-    welcomeSub: "Από εδώ και πέρα, απεριόριστες δημιουργίες.",
-    support: "Υποστήριξη",
-    terms: "Όροι",
-    privacy: "Απόρρητο",
-  },
-  sv: {
-    labelWeekTopic: "VAD DEN HÄR VECKAN VERKLIGEN HANDLAR OM",
-    placeholderWeekTopic: "t.ex. lansering av vår nya espressoblandning, öppning av en andra butik...",
-    subtitle: "En vecka av idéer, genomtänkta per plattform. För team som planerar med avsikt.",
-    about: "Content Strategist AI bygger en veckas inläggsidéer i taget.",
-    tabSingle: "En plattform",
-    tabCross: "Flera plattformar",
-    tabCompetitor: "Konkurrentanalys",
-    labelBusiness: "VAD GÖR DITT FÖRETAG",
-    placeholderBusiness: "Lokalt kafé",
-    labelOccasion: "SÄSONG ELLER TILLFÄLLE",
-    optional: "(VALFRITT)",
-    placeholderOccasion: "Högtidssäsong",
-    labelAudience: "DIN MÅLGRUPP",
-    placeholderAudience: "Unga yrkesverksamma",
-    labelPlatform: "PLATTFORM",
-    labelPlatformsMulti: "PLATTFORMAR",
-    pickTwo: "(VÄLJ 2 ELLER FLER)",
-    labelCompetitorPost: "KONKURRENTENS INLÄGG ELLER PROFIL",
-    placeholderCompetitorPost: "Klistra in här...",
-    errBusiness: "Berätta först vad ditt företag gör.",
-    errPlatforms: "Välj minst 2 plattformar.",
-    errCompetitor: "Klistra in konkurrentens inlägg först.",
-    errTrialUsed: "Gratis förhandsvisning använd. Ange din åtkomstkod för att fortsätta.",
-    errInvalidCode: "Ogiltig eller utgången åtkomstkod.",
-    errGeneric: "Något gick fel.",
-    errRegenerate: "Kunde inte återskapa den dagen.",
-    limitReached: "Dagens tilldelning är slut.",
-    limitTomorrow: "Femtio till väntar imorgon.",
-    btnThinking: "FUNDERAR...",
-    btnBuildWeek: "BYGG VECKAN",
-    btnFindGap: "HITTA LUCKAN",
-    dailyAllowance: "DAGLIG TILLDELNING",
-    theWeek: "Veckan",
-    copied: "KOPIERAT",
-    copyAll: "KOPIERA ALLT",
-    whatMissing: "VAD DE SAKNAR",
-    yourAngle: "DIN VINKEL",
-    tryThis: "PROVA DETTA",
-    bestTime: "Bästa tid",
-    regenerating: "ÅTERSKAPAR...",
-    tryAnother: "PROVA EN ANNAN",
-    trialUsedMsg: "Din gratis förhandsvisning har redan använts. Ange koden när du är redo.",
-    enterCode: "ANGE DIN KOD",
-    noCode: "Ingen kod? Få åtkomst",
-    trialFreeMsg: "Din första generering är gratis. Ingen kod krävs.",
-    statPlatforms: "Plattformar",
-    statPillars: "Pelare",
-    statLanguages: "Språk",
-    statDailyLimit: "Daglig Gräns",
-    statFreeTrial: "Gratis Provning",
-    statPayment: "Betalning",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit och YouTube -- varje plattform får idéer anpassade dit.",
-    descPillars: "Pädagogiskt, bakom kulisserna, socialt bevis, marknadsföring och underhållning -- automatiskt balanserat.",
-    descLanguages: "Förklaringar och idéer tillgängliga på 25 språk.",
-    descDailyLimit: "Femtio genereringar per dag -- tillräckligt för verklig, löpande användning.",
-    descFreeTrial: "Prova en full generering innan du köper. Ingen kod, inget åtagande.",
-    descPayment: "En engångsbetalning. Ingen prenumeration, aldrig återkommande avgifter.",
-    welcomeTitle: "Välkommen",
-    welcomeSub: "Från och med nu, obegränsade genereringar.",
-    support: "Support",
-    terms: "Villkor",
-    privacy: "Integritet",
-  },
-  da: {
-    labelWeekTopic: "HVAD DENNE UGE REELT HANDLER OM",
-    placeholderWeekTopic: "f.eks. lancering af vores nye espressoblanding, åbning af en anden filial...",
-    subtitle: "En uge med idéer, overvejet pr. platform. Til teams, der planlægger med hensigt.",
-    about: "Content Strategist AI bygger en uges opslagsidéer ad gangen.",
-    tabSingle: "Én platform",
-    tabCross: "Tværplatform",
-    tabCompetitor: "Konkurrentanalyse",
-    labelBusiness: "HVAD LAVER DIN VIRKSOMHED",
-    placeholderBusiness: "Lokal cafe",
-    labelOccasion: "SÆSON ELLER LEJLIGHED",
-    optional: "(VALGFRIT)",
-    placeholderOccasion: "Højtidssæson",
-    labelAudience: "DIN MÅLGRUPPE",
-    placeholderAudience: "Unge professionelle",
-    labelPlatform: "PLATFORM",
-    labelPlatformsMulti: "PLATFORME",
-    pickTwo: "(VÆLG 2 ELLER FLERE)",
-    labelCompetitorPost: "KONKURRENTENS OPSLAG ELLER PROFIL",
-    placeholderCompetitorPost: "Indsæt her...",
-    errBusiness: "Fortæl os først, hvad din virksomhed laver.",
-    errPlatforms: "Vælg mindst 2 platforme.",
-    errCompetitor: "Indsæt konkurrentens opslag først.",
-    errTrialUsed: "Gratis prøvevisning brugt. Indtast din adgangskode for at fortsætte.",
-    errInvalidCode: "Ugyldig eller udløbet adgangskode.",
-    errGeneric: "Noget gik galt.",
-    errRegenerate: "Kunne ikke genskabe den dag.",
-    limitReached: "Dagens tildeling er brugt op.",
-    limitTomorrow: "Halvtreds mere venter i morgen.",
-    btnThinking: "TÆNKER...",
-    btnBuildWeek: "BYG UGEN",
-    btnFindGap: "FIND HULLET",
-    dailyAllowance: "DAGLIG TILDELING",
-    theWeek: "Ugen",
-    copied: "KOPIERET",
-    copyAll: "KOPIÉR ALT",
-    whatMissing: "HVAD DE MANGLER",
-    yourAngle: "DIN VINKEL",
-    tryThis: "PRØV DETTE",
-    bestTime: "Bedste tidspunkt",
-    regenerating: "GENSKABER...",
-    tryAnother: "PRØV EN ANDEN",
-    trialUsedMsg: "Din gratis prøvevisning er allerede brugt. Indtast koden, når du er klar.",
-    enterCode: "INDTAST DIN KODE",
-    noCode: "Ingen kode? Få adgang",
-    trialFreeMsg: "Din første generering er gratis. Ingen kode krævet.",
-    statPlatforms: "Platforme",
-    statPillars: "Søjler",
-    statLanguages: "Sprog",
-    statDailyLimit: "Dagligt Loft",
-    statFreeTrial: "Gratis Prøve",
-    statPayment: "Betaling",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit og YouTube -- hver platform får idéer tilpasset dertil.",
-    descPillars: "Lærerigt, bag kulisserne, socialt bevis, promoverende og underholdende -- automatisk afbalanceret.",
-    descLanguages: "Forklaringer og idéer tilgængelige på 25 sprog.",
-    descDailyLimit: "Halvtreds genereringer om dagen -- nok til reel, løbende brug.",
-    descFreeTrial: "Prøv en fuld generering, før du køber. Ingen kode, ingen forpligtelse.",
-    descPayment: "Én engangsbetaling. Intet abonnement, aldrig tilbagevendende gebür.",
-    welcomeTitle: "Velkommen",
-    welcomeSub: "Fra nu af, ubegrænsede genereringer.",
-    support: "Support",
-    terms: "Vilkår",
-    privacy: "Privatliv",
-  },
-  no: {
-    labelWeekTopic: "HVA DENNE UKEN FAKTISK HANDLER OM",
-    placeholderWeekTopic: "f.eks. lansering av vår nye espressoblanding, åpning av en ny avdeling...",
-    subtitle: "En uke med ideer, gjennomtænkt per plattform. For team som planlegger med hensikt.",
-    about: "Content Strategist AI bygger en ukes innleggsideer om gangen.",
-    tabSingle: "Én plattform",
-    tabCross: "Kryssplattform",
-    tabCompetitor: "Konkurrentanalyse",
-    labelBusiness: "HVA GJØR BEDRIFTEN DIN",
-    placeholderBusiness: "Lokal kafé",
-    labelOccasion: "SESONG ELLER ANLEDNING",
-    optional: "(VALGFRITT)",
-    placeholderOccasion: "Høytidssesong",
-    labelAudience: "MÅLGRUPPEN DIN",
-    placeholderAudience: "Unge fagfolk",
-    labelPlatform: "PLATTFORM",
-    labelPlatformsMulti: "PLATTFORMER",
-    pickTwo: "(VELG 2 ELLER FLERE)",
-    labelCompetitorPost: "KONKURRENTENS INNLEGG ELLER PROFIL",
-    placeholderCompetitorPost: "Lim inn her...",
-    errBusiness: "Fortell oss først hva bedriften din gjør.",
-    errPlatforms: "Velg minst 2 plattformer.",
-    errCompetitor: "Lim inn konkurrentens innlegg først.",
-    errTrialUsed: "Gratis forhåndsvisning brukt. Skriv inn tilgangskoden din for å fortsette.",
-    errInvalidCode: "Ugyldig eller utløpt tilgangskode.",
-    errGeneric: "Noe gikk galt.",
-    errRegenerate: "Kunne ikke gjenskape den dagen.",
-    limitReached: "Dagens tildeling er brukt opp.",
-    limitTomorrow: "Femti til venter i morgen.",
-    btnThinking: "TENKER...",
-    btnBuildWeek: "BYGG UKEN",
-    btnFindGap: "FINN HULLET",
-    dailyAllowance: "DAGLIG TILDELING",
-    theWeek: "Uken",
-    copied: "KOPIERT",
-    copyAll: "KOPIÉR ALT",
-    whatMissing: "HVA DE MANGLER",
-    yourAngle: "DIN VINKEL",
-    tryThis: "PRØV DETTE",
-    bestTime: "Beste tidspunkt",
-    regenerating: "GJENSKAPER...",
-    tryAnother: "PRØV EN ANNEN",
-    trialUsedMsg: "Din gratis forhåndsvisning er allerede brukt. Skriv inn koden når du er klar.",
-    enterCode: "SKRIV INN KODEN",
-    noCode: "Ingen kode? Få tilgang",
-    trialFreeMsg: "Din første generering er gratis. Ingen kode kreves.",
-    statPlatforms: "Plattformer",
-    statPillars: "Søyler",
-    statLanguages: "Språk",
-    statDailyLimit: "Daglig Grense",
-    statFreeTrial: "Gratis Prøve",
-    statPayment: "Betaling",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit og YouTube -- hver plattform får ideer tilpasset der.",
-    descPillars: "Lærerikt, bak kulissene, sosialt bevis, promoterende og underholdende -- automatisk balansert.",
-    descLanguages: "Forklaringer og ideer tilgjengelig på 25 språk.",
-    descDailyLimit: "Femti genereringer per dag -- nok til reell, løpende bruk.",
-    descFreeTrial: "Prøv en full generering før du kjøper. Ingen kode, ingen forpliktelse.",
-    descPayment: "Én engangsbetaling. Ingen abonnement, aldri tilbakevendende avgift.",
-    welcomeTitle: "Velkommen",
-    welcomeSub: "Fra nå av, ubegrensede genereringer.",
-    support: "Støtte",
-    terms: "Vilkår",
-    privacy: "Personvern",
-  },
-  fi: {
-    labelWeekTopic: "MISTÄ TÄMÄ VIIKKO OIKEASTI KERTOO",
-    placeholderWeekTopic: "esim. uuden espressosekoituksemme lanseeraus, toisen toimipisteen avaaminen...",
-    subtitle: "Viikko ideoita, harkittu alustakohtaisesti. Tiimeille, jotka suunnittelevat tarkoituksella.",
-    about: "Content Strategist AI rakentaa viikon julkaisuideoita kerrallaan.",
-    tabSingle: "Yksi alusta",
-    tabCross: "Monialustainen",
-    tabCompetitor: "Kilpailija-analyysi",
-    labelBusiness: "MITÄ YRITYKSESI TEKEE",
-    placeholderBusiness: "Naapuruston kahvila",
-    labelOccasion: "VUODENAIKA TAI TILAISUUS",
-    optional: "(VALINNAINEN)",
-    placeholderOccasion: "Juhlakausi",
-    labelAudience: "YLEISÖSI",
-    placeholderAudience: "Nuoret ammattilaiset",
-    labelPlatform: "ALUSTA",
-    labelPlatformsMulti: "ALUSTAT",
-    pickTwo: "(VALITSE 2 TAI ENEMMÄN)",
-    labelCompetitorPost: "KILPAILIJAN JULKAISU TAI PROFIILI",
-    placeholderCompetitorPost: "Liitä tähän...",
-    errBusiness: "Kerro ensin, mitä yrityksesi tekee.",
-    errPlatforms: "Valitse vähintään 2 alustaa.",
-    errCompetitor: "Liitä ensin kilpailijan julkaisu.",
-    errTrialUsed: "Ilmainen esikatselu käytetty. Syötä käyttöoikeuskoodisi jatkaaksesi.",
-    errInvalidCode: "Virheellinen tai vanhentunut käyttöoikeuskoodi.",
-    errGeneric: "Jokin meni pieleen.",
-    errRegenerate: "Tätä päivää ei voitu luoda uudelleen.",
-    limitReached: "Tämän päivän kiintiö on täynnä.",
-    limitTomorrow: "Viisikymmentä lisää odottaa huomenna.",
-    btnThinking: "MIETITÄÄN...",
-    btnBuildWeek: "RAKENNA VIIKKO",
-    btnFindGap: "LÖYDÄ AUKKO",
-    dailyAllowance: "PÄIVITTÄINEN KIINTIÖ",
-    theWeek: "Tämä Viikko",
-    copied: "KOPIOITU",
-    copyAll: "KOPIOI KAIKKI",
-    whatMissing: "MITÄ HEILTÄ PUUTTUU",
-    yourAngle: "SINUN NÄKÖKULMASI",
-    tryThis: "KOKEILE TÄTÄ",
-    bestTime: "Paras aika",
-    regenerating: "LUODAAN UUDELLEEN...",
-    tryAnother: "KOKEILE TOISTA",
-    trialUsedMsg: "Ilmainen esikatselusi on jo käytetty. Syötä koodi, kun olet valmis.",
-    enterCode: "SYÖTÄ KOODISI",
-    noCode: "Ei koodia? Hanki käyttöoikeus",
-    trialFreeMsg: "Ensimmäinen luontisi on ilmainen. Koodia ei tarvita.",
-    statPlatforms: "Alustat",
-    statPillars: "Pilarit",
-    statLanguages: "Kielet",
-    statDailyLimit: "Päiväraja",
-    statFreeTrial: "Ilmainen Kokeilu",
-    statPayment: "Maksu",
-    descPlatforms: "Instagram, TikTok, LinkedIn, Facebook, Telegram, X, Reddit ja YouTube -- jokainen alusta saa sille sopivia ideoita.",
-    descPillars: "Opettava, kulissien takana, sosiaalinen todiste, mainostava ja viihdyttävä -- automaattisesti tasapainossa.",
-    descLanguages: "Selitykset ja ideat saatavilla 25 kielellä.",
-    descDailyLimit: "Viisikymmentä luontia päivässä -- riittävästi todelliseen, jatkuvaan käyttöön.",
-    descFreeTrial: "Kokeile täyttä luontia ennen ostoa. Ei koodia, ei sitoumusta.",
-    descPayment: "Yksi kertamaksu. Ei tilausta, ei koskaan toistuvia maksuja.",
-    welcomeTitle: "Tervetuloa",
-    welcomeSub: "Tästä eteenpäin rajattomat luonnit.",
-    support: "Tuki",
-    terms: "Ehdot",
-    privacy: "Tietosuoja",
+    tagline: 'Plainwork \u30b9\u30bf\u30b8\u30aa',
+    heroTitle: '\u4e00\u4eba\u3067\u30d3\u30b8\u30cd\u30b9\u3092\u9053\u3059\u4eba\u306e\u305f\u3081\u306e\u3001\u5c0f\u3055\u304f\u3066\u5f79\u306b\u7acb\u3064\u30c4\u30fc\u30eb\u3002',
+    heroBody: 'Plainwork\u306f\u3001\u305d\u308c\u305e\u308c\u4e00\u3064\u306e\u53cd\u5fa9\u4f5c\u696d\u3092\u89e3\u6c7a\u3059\u308b\u5c02\u9580\u7684\u306aAI\u30c4\u30fc\u30eb\u3092\u4f5c\u3063\u3066\u3044\u307e\u3059\u2014\u2014\u30ad\u30e3\u30d7\u30b7\u30e7\u30f3\u4f5c\u6210\u3001\u30ec\u30d3\u30e5\u30fc\u8fd4\u4fe1\u3001Google\u3067\u306e\u53ef\u8996\u6027\u7dad\u6301\u2014\u2014\u672c\u5f53\u306b\u4eba\u306e\u624b\u304c\u5fc5\u8981\u306a\u90e8\u5206\u306b\u5c11\u3057\u3067\u3082\u591a\u304f\u306e\u6642\u9593\u3092\u5145\u3066\u3089\u308c\u308b\u3088\u3046\u306b\u3002',
+    heroNote: '\u4eca\u306e\u3068\u3053\u308d3\u3064\u306e\u30c4\u30fc\u30eb\u304c\u7a3c\u50cd\u4e2d\u3002\u3055\u3089\u306b\u5897\u3048\u3066\u3044\u304d\u307e\u3059\u3002',
+    statProducts: '\u30d7\u30ed\u30c0\u30af\u30c8\u30ea\u30ea\u30fc\u30b9\u6e08\u307f', statLangs: '\u8a00\u8a9e\u306b\u5bfe\u5fdc', statPeople: '\u4eba\u304c\u69cb\u7bc9\u4e2d',
+    workHeading: '\u4f5c\u54c1', workSub: '\u73fe\u5728\u7a3c\u50cd\u4e2d\u306e\u5168\u3066\u3092\u30ea\u30ea\u30fc\u30b9\u9806\u306b\u3002',
+    capHeading: '\u6a5f\u80fd', capSub: '\u4e0a\u8a18\u306e3\u3064\u306e\u88fd\u54c1\u306e\u88cf\u3067\u5b9f\u969b\u306b\u52d5\u3044\u3066\u3044\u308b\u3082\u306e\u3002',
+    approachHeading: '\u3053\u3053\u3067\u306e\u3082\u306e\u3065\u304f\u308a\u306e\u65b9\u6cd5',
+    aboutHeading: '\u81ea\u5df1\u7d39\u4ecb',
+    aboutLead: '\u79c1\u306fKsenia\u3067\u3059\u3002Plainwork\u306e\u3059\u3079\u3066\u2014\u2014\u88fd\u54c1\u3001\u305d\u306e\u88cf\u306e\u30a4\u30f3\u30d5\u30e9\u3001\u30b5\u30dd\u30fc\u30c8\u5bfe\u5fdc\u2014\u2014\u3092\u81ea\u5206\u3067\u4f5c\u3063\u3066\u3044\u307e\u3059\u3002',
+    aboutBody: '\u5c0f\u898f\u6a21\u30d3\u30b8\u30cd\u30b9\u306e\u30aa\u30fc\u30ca\u30fc\u306b\u5171\u901a\u3059\u308b\u30d1\u30bf\u30fc\u30f3\u306b\u6c17\u3065\u304d\u307e\u3057\u305f\u2014\u2014\u30ad\u30e3\u30d7\u30b7\u30e7\u30f3\u3001\u30ec\u30d3\u30e5\u30fc\u8fd4\u4fe1\u3001Google\u6295\u7a3f\u3068\u3044\u3063\u305f\u5c0f\u3055\u304f\u53cd\u5fa9\u7684\u306a\u4f5c\u6587\u4f5c\u696d\u304c\u3001\u5e38\u306b\u3082\u3063\u3068\u7dca\u6025\u306a\u4f55\u304b\u304c\u3042\u308b\u305f\u3081\u306b\u5f8c\u56de\u3057\u306b\u306a\u308b\u3068\u3044\u3046\u3053\u3068\u3002Plainwork\u306f\u305d\u306e\u56de\u7b54\u3067\u3059\u2014\u2014\u3059\u3079\u3066\u306e\u30b5\u30dd\u30fc\u30c8\u30e1\u30fc\u30eb\u3092\u81ea\u3089\u8aad\u3080\u4e00\u4eba\u306e\u4eba\u9593\u304c\u4f5c\u3063\u305f\u3001\u78ba\u5b9f\u306b\u5b8c\u4e86\u3067\u304d\u308b\u307b\u3069\u72ed\u3044\u30c4\u30fc\u30eb\u3002',
+    basedIn: '\u62e0\u70b9', city: '\u30d2\u30e5\u30fc\u30b9\u30c8\u30f3\uff08\u30c6\u30ad\u30b5\u30b9\u5dde\uff09',
+    footerTag: 'Plainwork \u00b7 \u4e00\u4eba\u3067\u6700\u521d\u304b\u3089\u6700\u5f8c\u307e\u3067\u69cb\u7bc9',
+    terms: '\u5229\u7528\u898f\u7d04', privacy: '\u30d7\u30e9\u30a4\u30d0\u30b7\u30fc\u30dd\u30ea\u30b7\u30fc',
   },
 };
 
-// Маленький значок-созвездие (узел в центре + точки вокруг, соединённые
-// линиями), используется как декоративный плавающий элемент в пустых
-// полях по краям страницы — не на весь экран, чтобы не перекрывать контент.
-function ConstellationMark({ className = '', style = {} }) {
-  const pts = [
-    [50, 10], [25, 30], [50, 30], [75, 30],
-    [10, 50], [30, 50], [50, 50], [70, 50], [90, 50],
-    [25, 70], [50, 70], [75, 70], [50, 90],
-  ];
-  const lines = [
-    [1, 2], [2, 3], [4, 5], [5, 6], [6, 7], [7, 8],
-    [1, 5], [3, 7], [9, 10], [10, 11], [5, 9], [7, 11], [10, 12], [6, 3], [6, 1], [6, 9], [6, 11],
-  ];
-  return (
-    <svg className={`float-constellation ${className}`} style={{ opacity: 0.28, pointerEvents: 'none', ...style }} viewBox="0 0 100 100">
-      {lines.map(([a, b], i) => (
-        <line key={i} x1={pts[a][0]} y1={pts[a][1]} x2={pts[b][0]} y2={pts[b][1]} stroke="#C9A968" strokeWidth="0.8" />
-      ))}
-      {pts.map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r={i === 6 ? 3 : 2} fill={i === 6 ? '#C9A968' : '#F5F1E8'} />
-      ))}
-    </svg>
-  );
-}
 
-// Собственный выпадающий список вместо нативного <datalist> — тот плохо
-// или совсем не поддерживается в мобильных браузерах (особенно iOS Safari).
-function AutocompleteInput({ value, onChange, options, placeholder, style, onKeyDown }) {
-  const [open, setOpen] = useState(false);
-  // Показываем весь список при пустом поле или фокусе на точном совпадении
-  // (раньше точное совпадение исключалось из списка — при клике на уже
-  // заполненное поле подсказки казались "не работающими")
-  const v = (value || '').toLowerCase().trim();
-  const filtered = v === '' ? options : options.filter(o => o.toLowerCase().includes(v));
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => { onChange(e.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)}
-        onClick={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
-        onKeyDown={onKeyDown}
-        placeholder={placeholder}
-        style={style}
-      />
-      {open && filtered.length > 0 && (
-        <div style={{
-          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20,
-          background: '#151412', border: '1px solid rgba(245,241,232,0.15)', borderRadius: 3,
-          marginTop: 2, maxHeight: 180, overflowY: 'auto',
-        }}>
-          {filtered.map(o => (
-            <div
-              key={o}
-              onMouseDown={() => { onChange(o); setOpen(false); }}
-              style={{ padding: '9px 12px', fontSize: 13.5, color: '#F5F1E8', cursor: 'pointer' }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(201,169,104,0.12)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-            >
-              {o}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function App() {
-  const [licenseCode, setLicenseCode] = useState(() => localStorage.getItem('cs_licenseCode') || '');
-  const [unlocked, setUnlocked] = useState(() => localStorage.getItem('cs_unlocked') === 'true');
-  const [freeTrialUsed, setFreeTrialUsed] = useState(() => localStorage.getItem('cs_free_trial_used') === 'true');
-  const [dailyCount, setDailyCount] = useState(() => getDailyCount());
-  const [showSupportEmail, setShowSupportEmail] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(false);
-  const [uiLang, setUiLang] = useState('en');
-  const [expandedStat, setExpandedStat] = useState(null);
-  const [regeneratingDay, setRegeneratingDay] = useState(null);
-  const [copiedAll, setCopiedAll] = useState(false);
-
-  const [businessType, setBusinessType] = useState('');
-  const [occasion, setOccasion] = useState('');
-  const [weekTopic, setWeekTopic] = useState('');
-  const [audience, setAudience] = useState('');
-  const [platform, setPlatform] = useState('Instagram');
-  const [selectedPlatforms, setSelectedPlatforms] = useState(['Instagram', 'TikTok']);
-  const [customPlatformInput, setCustomPlatformInput] = useState('');
-  const [uploadedPhotos, setUploadedPhotos] = useState([]);
-  const [photoError, setPhotoError] = useState('');
-  const [mode, setMode] = useState('single');
-  const [competitorText, setCompetitorText] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [result, setResult] = useState(null);
+  const [lang, setLang] = useState('en');
+  const [expandedProduct, setExpandedProduct] = useState(null);
+  const t = T[lang];
+  const mapContainerRef = useRef(null);
+  const mapInstanceRef = useRef(null);
 
   useEffect(() => {
-    if (window.location.search.includes('welcome=1')) {
-      setShowWelcome(true);
-      window.history.replaceState({}, '', window.location.pathname);
-      const timer = setTimeout(() => setShowWelcome(false), 3800);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+    let cancelled = false;
 
-  function togglePlatform(code) {
-    setSelectedPlatforms(prev => prev.includes(code) ? prev.filter(p => p !== code) : [...prev, code]);
-  }
-
-  function addCustomPlatform() {
-    const name = customPlatformInput.trim();
-    if (!name) return;
-    if (!selectedPlatforms.includes(name)) {
-      setSelectedPlatforms(prev => [...prev, name]);
+    function loadMapLibre() {
+      return new Promise((resolve) => {
+        if (window.maplibregl) { resolve(); return; }
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css';
+        document.head.appendChild(link);
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js';
+        script.onload = resolve;
+        document.body.appendChild(script);
+      });
     }
-    setCustomPlatformInput('');
-  }
 
-  function handlePhotoUpload(e) {
-    const files = Array.from(e.target.files || []);
-    setPhotoError('');
-    if (uploadedPhotos.length + files.length > 7) {
-      setPhotoError('Up to 7 photos at a time.');
-      return;
-    }
-    files.forEach(file => {
-      if (!file.type.startsWith('image/')) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result;
-        const base64 = dataUrl.split(',')[1];
-        setUploadedPhotos(prev => [...prev, {
-          id: Date.now() + Math.random(),
-          name: file.name,
-          previewUrl: dataUrl,
-          base64,
-          mediaType: file.type,
-        }]);
-      };
-      reader.readAsDataURL(file);
+    loadMapLibre().then(() => {
+      if (cancelled || !mapContainerRef.current || mapInstanceRef.current) return;
+      const maplibregl = window.maplibregl;
+      const houston = [-95.3698, 29.7604];
+
+      const map = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: 'https://tiles.openfreemap.org/styles/liberty',
+        center: houston,
+        zoom: 12,
+        attributionControl: false,
+      });
+
+      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+      map.addControl(new maplibregl.AttributionControl({ compact: true }));
+
+      const el = document.createElement('div');
+      el.style.cssText = 'position:relative;width:22px;height:22px;';
+      el.innerHTML = `
+        <div style="position:absolute;inset:0;border-radius:50%;border:2px solid #A56A45;opacity:0.6;"></div>
+        <div style="position:absolute;top:5px;left:5px;width:12px;height:12px;border-radius:50%;background:#D97757;box-shadow:0 0 8px rgba(217,119,87,0.7);"></div>
+      `;
+      new maplibregl.Marker({ element: el }).setLngLat(houston).addTo(map);
+
+      mapInstanceRef.current = map;
     });
-    e.target.value = '';
-  }
 
-  function removePhoto(id) {
-    setUploadedPhotos(prev => prev.filter(p => p.id !== id));
-  }
-
-  function copyAllIdeas() {
-    if (!result?.ideas) return;
-    const text = result.ideas.map(it => `${it.day}${it.platform ? ` (${it.platform})` : ''}: ${it.idea}`).join('\n');
-    navigator.clipboard.writeText(text);
-    setCopiedAll(true);
-    setTimeout(() => setCopiedAll(false), 1800);
-  }
-
-  async function regenerateDay(index) {
-    if (!unlocked) return;
-    if (!checkAndUseDailyLimit()) { setDailyCount(DAILY_LIMIT); return; }
-    setDailyCount(getDailyCount());
-    setRegeneratingDay(index);
-    const oldIdea = result.ideas[index];
-    const outputLangName = LANG_ENGLISH_NAMES[uiLang] || 'English';
-    const langInstruction = uiLang === 'en' ? '' : ` Write the "idea" and hashtags in ${outputLangName}.`;
-    const prompt = `Give ONE new alternative post idea for ${oldIdea.day}, platform "${oldIdea.platform}", different from: "${oldIdea.idea}". Same content pillar: ${oldIdea.pillar}. Business: ${businessType}.${langInstruction}
-Respond ONLY with valid JSON: {"day": "${oldIdea.day}", "platform": "${oldIdea.platform}", "pillar": "${oldIdea.pillar}", "idea": "...", "hashtags": ["...", "...", "..."]}`;
-    try {
-      const res = await fetch('/api/generate', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ licenseCode, prompt, trial: false }),
-      });
-      const data = await res.json();
-      const text = data.content?.map(b => b.text || '').join('') || '';
-      const newIdea = JSON.parse(text.replace(/```json|```/g, '').trim());
-      setResult(r => { const next = { ...r, ideas: [...r.ideas] }; next.ideas[index] = newIdea; return next; });
-    } catch (err) {
-      setError(t.errRegenerate);
-    } finally {
-      setRegeneratingDay(null);
-    }
-  }
-
-  async function handleGenerate() {
-    if ((mode === 'single' || mode === 'cross') && !businessType.trim()) { setError(t.errBusiness); return; }
-    if (mode === 'cross' && selectedPlatforms.length < 2) { setError(t.errPlatforms); return; }
-    if (mode === 'competitor' && !competitorText.trim()) { setError(t.errCompetitor); return; }
-    if (mode === 'photos' && uploadedPhotos.length === 0) { setError(t.errPhotos || 'Upload at least one photo first.'); return; }
-    const isTrial = !unlocked && !freeTrialUsed;
-    if (!unlocked && freeTrialUsed) { setError(t.errTrialUsed); return; }
-    if (!isTrial) {
-      if (!checkAndUseDailyLimit()) { setDailyCount(DAILY_LIMIT); return; }
-      setDailyCount(getDailyCount());
-    }
-    setError(''); setLoading(true); setResult(null);
-
-    const platformLabel = PLATFORMS.find(p => p.code === platform)?.label || platform;
-    const selectedLabels = selectedPlatforms.map(c => PLATFORMS.find(p => p.code === c)?.label || c);
-    const outputLangName = LANG_ENGLISH_NAMES[uiLang] || 'English';
-    const langInstruction = uiLang === 'en'
-      ? ''
-      : ` Write in ${outputLangName}: the "idea" text, hashtags, and any other free text. IMPORTANT: keep the "pillar" field exactly as one of these English words (do not translate it): ${PILLARS.join(', ')}. Keep the "platform" field as given (do not translate platform names). Day names may be in ${outputLangName} or English, whichever reads more naturally.`;
-
-    let prompt;
-    const topicInstruction = weekTopic.trim()
-      ? `\n\nThis week is specifically about: "${weekTopic.trim()}". This is the real, concrete thing happening -- don't just mention it in passing. Build the week AROUND it: some days introduce it, some show it in use, some address doubts about it, some celebrate it. Avoid generic filler ideas that could apply to any business -- every idea should feel like it could only exist because of this specific thing.`
-      : `\n\nNo specific topic was given, so ground the ideas in concrete, believable specifics for this exact business (real-sounding details, not generic "great products, great service" filler).`;
-    if (mode === 'single') {
-      prompt = `You are a social media content strategist. Give a week of post IDEAS (topics, not captions) for ${platformLabel}.
-Business: ${businessType}. Occasion: ${occasion || 'none specific'}. Audience: ${audience || 'general'}.${topicInstruction}
-Give exactly 7 ideas, one per day, tailored to ${platformLabel}. Assign a content pillar from: ${PILLARS.join(', ')} to each, don't repeat more than twice, include 2-3 hashtags each.${langInstruction}
-Respond ONLY with valid JSON: {"ideas": [{"day": "Monday", "platform": "${platformLabel}", "pillar": "...", "idea": "...", "hashtags": ["...","...","..."]}, ...7 total]}`;
-    } else if (mode === 'cross') {
-      prompt = `You are a social media content strategist building a cross-platform calendar.
-Business: ${businessType}. Occasion: ${occasion || 'none specific'}. Audience: ${audience || 'general'}. Platforms: ${selectedLabels.join(', ')}.${topicInstruction}
-Give exactly 7 ideas, one per day, picking the best platform per idea from the list. Assign a content pillar from: ${PILLARS.join(', ')}, don't repeat more than twice, include 2-3 hashtags each.${langInstruction}
-Respond ONLY with valid JSON: {"ideas": [{"day": "Monday", "platform": "one of: ${selectedLabels.join(', ')}", "pillar": "...", "idea": "...", "hashtags": ["...","...","..."]}, ...7 total]}`;
-    } else {
-      prompt = `Find what a competitor is missing on ${platformLabel} and suggest a unique angle.
-Business: ${businessType || 'small business'}. Competitor content: "${competitorText}".${langInstruction}
-Respond ONLY with valid JSON: {"gap": "...", "angle": "...", "ideaExample": "..."}`;
-    }
-
-    // Для режима с фото — отдельная логика: без caption, только
-    // стратегическое распределение (день/платформа/pillar на фото)
-    const isPhotoMode = mode === 'photos';
-    if (isPhotoMode) {
-      prompt = `You are a social media content strategist. You are given ${uploadedPhotos.length} photos, in order (Photo 1, Photo 2, etc). Business: ${businessType || 'small business'}. Occasion: ${occasion || 'none specific'}.
-
-For EACH photo, decide: which day of the week it should be posted, which platform fits it best (from: ${PLATFORMS.map(p => p.label).join(', ')}, or suggest another if none fit), and which content pillar it represents (from: ${PILLARS.join(', ')}). Do NOT write a caption -- only the strategic placement. Briefly describe what you see in 3-6 words per photo (for reference, not a caption).${langInstruction}
-
-Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday", "platform": "...", "pillar": "...", "whatItShows": "..."}, ... one per photo]}`;
-    }
-
-    try {
-      const res = await fetch('/api/generate', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          licenseCode, prompt, trial: isTrial,
-          images: isPhotoMode ? uploadedPhotos.map(p => ({ base64: p.base64, mediaType: p.mediaType })) : undefined,
-        }),
-      });
-      if (res.status === 403) throw new Error(t.errInvalidCode);
-      const data = await res.json();
-      const text = data.content?.map(b => b.text || '').join('') || '';
-      const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-      if (isTrial) { localStorage.setItem('cs_free_trial_used', 'true'); setFreeTrialUsed(true); }
-      setResult(parsed);
-    } catch (err) {
-      setError(err.message || t.errGeneric);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const t = UI_TEXT[uiLang] || UI_TEXT.en;
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: "'Inter', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both; }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        .gold-line { background: linear-gradient(90deg, transparent, ${GOLD}, transparent); background-size: 200% 100%; animation: shimmer 4s linear infinite; }
-        @keyframes cardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .idea-row { animation: cardIn 0.5s ease both; }
-        @keyframes welcomeFadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes welcomeFadeOut { to { opacity: 0; } }
-        @keyframes checkDraw { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
-        @keyframes floatMark {
-          0%   { transform: translate(0, 0) rotate(0deg); }
-          50%  { transform: translate(10px, -18px) rotate(8deg); }
-          100% { transform: translate(0, 0) rotate(0deg); }
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+        @keyframes runP {
+          0%   { transform: translateX(0) translateY(0) rotate(-4deg); }
+          25%  { transform: translateX(60px) translateY(-14px) rotate(3deg); }
+          50%  { transform: translateX(120px) translateY(0) rotate(-3deg); }
+          75%  { transform: translateX(60px) translateY(-10px) rotate(4deg); }
+          100% { transform: translateX(0) translateY(0) rotate(-4deg); }
         }
-        .float-constellation { animation: floatMark 8s ease-in-out infinite; }
-        .constellation-1 { animation-duration: 9s; }
-        .constellation-2 { animation-duration: 7s; animation-delay: -2s; }
-        .constellation-3 { animation-duration: 10s; animation-delay: -4s; }
-        button { transition: all 0.2s ease; }
-        button:hover:not(:disabled) { transform: translateY(-1px); }
-        .platform-pill:hover { border-color: ${GOLD} !important; color: ${GOLD} !important; }
-        @keyframes allowanceFill { from { width: 0; } }
-        .allowance-fill { animation: allowanceFill 0.8s ease both; }
+        .running-p-base {
+          position: absolute; font-family: 'Fraunces', serif; font-weight: 700;
+          color: rgba(217,119,87,0.14); pointer-events: none; user-select: none;
+          animation-name: runP; animation-timing-function: ease-in-out; animation-iteration-count: infinite;
+        }
+        .running-p { animation-duration: 6s; }
+        .running-p-2 { animation-duration: 8s; animation-delay: -2s; }
+        .running-p-3 { animation-duration: 7s; animation-delay: -4s; }
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        .marquee-track {
+          display: inline-flex; white-space: nowrap; animation: marquee 18s linear infinite;
+        }
       `}</style>
 
-      {/* Три маленьких значка-созвездия, плавающие в пустых чёрных полях по краям */}
-      <ConstellationMark className="constellation-1" style={{ position: 'fixed', top: '15%', left: '3%', width: 90 }} />
-      <ConstellationMark className="constellation-2" style={{ position: 'fixed', top: '55%', right: '3%', width: 70 }} />
-      <ConstellationMark className="constellation-3" style={{ position: 'fixed', bottom: '8%', left: '5%', width: 60 }} />
+      {/* ---------- HERO ---------- */}
+      <section style={{ position: 'relative', overflow: 'hidden', padding: '96px 24px 80px' }}>
+        <svg aria-hidden="true" viewBox="0 0 100 124" style={{
+          position: 'absolute', top: -60, right: -20, width: 340, height: 420,
+          transform: 'rotate(-6deg)', opacity: 0.06,
+        }}>
+          <path d="M10 4h80a6 6 0 0 1 6 6v90a6 6 0 0 1-6 6h-63L10 88V10a6 6 0 0 1 6-6z" fill={RUST} />
+          <circle cx="66" cy="24" r="7" fill={BG} />
+        </svg>
+        <span className="running-p-base running-p" aria-hidden="true" style={{ bottom: 40, left: 40, fontSize: 90 }}>Р</span>
+        <span className="running-p-base running-p-2" aria-hidden="true" style={{ top: 60, right: 60, fontSize: 60 }}>Р</span>
+        <span className="running-p-base running-p-3" aria-hidden="true" style={{ top: '45%', left: '65%', fontSize: 44 }}>Р</span>
 
-      {/* ---------- HERO: тёмный фон, фото в дуотоне, крупная serif-типографика ---------- */}
-      <div style={{ position: 'relative', padding: '24px 24px 0', textAlign: 'center', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', maxWidth: 900, margin: '0 auto 40px' }}>
-          <select
-            value={uiLang}
-            onChange={(e) => setUiLang(e.target.value)}
-            style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, letterSpacing: '0.08em', color: GOLD, background: 'none', border: `1px solid ${LINE}`, borderRadius: 2, padding: '4px 10px' }}
-          >
-            {LANGS.map(l => <option key={l.code} value={l.code} style={{ background: BG }}>{l.label}</option>)}
-          </select>
-        </div>
-        <div className="fade-in" style={{ maxWidth: 720, margin: '0 auto' }}>
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD }}>Plainwork Studio</span>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: 'clamp(38px, 6vw, 58px)', margin: '18px 0 20px', lineHeight: 1.08, letterSpacing: '-0.01em' }}>
-            Content Strategist
-          </h1>
-          <div className="gold-line" style={{ height: 1, width: 70, margin: '0 auto 22px' }} />
-          <p style={{ fontSize: 16, color: INK_SOFT, fontWeight: 300, lineHeight: 1.6, maxWidth: 420, margin: '0 auto' }}>
-            {t.subtitle}
-          </p>
-        </div>
-
-        <div className="fade-in" style={{ animationDelay: '0.15s', maxWidth: 900, margin: '48px auto 0', position: 'relative' }}>
-          <div style={{ borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
-            <img
-              src="/images/hero-team.jpg" alt="Team planning content strategy together"
-              style={{ width: '100%', height: 'auto', display: 'block', filter: 'grayscale(0.45) contrast(1.08) brightness(0.92)' }}
-            />
-            <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, transparent 40%, ${BG} 100%)` }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(201,169,104,0.06)', mixBlendMode: 'overlay' }} />
-          </div>
-        </div>
-
-        <div className="fade-in" style={{ animationDelay: '0.3s', maxWidth: 680, margin: '0 auto', padding: '8px 0 40px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-            {getStatCubes(t).map((s) => (
-              <button
-                key={s.label}
-                onClick={() => setExpandedStat(expandedStat === s.label ? null : s.label)}
+        <div style={{ maxWidth: 720, margin: '0 auto', position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 28 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <svg viewBox="0 0 100 124" style={{ width: 20, height: 24, transform: 'skewX(-8deg)' }}>
+                <defs>
+                  <linearGradient id="tagGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor={RUST} />
+                    <stop offset="100%" stopColor={RUST_DEEP} />
+                  </linearGradient>
+                </defs>
+                <path d="M10 4h80a6 6 0 0 1 6 6v90a6 6 0 0 1-6 6h-63L10 88V10a6 6 0 0 1 6-6z" fill="url(#tagGrad)" />
+                <circle cx="66" cy="24" r="7" fill={BG} />
+              </svg>
+              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: '0.12em', color: RUST_DEEP, textTransform: 'uppercase' }}>
+                {t.tagline}
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <a href="https://wa.me/79101537910" target="_blank" rel="noopener noreferrer"
+                style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, color: INK_SOFT, textDecoration: 'underline', textUnderlineOffset: 3 }}>
+                WhatsApp
+              </a>
+              <a href="https://t.me/+79101537910" target="_blank" rel="noopener noreferrer"
+                style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, color: INK_SOFT, textDecoration: 'underline', textUnderlineOffset: 3 }}>
+                Telegram
+              </a>
+              <a href="mailto:kssw117@gmail.com"
+                style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, color: INK_SOFT, textDecoration: 'underline', textUnderlineOffset: 3 }}>
+                Email
+              </a>
+              <select
+                value={lang}
+                onChange={(e) => setLang(e.target.value)}
                 style={{
-                  textAlign: 'center', border: `1px solid ${expandedStat === s.label ? GOLD : LINE}`, borderRadius: 3, padding: '16px 6px',
-                  background: expandedStat === s.label ? 'rgba(201,169,104,0.08)' : 'rgba(201,169,104,0.03)',
-                  cursor: 'pointer', color: 'inherit', fontFamily: 'inherit',
+                  fontFamily: "'IBM Plex Mono', monospace", fontSize: 11.5, color: RUST_DEEP,
+                  background: 'rgba(217,119,87,0.10)', border: '1px solid rgba(217,119,87,0.3)',
+                  borderRadius: 999, padding: '3px 10px', cursor: 'pointer', appearance: 'none',
                 }}
               >
-                <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: 22, color: GOLD }}>{s.n}</div>
-                <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: INK_SOFT, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4 }}>{s.label}</div>
-              </button>
-            ))}
+                {LANGS.map((l) => (
+                  <option key={l.code} value={l.code}>{l.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
-          {expandedStat && (
-            <p style={{ fontSize: 13, color: INK_SOFT, lineHeight: 1.6, textAlign: 'center', marginTop: 16, fontWeight: 300 }}>
-              {getStatCubes(t).find(s => s.label === expandedStat)?.desc}
-            </p>
-          )}
-        </div>
 
-        <div className="fade-in" style={{ animationDelay: '0.4s', maxWidth: 720, margin: '0 auto', padding: '32px 0 60px', borderTop: `1px solid ${LINE}` }}>
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: GOLD }}>About</span>
-          <p style={{ fontSize: 14.5, color: INK_SOFT, fontWeight: 300, lineHeight: 1.7, margin: '14px 0 0' }}>
-            {t.about}
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 'clamp(34px, 5vw, 52px)', lineHeight: 1.1, margin: '0 0 24px', letterSpacing: '-0.01em' }}>
+            {t.heroTitle}
+          </h1>
+          <p style={{ fontSize: 17, color: INK_SOFT, lineHeight: 1.65, maxWidth: 540, margin: '0 0 12px' }}>
+            {t.heroBody}
+          </p>
+          <p style={{ fontSize: 14, color: RUST_DEEP, lineHeight: 1.6, maxWidth: 540, margin: '0 0 32px', fontWeight: 500 }}>
+            {t.heroNote}
+          </p>
+
+          <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', fontFamily: "'IBM Plex Mono', monospace", fontSize: 12.5, color: INK_SOFT }}>
+            <span><strong style={{ color: INK }}>5</strong> {t.statProducts}</span>
+            <span><strong style={{ color: INK }}>20</strong> {t.statLangs}</span>
+            <span><strong style={{ color: INK }}>1</strong> {t.statPeople}</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- MANIFESTO ---------- */}
+      <section style={{ padding: '0 24px 72px' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontFamily: "'Fraunces', serif", fontSize: 21, lineHeight: 1.55, color: INK, margin: '0 0 16px' }}>
+            {t.manifesto1 || T.en.manifesto1}
+          </p>
+          <p style={{ fontSize: 15, color: INK_SOFT, lineHeight: 1.6, margin: 0 }}>
+            {t.manifesto2 || T.en.manifesto2}
           </p>
         </div>
-      </div>
+      </section>
 
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px 100px' }}>
+      {/* ---------- THE WORK (ledger-style portfolio) ---------- */}
+      <section style={{ padding: '0 24px 96px' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <h2 style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: '0.1em', color: RUST_DEEP, textTransform: 'uppercase', marginBottom: 4 }}>
+            {t.workHeading}
+          </h2>
+          <p style={{ color: INK_SOFT, fontSize: 14, marginBottom: 28 }}>{t.workSub}</p>
 
-        {!unlocked && (
-          <div style={{ border: `1px solid ${freeTrialUsed ? 'rgba(201,120,104,0.4)' : LINE}`, borderRadius: 4, padding: 18, marginBottom: 32 }}>
-            {freeTrialUsed ? (
-              <div>
-                <p style={{ fontSize: 13.5, color: INK, margin: '0 0 12px', fontWeight: 400 }}>{t.trialUsedMsg}</p>
-                <a href="/unlock.html" style={{ display: 'inline-block', border: `1px solid ${GOLD}`, color: GOLD, padding: '9px 20px', borderRadius: 2, fontSize: 12.5, fontWeight: 500, textDecoration: 'none', letterSpacing: '0.04em' }}>
-                  {t.enterCode}
-                </a>
-                <a href="/buy.html" style={{ display: 'block', fontSize: 12, color: INK_SOFT, marginTop: 10 }}>{t.noCode}</a>
+          <div style={{ border: `1px solid ${LINE}`, borderRadius: 14, overflow: 'hidden', background: CARD }}>
+            {products.map((p, i) => (
+              <div key={p.tag} style={{ padding: '22px 24px', borderTop: i === 0 ? 'none' : `1px solid ${LINE}` }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 18 }}>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: RUST_DEEP, width: 24, flexShrink: 0, marginTop: 3 }}>{p.tag}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 18, marginBottom: 3 }}>{p.name}</div>
+                    <div style={{ fontSize: 13.5, color: INK_SOFT, lineHeight: 1.4, marginBottom: 8 }}>{p.line[lang]}</div>
+                    <div style={{ display: 'flex', gap: 8, fontSize: 12, lineHeight: 1.45 }}>
+                      <span style={{ color: '#B34B3C' }}>{p.problem[lang]}</span>
+                      <span style={{ color: RUST_DEEP, flexShrink: 0 }}>&rarr;</span>
+                      <span style={{ color: '#3A7A5C' }}>{p.result[lang]}</span>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: INK_SOFT }}>{p.stat[lang]}</span>
+                    <span style={{ fontWeight: 600, fontSize: 15 }}>{p.price}</span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 44 }}>
+                  <iframe title={`Buy ${p.name}`} style={{ border: 'none', borderRadius: 10 }} width="250" height="80" src={p.widget}></iframe>
+                  <button
+                    onClick={() => setExpandedProduct(expandedProduct === p.tag ? null : p.tag)}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: 11, color: RUST_DEEP, textDecoration: 'underline', textUnderlineOffset: 3,
+                    }}
+                  >
+                    {expandedProduct === p.tag ? 'Hide details' : 'Learn more'}
+                  </button>
+                </div>
+                {expandedProduct === p.tag && (
+                  <div style={{ paddingLeft: 44, marginTop: 16 }}>
+                    {p.benefits.map((b, bi) => (
+                      <div key={bi} style={{ display: 'flex', gap: 8, marginBottom: 8, fontSize: 13, color: INK_SOFT, lineHeight: 1.5 }}>
+                        <span style={{ color: RUST_DEEP, flexShrink: 0 }}>&bull;</span>
+                        <span>{b}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            ) : (
-              <p style={{ fontSize: 13.5, color: INK_SOFT, margin: 0 }}>{t.trialFreeMsg}</p>
-            )}
+            ))}
           </div>
-        )}
+        </div>
+      </section>
 
-        <div style={{ display: 'flex', gap: 0, marginBottom: 28, borderBottom: `1px solid ${LINE}` }}>
-          {getModes(t).map(m => (
-            <button
-              key={m.value}
-              onClick={() => setMode(m.value)}
-              style={{
-                flex: 1, padding: '12px 8px', fontSize: 12, fontWeight: 500, letterSpacing: '0.03em', cursor: 'pointer',
-                background: 'none', color: mode === m.value ? GOLD : INK_SOFT,
-                border: 'none', borderBottom: mode === m.value ? `1px solid ${GOLD}` : '1px solid transparent',
-                marginBottom: -1, transition: 'color 0.2s',
-              }}
-            >
-              {m.label.toUpperCase()}
-            </button>
+      {/* ---------- CAPABILITIES ---------- */}
+      <section style={{ padding: '0 24px 96px' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <h2 style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: '0.1em', color: RUST_DEEP, textTransform: 'uppercase', marginBottom: 4 }}>
+            {t.capHeading}
+          </h2>
+          <p style={{ color: INK_SOFT, fontSize: 14, marginBottom: 28 }}>{t.capSub}</p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 1, background: LINE, border: `1px solid ${LINE}`, borderRadius: 14, overflow: 'hidden' }}>
+            {capabilities.map((c, i) => (
+              <div key={i} style={{ background: CARD, padding: '22px 22px' }}>
+                <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: '0.04em', color: RUST_DEEP, marginBottom: 8 }}>
+                  {c.label[lang]}
+                </div>
+                <p style={{ fontSize: 13.5, color: INK_SOFT, lineHeight: 1.55, margin: 0 }}>{c.body[lang]}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- APPROACH ---------- */}
+      <section style={{ padding: '0 24px 96px' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <h2 style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: '0.1em', color: RUST_DEEP, textTransform: 'uppercase', marginBottom: 28 }}>
+            {t.approachHeading}
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 28 }}>
+            {principles.map((pr) => (
+              <div key={pr.n}>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28,
+                  borderRadius: '50%', border: `1px solid ${RUST}`, color: RUST_DEEP,
+                  fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, fontWeight: 600, marginBottom: 14,
+                }}>{pr.n}</div>
+                <h3 style={{ fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 17, margin: '0 0 8px' }}>{pr.title[lang]}</h3>
+                <p style={{ fontSize: 14, color: INK_SOFT, lineHeight: 1.55, margin: 0 }}>{pr.body[lang]}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- ABOUT / FOUNDER ---------- */}
+      <section style={{ padding: '0 24px 96px' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto', background: CARD, border: `1px solid ${LINE}`, borderRadius: 16, padding: '40px 36px' }}>
+          <h2 style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: '0.1em', color: RUST_DEEP, textTransform: 'uppercase', marginBottom: 20 }}>
+            {t.aboutHeading}
+          </h2>
+          <p style={{ fontFamily: "'Fraunces', serif", fontSize: 21, lineHeight: 1.5, margin: '0 0 20px', color: INK }}>
+            {t.aboutLead}
+          </p>
+          <p style={{ fontSize: 15, color: INK_SOFT, lineHeight: 1.65, margin: 0 }}>
+            {t.aboutBody}
+          </p>
+        </div>
+      </section>
+
+      {/* ---------- LOCATION ---------- */}
+      <section style={{ padding: '0 24px 96px' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <h2 style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: '0.1em', color: RUST_DEEP, textTransform: 'uppercase', marginBottom: 4 }}>
+            {t.basedIn}
+          </h2>
+          <p style={{ color: INK_SOFT, fontSize: 14, marginBottom: 20 }}>{t.city}</p>
+          <div
+            ref={mapContainerRef}
+            style={{ width: '100%', height: 260, borderRadius: 14, border: `1px solid ${LINE}`, overflow: 'hidden' }}
+          />
+        </div>
+      </section>
+
+      {/* ---------- MARQUEE ---------- */}
+      <div style={{ background: INK, padding: '14px 0', overflow: 'hidden' }}>
+        <div className="marquee-track">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <span key={i} style={{
+              fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 22, color: '#FFFFFF',
+              padding: '0 28px', display: 'inline-flex', alignItems: 'center', gap: 28,
+            }}>
+              PLAINWORK
+              <span style={{ color: RUST, fontSize: 14 }}>&#9670;</span>
+            </span>
           ))}
         </div>
-
-        {mode !== 'competitor' && (
-          <>
-            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelBusiness}</label>
-            <AutocompleteInput
-              value={businessType} onChange={setBusinessType} options={BUSINESS_CATEGORY_OPTIONS_BY_LANG[uiLang] || BUSINESS_CATEGORY_OPTIONS_BY_LANG.en}
-              placeholder={t.placeholderBusiness}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
-            />
-            <div style={{ marginBottom: 22 }} />
-
-            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelOccasion} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
-            <AutocompleteInput
-              value={occasion} onChange={setOccasion} options={OCCASION_OPTIONS_BY_LANG[uiLang] || OCCASION_OPTIONS_BY_LANG.en} placeholder={t.placeholderOccasion}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
-            />
-            <div style={{ marginBottom: 22 }} />
-
-            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelWeekTopic || 'WHAT\u2019S THIS WEEK ACTUALLY ABOUT'} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
-            <input
-              type="text" value={weekTopic} onChange={(e) => setWeekTopic(e.target.value)}
-              placeholder={t.placeholderWeekTopic || 'e.g. launching our new espresso blend, opening a second location...'}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', marginBottom: 22, boxSizing: 'border-box', outline: 'none' }}
-            />
-
-            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelAudience} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
-            <AutocompleteInput
-              value={audience} onChange={setAudience} options={AUDIENCE_OPTIONS_BY_LANG[uiLang] || AUDIENCE_OPTIONS_BY_LANG.en} placeholder={t.placeholderAudience}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
-            />
-            <div style={{ marginBottom: 26 }} />
-          </>
-        )}
-
-        {mode === 'single' && (
-          <>
-            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>{t.labelPlatform}</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
-              {PLATFORMS.map(p => (
-                <button key={p.code} onClick={() => setPlatform(p.label)} className="platform-pill"
-                  style={{
-                    padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s ease',
-                    background: platform === p.label ? GOLD : 'none',
-                    color: platform === p.label ? BG : INK_SOFT,
-                    border: `1px solid ${platform === p.label ? GOLD : LINE}`,
-                  }}>
-                  {p.label}
-                </button>
-              ))}
-            </div>
-            <div style={{ marginBottom: 26 }}>
-              <input
-                type="text" value={platform} onChange={(e) => setPlatform(e.target.value)}
-                placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
-                style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
-              />
-            </div>
-          </>
-        )}
-
-        {mode === 'cross' && (
-          <>
-            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>{t.labelPlatformsMulti} <span style={{ opacity: 0.5 }}>{t.pickTwo}</span></label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
-              {PLATFORMS.map(p => (
-                <button key={p.code} onClick={() => togglePlatform(p.label)}
-                  style={{
-                    padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer',
-                    background: selectedPlatforms.includes(p.label) ? GOLD : 'none',
-                    color: selectedPlatforms.includes(p.label) ? BG : INK_SOFT,
-                    border: `1px solid ${selectedPlatforms.includes(p.label) ? GOLD : LINE}`,
-                  }}>
-                  {p.label}
-                </button>
-              ))}
-              {selectedPlatforms.filter(p => !PLATFORMS.some(std => std.label === p)).map(custom => (
-                <button key={custom} onClick={() => togglePlatform(custom)}
-                  style={{
-                    padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer',
-                    background: GOLD, color: BG, border: `1px solid ${GOLD}`,
-                  }}>
-                  {custom} &times;
-                </button>
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: 8, marginBottom: 26 }}>
-              <div style={{ flex: 1 }}>
-                <input
-                  type="text" value={customPlatformInput} onChange={(e) => setCustomPlatformInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomPlatform(); } }}
-                  placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
-                  style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
-                />
-              </div>
-              <button onClick={addCustomPlatform} style={{ fontSize: 11, color: GOLD, background: 'none', border: `1px solid ${GOLD}`, borderRadius: 2, padding: '0 14px', cursor: 'pointer', flexShrink: 0, height: 34 }}>
-                {t.addPlatform || 'Add'}
-              </button>
-            </div>
-          </>
-        )}
-
-        {mode === 'competitor' && (
-          <>
-            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelBusiness} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
-            <AutocompleteInput
-              value={businessType} onChange={setBusinessType} options={BUSINESS_CATEGORY_OPTIONS_BY_LANG[uiLang] || BUSINESS_CATEGORY_OPTIONS_BY_LANG.en}
-              placeholder={t.placeholderBusiness}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
-            />
-            <div style={{ marginBottom: 22 }} />
-            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>{t.labelPlatform}</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
-              {PLATFORMS.map(p => (
-                <button key={p.code} onClick={() => setPlatform(p.label)}
-                  style={{
-                    padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s ease',
-                    background: platform === p.label ? GOLD : 'none',
-                    color: platform === p.label ? BG : INK_SOFT,
-                    border: `1px solid ${platform === p.label ? GOLD : LINE}`,
-                  }}>
-                  {p.label}
-                </button>
-              ))}
-            </div>
-            <div style={{ marginBottom: 22 }}>
-              <input
-                type="text" value={platform} onChange={(e) => setPlatform(e.target.value)}
-                placeholder={t.customPlatformPlaceholder || 'Or type your own platform...'}
-                style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
-              />
-            </div>
-            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelCompetitorPost}</label>
-            <textarea value={competitorText} onChange={(e) => setCompetitorText(e.target.value)} rows={4} placeholder={t.placeholderCompetitorPost}
-              style={{ width: '100%', background: 'none', border: `1px solid ${LINE}`, color: INK, fontSize: 14, padding: '10px 12px', marginBottom: 26, boxSizing: 'border-box', outline: 'none', resize: 'vertical' }} />
-          </>
-        )}
-
-        {mode === 'photos' && (
-          <>
-            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>{t.labelBusiness} <span style={{ opacity: 0.5 }}>{t.optional}</span></label>
-            <AutocompleteInput
-              value={businessType} onChange={setBusinessType} options={BUSINESS_CATEGORY_OPTIONS_BY_LANG[uiLang] || BUSINESS_CATEGORY_OPTIONS_BY_LANG.en}
-              placeholder={t.placeholderBusiness}
-              style={{ width: '100%', background: 'none', border: 'none', borderBottom: `1px solid ${LINE}`, color: INK, fontSize: 15, padding: '8px 0', boxSizing: 'border-box', outline: 'none' }}
-            />
-            <div style={{ marginBottom: 22 }} />
-            <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>{t.labelPhotos || 'Upload your photos'} <span style={{ opacity: 0.5 }}>({uploadedPhotos.length}/7)</span></label>
-
-            {uploadedPhotos.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
-                {uploadedPhotos.map((p, i) => (
-                  <div key={p.id} style={{ position: 'relative', width: 64, height: 64 }}>
-                    <img src={p.previewUrl} alt={p.name} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 3, border: `1px solid ${LINE}` }} />
-                    <span style={{ position: 'absolute', top: -6, left: -6, background: GOLD, color: BG, borderRadius: '50%', width: 16, height: 16, fontSize: 9.5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>{i + 1}</span>
-                    <button onClick={() => removePhoto(p.id)} style={{ position: 'absolute', top: -6, right: -6, background: '#0A0908', border: `1px solid ${LINE}`, color: INK_SOFT, borderRadius: '50%', width: 16, height: 16, fontSize: 10, cursor: 'pointer', lineHeight: 1, padding: 0 }}>&times;</button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {uploadedPhotos.length < 7 && (
-              <label style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', height: 56, border: `1px dashed ${LINE}`,
-                borderRadius: 3, cursor: 'pointer', marginBottom: 8, fontSize: 12.5, color: INK_SOFT,
-              }}>
-                {t.uploadPhotosHint || 'Click to upload photos (up to 7)'}
-                <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} style={{ display: 'none' }} />
-              </label>
-            )}
-            {photoError && <p style={{ fontSize: 12, color: '#D98E7F', margin: '0 0 8px' }}>{photoError}</p>}
-            <div style={{ marginBottom: 22 }} />
-          </>
-        )}
-
-        {dailyCount >= DAILY_LIMIT ? (
-          <div style={{ textAlign: 'center', padding: 16, border: `1px solid ${LINE}` }}>
-            <p style={{ fontSize: 13, color: INK, margin: 0 }}>{t.limitReached}</p>
-            <p style={{ fontSize: 12, color: INK_SOFT, margin: '4px 0 0' }}>{t.limitTomorrow}</p>
-          </div>
-        ) : (
-          <button onClick={handleGenerate} disabled={loading}
-            style={{
-              width: '100%', padding: '15px', fontSize: 13, letterSpacing: '0.08em', fontWeight: 500, cursor: 'pointer',
-              background: GOLD, color: BG, border: 'none', borderRadius: 2, opacity: loading ? 0.6 : 1,
-            }}>
-            {loading ? t.btnThinking : mode === 'competitor' ? t.btnFindGap : mode === 'photos' ? (t.btnPlanPhotos || 'Plan the week') : t.btnBuildWeek}
-          </button>
-        )}
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14 }}>
-          <span style={{ fontSize: 10, color: INK_SOFT, letterSpacing: '0.03em' }}>{t.dailyAllowance}</span>
-          <span style={{ fontSize: 10, color: INK_SOFT }}>{DAILY_LIMIT - dailyCount} / {DAILY_LIMIT}</span>
-        </div>
-        <div style={{ height: 1, background: LINE, marginTop: 6 }}>
-          <div className="allowance-fill" style={{ height: '100%', width: `${(dailyCount / DAILY_LIMIT) * 100}%`, background: GOLD, transition: 'width 0.5s ease' }} />
-        </div>
-
-        {result && result.ideas && (
-          <div style={{ marginTop: 48 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 24 }}>
-              <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: 20, color: INK }}>{t.theWeek}</span>
-              <button onClick={copyAllIdeas} style={{ fontSize: 11, color: GOLD, background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.04em' }}>
-                {copiedAll ? t.copied : t.copyAll}
-              </button>
-            </div>
-
-            {result.ideas.map((it, i) => {
-              const pc = PILLAR_COLORS[it.pillar] || PILLAR_COLORS['Educational'];
-              const plat = PLATFORMS.find(p => p.label === it.platform);
-              const bestTime = plat ? BEST_TIMES[plat.code] : null;
-              return (
-                <div key={i} className="idea-row" style={{ animationDelay: `${i * 0.06}s`, padding: '20px 0', borderTop: `1px solid ${LINE}` }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: INK_SOFT, letterSpacing: '0.05em' }}>{it.day?.toUpperCase()}</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      {it.platform && <span style={{ fontSize: 10.5, color: INK_SOFT }}>{it.platform}</span>}
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: pc.dot, display: 'inline-block' }} />
-                      <span style={{ fontSize: 10.5, color: INK_SOFT }}>{it.pillar}</span>
-                    </div>
-                  </div>
-                  <p style={{ fontSize: 16, color: INK, margin: '0 0 10px', lineHeight: 1.5, fontWeight: 300 }}>{it.idea}</p>
-                  {it.hashtags && it.hashtags.length > 0 && (
-                    <p style={{ fontSize: 12, color: GOLD, margin: '0 0 6px', opacity: 0.85 }}>{it.hashtags.map(h => `#${h.replace(/^#/, '')}`).join('  ')}</p>
-                  )}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    {bestTime && <span style={{ fontSize: 10.5, color: INK_SOFT }}>{t.bestTime}: {bestTime}</span>}
-                    {unlocked && (
-                      <button onClick={() => regenerateDay(i)} disabled={regeneratingDay === i}
-                        style={{ fontSize: 10.5, color: GOLD, background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.02em' }}>
-                        {regeneratingDay === i ? t.regenerating : t.tryAnother}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {result && result.gap && (
-          <div style={{ marginTop: 48 }}>
-            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: GOLD, letterSpacing: '0.08em', marginBottom: 10 }}>{t.whatMissing}</div>
-            <p style={{ fontSize: 16, color: INK, marginBottom: 26, lineHeight: 1.6, fontWeight: 300 }}>{result.gap}</p>
-            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: GOLD, letterSpacing: '0.08em', marginBottom: 10 }}>{t.yourAngle}</div>
-            <p style={{ fontSize: 16, color: INK, marginBottom: 26, lineHeight: 1.6, fontWeight: 300 }}>{result.angle}</p>
-            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10.5, color: GOLD, letterSpacing: '0.08em', marginBottom: 10 }}>{t.tryThis}</div>
-            <p style={{ fontSize: 16, color: INK, margin: 0, lineHeight: 1.6, fontWeight: 300 }}>{result.ideaExample}</p>
-          </div>
-        )}
-
-        {result && result.photoIdeas && (
-          <div style={{ marginTop: 48 }}>
-            <div style={{ fontSize: 12, color: INK_SOFT, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 24 }}>{t.theWeek}</div>
-            {result.photoIdeas.map((it, i) => {
-              const photo = uploadedPhotos[it.photoIndex - 1] || uploadedPhotos[i];
-              const pc = PILLAR_COLORS[it.pillar] || PILLAR_COLORS['Educational'];
-              return (
-                <div key={i} className="idea-row" style={{ animationDelay: `${i * 0.06}s`, display: 'flex', gap: 14, padding: '20px 0', borderTop: `1px solid ${LINE}` }}>
-                  {photo && <img src={photo.previewUrl} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: INK_SOFT, letterSpacing: '0.05em' }}>{it.day?.toUpperCase()}</span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span style={{ fontSize: 10.5, color: INK_SOFT }}>{it.platform}</span>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: pc.dot, display: 'inline-block' }} />
-                        <span style={{ fontSize: 10.5, color: INK_SOFT }}>{it.pillar}</span>
-                      </div>
-                    </div>
-                    <p style={{ fontSize: 14, color: INK, margin: 0, lineHeight: 1.5, fontWeight: 300, fontStyle: 'italic', opacity: 0.8 }}>{it.whatItShows}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {showWelcome && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)', animation: 'welcomeFadeIn 0.5s ease both' }}>
-            <div style={{ textAlign: 'center', animation: 'welcomeFadeOut 0.5s ease 3.3s both' }}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.2" style={{ marginBottom: 20 }}>
-                <polyline points="20 6 9 17 4 12" style={{ strokeDasharray: 40, animation: 'checkDraw 0.6s ease 0.4s both' }} />
-              </svg>
-              <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: 28, color: INK, margin: '0 0 8px' }}>{t.welcomeTitle}</h2>
-              <p style={{ fontSize: 14, color: INK_SOFT, margin: 0, fontWeight: 300 }}>{t.welcomeSub}</p>
-            </div>
-          </div>
-        )}
-
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: 80, paddingTop: 32, borderTop: `1px solid ${LINE}` }}>
-          <span style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.03em' }}>POWERED BY CLAUDE &middot; PLAINWORK BY KSENIA</span>
-          <div style={{ display: 'flex', gap: 18, marginTop: 4 }}>
-            <a href="/terms.html" style={{ fontSize: 10.5, color: INK_SOFT }}>{t.terms}</a>
-            <a href="/privacy.html" style={{ fontSize: 10.5, color: INK_SOFT }}>{t.privacy}</a>
-          </div>
-          {!showSupportEmail ? (
-            <button onClick={() => setShowSupportEmail(true)} style={{ fontSize: 10.5, color: GOLD, background: 'none', border: 'none', cursor: 'pointer' }}>{t.support}</button>
-          ) : (
-            <a href="mailto:kssw117@gmail.com" style={{ fontSize: 10.5, color: GOLD }}>kssw117@gmail.com</a>
-          )}
-        </div>
       </div>
+
+      {/* ---------- FOOTER ---------- */}
+      <footer style={{ padding: '32px 24px 48px', borderTop: `1px solid ${LINE}` }}>
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 20 }}>
+            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: INK_SOFT }}>{t.footerTag}</span>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <a href="https://wa.me/79101537910" target="_blank" rel="noopener noreferrer" style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: RUST_DEEP }}>WhatsApp</a>
+              <a href="https://t.me/+79101537910" target="_blank" rel="noopener noreferrer" style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: RUST_DEEP }}>Telegram</a>
+              <a href="mailto:kssw117@gmail.com" style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: RUST_DEEP }}>kssw117@gmail.com</a>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 16, paddingTop: 16, borderTop: `1px solid ${LINE}` }}>
+            <a href="/terms.html" style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: INK_SOFT }}>{t.terms}</a>
+            <a href="/privacy.html" style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: INK_SOFT }}>{t.privacy}</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
