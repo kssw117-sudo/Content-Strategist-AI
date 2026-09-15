@@ -1911,6 +1911,8 @@ export default function App() {
   const [dailyCount, setDailyCount] = useState(() => getDailyCount());
   const [showSupportEmail, setShowSupportEmail] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [heroImageIndex, setHeroImageIndex] = useState(0);
+  const HERO_IMAGES = ['/images/hero-team.jpg', '/images/hero2.jpg', '/images/hero3.jpg'];
   const [uiLang, setUiLang] = useState('en');
   const [expandedStat, setExpandedStat] = useState(null);
   const [regeneratingDay, setRegeneratingDay] = useState(null);
@@ -1938,6 +1940,14 @@ export default function App() {
       const timer = setTimeout(() => setShowWelcome(false), 3800);
       return () => clearTimeout(timer);
     }
+  }, []);
+
+  // Автоматическое переключение фото в шапке, как карусель
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroImageIndex(i => (i + 1) % HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   // Сохраняем текстовые поля черновика при каждом изменении
@@ -2228,11 +2238,26 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
         <div className="fade-in" style={{ animationDelay: '0.15s', maxWidth: 900, margin: '48px auto 0', position: 'relative' }}>
           <div style={{ borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
             <img
-              src="/images/hero-team.jpg" alt="Team planning content strategy together"
-              style={{ width: '100%', height: 'auto', display: 'block', filter: 'grayscale(0.45) contrast(1.08) brightness(0.92)' }}
+              src={HERO_IMAGES[heroImageIndex]} alt="Team planning content strategy together"
+              style={{ width: '100%', height: 'auto', display: 'block', filter: 'grayscale(0.45) contrast(1.08) brightness(0.92)', transition: 'opacity 0.6s ease' }}
+              key={heroImageIndex}
             />
             <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, transparent 40%, ${BG} 100%)` }} />
             <div style={{ position: 'absolute', inset: 0, background: 'rgba(201,169,104,0.06)', mixBlendMode: 'overlay' }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 14 }}>
+            {HERO_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setHeroImageIndex(i)}
+                aria-label={`Show photo ${i + 1}`}
+                style={{
+                  width: i === heroImageIndex ? 20 : 6, height: 6, borderRadius: 3,
+                  background: i === heroImageIndex ? GOLD : 'rgba(245,241,232,0.25)',
+                  border: 'none', cursor: 'pointer', padding: 0, transition: 'all 0.3s ease',
+                }}
+              />
+            ))}
           </div>
         </div>
 
