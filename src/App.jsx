@@ -1912,8 +1912,17 @@ export default function App() {
   const [showSupportEmail, setShowSupportEmail] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [heroImageIndex, setHeroImageIndex] = useState(0);
+  const [heroImageVisible, setHeroImageVisible] = useState(true);
+  function changeHeroImage(updater) {
+    setHeroImageVisible(false);
+    setTimeout(() => {
+      setHeroImageIndex(updater);
+      setHeroImageVisible(true);
+    }, 280);
+  }
   const HERO_IMAGES = ['/images/hero-team.jpg', '/images/hero2.jpg', '/images/hero3.jpg'];
   const wheelLockRef = useRef(false);
+  const heroCarouselRef = useRef(null);
   const [uiLang, setUiLang] = useState('en');
   const [expandedStat, setExpandedStat] = useState(null);
   const [regeneratingDay, setRegeneratingDay] = useState(null);
@@ -1946,9 +1955,29 @@ export default function App() {
   // Автоматическое переключение фото в шапке, как карусель
   useEffect(() => {
     const interval = setInterval(() => {
-      setHeroImageIndex(i => (i + 1) % HERO_IMAGES.length);
+      changeHeroImage(i => (i + 1) % HERO_IMAGES.length);
     }, 5000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Переключение колесиком мыши — нативный обработчик (не React onWheel),
+  // чтобы preventDefault() гарантированно остановил прокрутку страницы
+  useEffect(() => {
+    const el = heroCarouselRef.current;
+    if (!el) return;
+    function handleWheel(e) {
+      e.preventDefault();
+      if (wheelLockRef.current) return;
+      wheelLockRef.current = true;
+      if (e.deltaY > 0) {
+        changeHeroImage(i => (i + 1) % HERO_IMAGES.length);
+      } else if (e.deltaY < 0) {
+        changeHeroImage(i => (i - 1 + HERO_IMAGES.length) % HERO_IMAGES.length);
+      }
+      setTimeout(() => { wheelLockRef.current = false; }, 700);
+    }
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
   }, []);
 
   // Сохраняем текстовые поля черновика при каждом изменении
@@ -2238,27 +2267,22 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
 
         <div className="fade-in" style={{ animationDelay: '0.15s', maxWidth: 900, margin: '48px auto 0', position: 'relative' }}>
           <div
+            ref={heroCarouselRef}
             style={{ borderRadius: 2, overflow: 'hidden', position: 'relative' }}
-            onWheel={(e) => {
-              if (wheelLockRef.current) return;
-              wheelLockRef.current = true;
-              if (e.deltaY > 0) {
-                setHeroImageIndex(i => (i + 1) % HERO_IMAGES.length);
-              } else if (e.deltaY < 0) {
-                setHeroImageIndex(i => (i - 1 + HERO_IMAGES.length) % HERO_IMAGES.length);
-              }
-              setTimeout(() => { wheelLockRef.current = false; }, 700);
-            }}
           >
             <img
               src={HERO_IMAGES[heroImageIndex]} alt="Team planning content strategy together"
-              style={{ width: '100%', height: 'auto', display: 'block', filter: 'grayscale(0.45) contrast(1.08) brightness(0.92)', transition: 'opacity 0.6s ease' }}
-              key={heroImageIndex}
+              style={{
+                width: '100%', height: 'auto', display: 'block',
+                filter: 'grayscale(0.45) contrast(1.08) brightness(0.92)',
+                transition: 'opacity 0.28s ease',
+                opacity: heroImageVisible ? 1 : 0,
+              }}
             />
             <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, transparent 40%, ${BG} 100%)` }} />
             <div style={{ position: 'absolute', inset: 0, background: 'rgba(201,169,104,0.06)', mixBlendMode: 'overlay' }} />
             <button
-              onClick={() => setHeroImageIndex(i => (i - 1 + HERO_IMAGES.length) % HERO_IMAGES.length)}
+              onClick={() => changeHeroImage(i => (i - 1 + HERO_IMAGES.length) % HERO_IMAGES.length)}
               aria-label="Previous photo"
               style={{
                 position: 'absolute', top: '50%', left: 14, transform: 'translateY(-50%)',
@@ -2273,7 +2297,7 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
               &#8249;
             </button>
             <button
-              onClick={() => setHeroImageIndex(i => (i + 1) % HERO_IMAGES.length)}
+              onClick={() => changeHeroImage(i => (i + 1) % HERO_IMAGES.length)}
               aria-label="Next photo"
               style={{
                 position: 'absolute', top: '50%', right: 14, transform: 'translateY(-50%)',
@@ -2292,7 +2316,7 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
             {HERO_IMAGES.map((_, i) => (
               <button
                 key={i}
-                onClick={() => setHeroImageIndex(i)}
+                onClick={() => changeHeroImage(() => i)}
                 aria-label={`Show photo ${i + 1}`}
                 style={{
                   width: i === heroImageIndex ? 20 : 6, height: 6, borderRadius: 3,
