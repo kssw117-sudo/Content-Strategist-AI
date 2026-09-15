@@ -1810,6 +1810,21 @@ function ConstellationMark({ className = '', style = {} }) {
   );
 }
 
+// Плавающий значок ноутбука с точками-календарём на экране — тот же мотив,
+// что в логотипе продукта, той же прозрачности, что и созвездия
+function LaptopMark({ className = '', style = {} }) {
+  return (
+    <svg className={`float-constellation ${className}`} style={{ opacity: 0.28, pointerEvents: 'none', ...style }} viewBox="0 0 100 100">
+      <rect x="20" y="15" width="60" height="42" rx="4" fill="none" stroke="#C9A968" strokeWidth="1.6" />
+      <polygon points="12,62 88,62 80,72 20,72" fill="none" stroke="#C9A968" strokeWidth="1.6" />
+      <rect x="28" y="22" width="44" height="7" fill="#C9A968" />
+      {[[30,38],[42,38],[54,38],[66,38],[30,48],[42,48],[54,48],[66,48]].map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r={i % 3 === 0 ? 2.2 : 1.6} fill={i % 3 === 0 ? '#C9A968' : '#F5F1E8'} />
+      ))}
+    </svg>
+  );
+}
+
 // Собственный выпадающий список вместо нативного <datalist> — тот плохо
 // или совсем не поддерживается в мобильных браузерах (особенно iOS Safari).
 function AutocompleteInput({ value, onChange, options, placeholder, style, onKeyDown }) {
@@ -1905,6 +1920,36 @@ export default function App() {
     setCustomPlatformInput('');
   }
 
+  // Достаём один кадр из видео (примерно на середине или 1-й секунде) и
+  // превращаем его в обычную картинку через canvas — так его можно
+  // отправить в Claude Vision, который сам видеофайлы не принимает
+  function extractVideoFrame(file) {
+    return new Promise((resolve) => {
+      const videoEl = document.createElement('video');
+      videoEl.preload = 'metadata';
+      videoEl.muted = true;
+      videoEl.playsInline = true;
+      videoEl.src = URL.createObjectURL(file);
+
+      videoEl.onloadedmetadata = () => {
+        const seekTime = Math.min(1, videoEl.duration / 2);
+        videoEl.currentTime = seekTime;
+      };
+
+      videoEl.onseeked = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = videoEl.videoWidth;
+        canvas.height = videoEl.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(videoEl.src);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+
+      videoEl.onerror = () => resolve(null);
+    });
+  }
+
   function handlePhotoUpload(e) {
     const files = Array.from(e.target.files || []);
     setPhotoError('');
@@ -1913,20 +1958,35 @@ export default function App() {
       return;
     }
     files.forEach(file => {
-      if (!file.type.startsWith('image/')) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result;
-        const base64 = dataUrl.split(',')[1];
-        setUploadedPhotos(prev => [...prev, {
-          id: Date.now() + Math.random(),
-          name: file.name,
-          previewUrl: dataUrl,
-          base64,
-          mediaType: file.type,
-        }]);
-      };
-      reader.readAsDataURL(file);
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result;
+          const base64 = dataUrl.split(',')[1];
+          setUploadedPhotos(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            name: file.name,
+            previewUrl: dataUrl,
+            base64,
+            mediaType: file.type,
+            isVideo: false,
+          }]);
+        };
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith('video/')) {
+        extractVideoFrame(file).then(dataUrl => {
+          if (!dataUrl) return;
+          const base64 = dataUrl.split(',')[1];
+          setUploadedPhotos(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            name: file.name,
+            previewUrl: dataUrl,
+            base64,
+            mediaType: 'image/jpeg',
+            isVideo: true,
+          }]);
+        });
+      }
     });
     e.target.value = '';
   }
@@ -2065,6 +2125,8 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
         .constellation-1 { animation-duration: 9s; }
         .constellation-2 { animation-duration: 7s; animation-delay: -2s; }
         .constellation-3 { animation-duration: 10s; animation-delay: -4s; }
+        .laptop-1 { animation-duration: 11s; animation-delay: -1s; }
+        .laptop-2 { animation-duration: 8s; animation-delay: -5s; }
         button { transition: all 0.2s ease; }
         button:hover:not(:disabled) { transform: translateY(-1px); }
         .platform-pill:hover { border-color: ${GOLD} !important; color: ${GOLD} !important; }
@@ -2076,6 +2138,8 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
       <ConstellationMark className="constellation-1" style={{ position: 'fixed', top: '15%', left: '3%', width: 90 }} />
       <ConstellationMark className="constellation-2" style={{ position: 'fixed', top: '55%', right: '3%', width: 70 }} />
       <ConstellationMark className="constellation-3" style={{ position: 'fixed', bottom: '8%', left: '5%', width: 60 }} />
+      <LaptopMark className="laptop-1" style={{ position: 'fixed', top: '30%', right: '5%', width: 80 }} />
+      <LaptopMark className="laptop-2" style={{ position: 'fixed', bottom: '15%', right: '8%', width: 55 }} />
 
       {/* ---------- HERO: тёмный фон, фото в дуотоне, крупная serif-типографика ---------- */}
       <div style={{ position: 'relative', padding: '24px 24px 0', textAlign: 'center', overflow: 'hidden' }}>
@@ -2331,6 +2395,11 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
                     <img src={p.previewUrl} alt={p.name} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 3, border: `1px solid ${LINE}` }} />
                     <span style={{ position: 'absolute', top: -6, left: -6, background: GOLD, color: BG, borderRadius: '50%', width: 16, height: 16, fontSize: 9.5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>{i + 1}</span>
                     <button onClick={() => removePhoto(p.id)} style={{ position: 'absolute', top: -6, right: -6, background: '#0A0908', border: `1px solid ${LINE}`, color: INK_SOFT, borderRadius: '50%', width: 16, height: 16, fontSize: 10, cursor: 'pointer', lineHeight: 1, padding: 0 }}>&times;</button>
+                    {p.isVideo && (
+                      <span style={{ position: 'absolute', bottom: 3, right: 3, background: 'rgba(10,9,8,0.75)', color: GOLD, borderRadius: 3, padding: '1px 4px', fontSize: 8, fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.03em' }}>
+                        VIDEO
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -2341,8 +2410,8 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
                 display: 'flex', alignItems: 'center', justifyContent: 'center', height: 56, border: `1px dashed ${LINE}`,
                 borderRadius: 3, cursor: 'pointer', marginBottom: 8, fontSize: 12.5, color: INK_SOFT,
               }}>
-                {t.uploadPhotosHint || 'Click to upload photos (up to 7)'}
-                <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} style={{ display: 'none' }} />
+                {t.uploadPhotosHint || 'Click to upload photos or videos (up to 7)'}
+                <input type="file" accept="image/*,video/*" multiple onChange={handlePhotoUpload} style={{ display: 'none' }} />
               </label>
             )}
             {photoError && <p style={{ fontSize: 12, color: '#D98E7F', margin: '0 0 8px' }}>{photoError}</p>}
