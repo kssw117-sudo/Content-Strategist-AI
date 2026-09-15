@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // Маленький помощник для IndexedDB — используем для фото/кадров видео,
 // т.к. до семи изображений в base64 легко превышают лимит localStorage
@@ -1913,6 +1913,7 @@ export default function App() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [heroImageIndex, setHeroImageIndex] = useState(0);
   const HERO_IMAGES = ['/images/hero-team.jpg', '/images/hero2.jpg', '/images/hero3.jpg'];
+  const wheelLockRef = useRef(false);
   const [uiLang, setUiLang] = useState('en');
   const [expandedStat, setExpandedStat] = useState(null);
   const [regeneratingDay, setRegeneratingDay] = useState(null);
@@ -2236,7 +2237,19 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
         </div>
 
         <div className="fade-in" style={{ animationDelay: '0.15s', maxWidth: 900, margin: '48px auto 0', position: 'relative' }}>
-          <div style={{ borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
+          <div
+            style={{ borderRadius: 2, overflow: 'hidden', position: 'relative' }}
+            onWheel={(e) => {
+              if (wheelLockRef.current) return;
+              wheelLockRef.current = true;
+              if (e.deltaY > 0) {
+                setHeroImageIndex(i => (i + 1) % HERO_IMAGES.length);
+              } else if (e.deltaY < 0) {
+                setHeroImageIndex(i => (i - 1 + HERO_IMAGES.length) % HERO_IMAGES.length);
+              }
+              setTimeout(() => { wheelLockRef.current = false; }, 700);
+            }}
+          >
             <img
               src={HERO_IMAGES[heroImageIndex]} alt="Team planning content strategy together"
               style={{ width: '100%', height: 'auto', display: 'block', filter: 'grayscale(0.45) contrast(1.08) brightness(0.92)', transition: 'opacity 0.6s ease' }}
