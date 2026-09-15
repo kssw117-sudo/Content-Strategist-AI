@@ -1952,14 +1952,6 @@ export default function App() {
     }
   }, []);
 
-  // Автоматическое переключение фото в шапке, как карусель
-  useEffect(() => {
-    const interval = setInterval(() => {
-      changeHeroImage(i => (i + 1) % HERO_IMAGES.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   // Переключение колесиком мыши — нативный обработчик (не React onWheel),
   // чтобы preventDefault() гарантированно остановил прокрутку страницы
   useEffect(() => {
