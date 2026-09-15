@@ -1,5 +1,38 @@
 import React, { useState, useEffect } from 'react';
 
+// Маленький помощник для IndexedDB — используем для фото/кадров видео,
+// т.к. до семи изображений в base64 легко превышают лимит localStorage
+function idbOpen() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('cs_drafts', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('files');
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbGet(key) {
+  try {
+    const db = await idbOpen();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction('files', 'readonly');
+      const req = tx.objectStore('files').get(key);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (e) { return null; }
+}
+async function idbSet(key, value) {
+  try {
+    const db = await idbOpen();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction('files', 'readwrite');
+      tx.objectStore('files').put(value, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (e) { /* тихо игнорируем — фото просто не сохранятся черновиком */ }
+}
+
 const BG = '#0A0908';
 const CREAM = '#F5F1E8';
 const CARD = '#151412';
@@ -1883,17 +1916,17 @@ export default function App() {
   const [regeneratingDay, setRegeneratingDay] = useState(null);
   const [copiedAll, setCopiedAll] = useState(false);
 
-  const [businessType, setBusinessType] = useState('');
-  const [occasion, setOccasion] = useState('');
-  const [weekTopic, setWeekTopic] = useState('');
-  const [audience, setAudience] = useState('');
+  const [businessType, setBusinessType] = useState(() => localStorage.getItem('cs_draft_businessType') || '');
+  const [occasion, setOccasion] = useState(() => localStorage.getItem('cs_draft_occasion') || '');
+  const [weekTopic, setWeekTopic] = useState(() => localStorage.getItem('cs_draft_weekTopic') || '');
+  const [audience, setAudience] = useState(() => localStorage.getItem('cs_draft_audience') || '');
   const [platform, setPlatform] = useState('Instagram');
   const [selectedPlatforms, setSelectedPlatforms] = useState(['Instagram', 'TikTok']);
   const [customPlatformInput, setCustomPlatformInput] = useState('');
   const [uploadedPhotos, setUploadedPhotos] = useState([]);
   const [photoError, setPhotoError] = useState('');
   const [mode, setMode] = useState('single');
-  const [competitorText, setCompetitorText] = useState('');
+  const [competitorText, setCompetitorText] = useState(() => localStorage.getItem('cs_draft_competitorText') || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
@@ -1906,6 +1939,35 @@ export default function App() {
       return () => clearTimeout(timer);
     }
   }, []);
+
+  // Сохраняем текстовые поля черновика при каждом изменении
+  useEffect(() => { localStorage.setItem('cs_draft_businessType', businessType); }, [businessType]);
+  useEffect(() => { localStorage.setItem('cs_draft_occasion', occasion); }, [occasion]);
+  useEffect(() => { localStorage.setItem('cs_draft_weekTopic', weekTopic); }, [weekTopic]);
+  useEffect(() => { localStorage.setItem('cs_draft_audience', audience); }, [audience]);
+  useEffect(() => { localStorage.setItem('cs_draft_competitorText', competitorText); }, [competitorText]);
+
+  // Восстанавливаем фото и последний результат генерации при загрузке страницы
+  useEffect(() => {
+    try {
+      const savedResult = localStorage.getItem('cs_draft_result');
+      if (savedResult) setResult(JSON.parse(savedResult));
+    } catch (e) { /* повреждённые данные — просто игнорируем */ }
+    idbGet('uploadedPhotos').then(p => { if (p) setUploadedPhotos(p); });
+  }, []);
+
+  // Фото/кадры видео — в IndexedDB, там лимит намного больше, чем у localStorage
+  useEffect(() => {
+    idbSet('uploadedPhotos', uploadedPhotos);
+  }, [uploadedPhotos]);
+
+  // Сохраняем результат генерации, чтобы не потерять его при случайном
+  // закрытии вкладки или обновлении страницы
+  useEffect(() => {
+    try {
+      if (result) localStorage.setItem('cs_draft_result', JSON.stringify(result));
+    } catch (e) { /* превышена квота localStorage — пропускаем */ }
+  }, [result]);
 
   function togglePlatform(code) {
     setSelectedPlatforms(prev => prev.includes(code) ? prev.filter(p => p !== code) : [...prev, code]);
