@@ -2244,6 +2244,36 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
             />
             <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, transparent 40%, ${BG} 100%)` }} />
             <div style={{ position: 'absolute', inset: 0, background: 'rgba(201,169,104,0.06)', mixBlendMode: 'overlay' }} />
+            <button
+              onClick={() => setHeroImageIndex(i => (i - 1 + HERO_IMAGES.length) % HERO_IMAGES.length)}
+              aria-label="Previous photo"
+              style={{
+                position: 'absolute', top: '50%', left: 14, transform: 'translateY(-50%)',
+                width: 36, height: 36, borderRadius: '50%', border: 'none', cursor: 'pointer',
+                background: 'rgba(10,9,8,0.35)', color: CREAM, fontSize: 18,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                opacity: 0.55, transition: 'opacity 0.2s ease', backdropFilter: 'blur(2px)',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = 0.55}
+            >
+              &#8249;
+            </button>
+            <button
+              onClick={() => setHeroImageIndex(i => (i + 1) % HERO_IMAGES.length)}
+              aria-label="Next photo"
+              style={{
+                position: 'absolute', top: '50%', right: 14, transform: 'translateY(-50%)',
+                width: 36, height: 36, borderRadius: '50%', border: 'none', cursor: 'pointer',
+                background: 'rgba(10,9,8,0.35)', color: CREAM, fontSize: 18,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                opacity: 0.55, transition: 'opacity 0.2s ease', backdropFilter: 'blur(2px)',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = 0.55}
+            >
+              &#8250;
+            </button>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 14 }}>
             {HERO_IMAGES.map((_, i) => (
