@@ -1911,6 +1911,26 @@ export default function App() {
   const [dailyCount, setDailyCount] = useState(() => getDailyCount());
   const [showSupportEmail, setShowSupportEmail] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [showHelpBubble, setShowHelpBubble] = useState(false);
+
+  // Лёгкий "поп"-звук для открытия/закрытия окошка подсказки
+  function playPopSound(opening) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(opening ? 520 : 380, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(opening ? 780 : 260, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+    } catch (e) { /* звук не критичен для работы приложения */ }
+  }
+
   const [heroImageIndex, setHeroImageIndex] = useState(0);
   const [heroImageVisible, setHeroImageVisible] = useState(true);
   function changeHeroImage(updater) {
@@ -2680,6 +2700,9 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: 80, paddingTop: 32, borderTop: `1px solid ${LINE}` }}>
+          <span style={{ fontFamily: "'Fraunces', serif", fontStyle: 'normal', fontSize: 13, color: GOLD, marginBottom: 2 }}>
+            The week, planned before breakfast.
+          </span>
           <span style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.03em' }}>POWERED BY CLAUDE &middot; PLAINWORK BY KSENIA</span>
           <div style={{ display: 'flex', gap: 18, marginTop: 4 }}>
             <a href="/terms.html" style={{ fontSize: 10.5, color: INK_SOFT }}>{t.terms}</a>
@@ -2693,6 +2716,38 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
           )}
         </div>
       </div>
+
+      {/* Плавающая кнопка "как пользоваться" — в углу экрана */}
+      <button
+        onClick={() => {
+          playPopSound(!showHelpBubble);
+          setShowHelpBubble(v => !v);
+        }}
+        aria-label="How it works"
+        style={{
+          position: 'fixed', bottom: 20, right: 20, width: 48, height: 48, borderRadius: '50%',
+          background: GOLD, color: '#0A0908', border: 'none',
+          cursor: 'pointer', fontSize: 20, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 14px rgba(201,169,104,0.35)', zIndex: 50,
+        }}
+      >
+        {showHelpBubble ? '\u2715' : '?'}
+      </button>
+
+      {showHelpBubble && (
+        <div
+          style={{
+            position: 'fixed', bottom: 80, right: 20, width: 300, maxWidth: 'calc(100vw - 40px)',
+            background: '#14120F', borderRadius: 14, padding: 18, boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+            border: `1px solid ${LINE}`, zIndex: 50,
+          }}
+        >
+          <p style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 600, color: INK }}>How Content Strategist AI works</p>
+          <p style={{ margin: 0, fontSize: 12.5, color: INK_SOFT, lineHeight: 1.55 }}>
+            Pick single platform, cross platform, competitor gap, or photo planner mode. Fill in your business details once, and get a full week of ideas, balanced across five content pillars, with hashtags and best posting times included.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
