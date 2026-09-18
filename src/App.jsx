@@ -85,6 +85,13 @@ const PLATFORMS = [
   { code: 'youtube', label: 'YouTube' },
 ];
 
+// Тонкие вариации золота под каждую платформу — не разноцветно, а едва
+// заметный сдвиг оттенка внутри одной золотой палитры
+const PLATFORM_GOLD = {
+  instagram: '#C9A968', tiktok: '#D4B57A', linkedin: '#B99A5E', facebook: '#C3A36A',
+  telegram: '#CFAE72', x: '#BFA164', reddit: '#D8BC85', youtube: '#C6A662',
+};
+
 function getModes(t) {
   return [
     { value: 'single', label: t.tabSingle },
@@ -1912,6 +1919,22 @@ export default function App() {
   const [showSupportEmail, setShowSupportEmail] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showHelpBubble, setShowHelpBubble] = useState(false);
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+  const [cursorHover, setCursorHover] = useState(false);
+
+  // Фирменный курсор — тонкое золотое кольцо, следует за мышью,
+  // увеличивается и заливается над кликабельными элементами
+  useEffect(() => {
+    function handleMove(e) {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+      const el = e.target;
+      const interactive = el.closest && el.closest('button, a, input, select, textarea, [role="button"]');
+      setCursorHover(!!interactive);
+    }
+    window.addEventListener('mousemove', handleMove);
+    return () => window.removeEventListener('mousemove', handleMove);
+  }, []);
+
 
   // Лёгкий "поп"-звук для открытия/закрытия окошка подсказки
   function playPopSound(opening) {
@@ -2626,14 +2649,14 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
                     <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: INK_SOFT, letterSpacing: '0.05em' }}>{it.day?.toUpperCase()}</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      {it.platform && <span style={{ fontSize: 10.5, color: INK_SOFT }}>{it.platform}</span>}
+                      {it.platform && <span style={{ fontSize: 10.5, color: plat ? PLATFORM_GOLD[plat.code] : INK_SOFT }}>{it.platform}</span>}
                       <span style={{ width: 6, height: 6, borderRadius: '50%', background: pc.dot, display: 'inline-block' }} />
                       <span style={{ fontSize: 10.5, color: INK_SOFT }}>{it.pillar}</span>
                     </div>
                   </div>
                   <p style={{ fontSize: 16, color: INK, margin: '0 0 10px', lineHeight: 1.5, fontWeight: 300 }}>{it.idea}</p>
                   {it.hashtags && it.hashtags.length > 0 && (
-                    <p style={{ fontSize: 12, color: GOLD, margin: '0 0 6px', opacity: 0.85 }}>{it.hashtags.map(h => `#${h.replace(/^#/, '')}`).join('  ')}</p>
+                    <p style={{ fontSize: 12, color: plat ? PLATFORM_GOLD[plat.code] : GOLD, margin: '0 0 6px', opacity: 0.85 }}>{it.hashtags.map(h => `#${h.replace(/^#/, '')}`).join('  ')}</p>
                   )}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     {bestTime && <span style={{ fontSize: 10.5, color: INK_SOFT }}>{t.bestTime}: {bestTime}</span>}
