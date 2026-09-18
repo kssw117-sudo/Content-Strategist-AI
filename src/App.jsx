@@ -1919,21 +1919,6 @@ export default function App() {
   const [showSupportEmail, setShowSupportEmail] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showHelpBubble, setShowHelpBubble] = useState(false);
-  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
-  const [cursorHover, setCursorHover] = useState(false);
-
-  // Фирменный курсор — тонкое золотое кольцо, следует за мышью,
-  // увеличивается и заливается над кликабельными элементами
-  useEffect(() => {
-    function handleMove(e) {
-      setCursorPos({ x: e.clientX, y: e.clientY });
-      const el = e.target;
-      const interactive = el.closest && el.closest('button, a, input, select, textarea, [role="button"]');
-      setCursorHover(!!interactive);
-    }
-    window.addEventListener('mousemove', handleMove);
-    return () => window.removeEventListener('mousemove', handleMove);
-  }, []);
 
 
   // Лёгкий "поп"-звук для открытия/закрытия окошка подсказки
@@ -2241,9 +2226,12 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
   const t = UI_TEXT[uiLang] || UI_TEXT.en;
 
   return (
-    <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: "'Inter', sans-serif" }} className="premium-cursor-host">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
+        @media (hover: hover) and (pointer: fine) {
+          /* курсор остаётся стандартным белым */
+        }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both; }
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
@@ -2498,7 +2486,8 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
                   style={{
                     padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer',
                     background: selectedPlatforms.includes(p.label) ? GOLD : 'none',
-                    color: selectedPlatforms.includes(p.label) ? BG : INK_SOFT,
+                    color: selectedPlatforms.includes(p.label) ? '#000000' : INK_SOFT,
+                    fontWeight: selectedPlatforms.includes(p.label) ? 600 : 400,
                     border: `1px solid ${selectedPlatforms.includes(p.label) ? GOLD : LINE}`,
                   }}>
                   {p.label}
@@ -2724,7 +2713,7 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: 80, paddingTop: 32, borderTop: `1px solid ${LINE}` }}>
           <span style={{ fontFamily: "'Fraunces', serif", fontStyle: 'normal', fontSize: 13, color: GOLD, marginBottom: 2 }}>
-            The week, planned before breakfast.
+            The week, planned before breakfast
           </span>
           <span style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.03em' }}>POWERED BY CLAUDE &middot; PLAINWORK BY KSENIA</span>
           <div style={{ display: 'flex', gap: 18, marginTop: 4 }}>
