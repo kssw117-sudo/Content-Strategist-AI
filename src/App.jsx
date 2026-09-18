@@ -2254,7 +2254,7 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
         .laptop-2 { animation-duration: 8s; animation-delay: -5s; }
         button { transition: all 0.2s ease; }
         button:hover:not(:disabled) { transform: translateY(-1px); }
-        .platform-pill:hover { border-color: ${GOLD} !important; color: ${GOLD} !important; }
+        .platform-pill:not(.selected):hover { border-color: ${GOLD} !important; color: ${GOLD} !important; }
         @keyframes allowanceFill { from { width: 0; } }
         .allowance-fill { animation: allowanceFill 0.8s ease both; }
       `}</style>
@@ -2456,11 +2456,12 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
             <label style={{ fontSize: 11, color: INK_SOFT, letterSpacing: '0.04em', display: 'block', marginBottom: 10 }}>{t.labelPlatform}</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
               {PLATFORMS.map(p => (
-                <button key={p.code} onClick={() => setPlatform(p.label)} className="platform-pill"
+                <button key={p.code} onClick={() => setPlatform(p.label)} className={`platform-pill ${platform === p.label ? 'selected' : ''}`}
                   style={{
                     padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s ease',
                     background: platform === p.label ? GOLD : 'none',
-                    color: platform === p.label ? BG : INK_SOFT,
+                    color: platform === p.label ? '#000000' : INK_SOFT,
+                    fontWeight: platform === p.label ? 600 : 400,
                     border: `1px solid ${platform === p.label ? GOLD : LINE}`,
                   }}>
                   {p.label}
@@ -2535,7 +2536,8 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
                   style={{
                     padding: '7px 14px', borderRadius: 2, fontSize: 12, cursor: 'pointer', transition: 'all 0.2s ease',
                     background: platform === p.label ? GOLD : 'none',
-                    color: platform === p.label ? BG : INK_SOFT,
+                    color: platform === p.label ? '#000000' : INK_SOFT,
+                    fontWeight: platform === p.label ? 600 : 400,
                     border: `1px solid ${platform === p.label ? GOLD : LINE}`,
                   }}>
                   {p.label}
