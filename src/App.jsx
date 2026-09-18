@@ -1949,7 +1949,6 @@ export default function App() {
     }, 280);
   }
   const HERO_IMAGES = ['/images/hero-team.jpg', '/images/hero2.jpg', '/images/hero3.jpg'];
-  const wheelLockRef = useRef(false);
   const heroCarouselRef = useRef(null);
   const [uiLang, setUiLang] = useState('en');
   const [expandedStat, setExpandedStat] = useState(null);
@@ -1980,25 +1979,9 @@ export default function App() {
     }
   }, []);
 
-  // Переключение колесиком мыши — нативный обработчик (не React onWheel),
-  // чтобы preventDefault() гарантированно остановил прокрутку страницы
-  useEffect(() => {
-    const el = heroCarouselRef.current;
-    if (!el) return;
-    function handleWheel(e) {
-      e.preventDefault();
-      if (wheelLockRef.current) return;
-      wheelLockRef.current = true;
-      if (e.deltaY > 0) {
-        changeHeroImage(i => (i + 1) % HERO_IMAGES.length);
-      } else if (e.deltaY < 0) {
-        changeHeroImage(i => (i - 1 + HERO_IMAGES.length) % HERO_IMAGES.length);
-      }
-      setTimeout(() => { wheelLockRef.current = false; }, 700);
-    }
-    el.addEventListener('wheel', handleWheel, { passive: false });
-    return () => el.removeEventListener('wheel', handleWheel);
-  }, []);
+  // Переключение колесиком мыши убрано — оно перехватывало обычную
+  // прокрутку страницы, когда курсор оказывался над фото. Переключение
+  // теперь только вручную: стрелками или точками-индикаторами.
 
   // Сохраняем текстовые поля черновика при каждом изменении
   useEffect(() => { localStorage.setItem('cs_draft_businessType', businessType); }, [businessType]);
@@ -2226,7 +2209,14 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
   const t = UI_TEXT[uiLang] || UI_TEXT.en;
 
   return (
-    <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: "'Inter', sans-serif" }} className="premium-cursor-host">
+    <div style={{ minHeight: '100vh', background: BG, color: INK, fontFamily: "'Inter', sans-serif", position: 'relative' }} className="premium-cursor-host">
+      {/* Едва заметная текстура шума на фоне — убирает ощущение плоской черноты */}
+      <svg style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0, opacity: 0.035 }}>
+        <filter id="noiseFilter">
+          <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+      </svg>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
         @media (hover: hover) and (pointer: fine) {
@@ -2255,6 +2245,16 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
         button { transition: all 0.2s ease; }
         button:hover:not(:disabled) { transform: translateY(-1px); }
         .platform-pill:not(.selected):hover { border-color: ${GOLD} !important; color: ${GOLD} !important; }
+        .gold-btn-premium { transition: transform 0.15s ease, box-shadow 0.2s ease; }
+        .gold-btn-premium:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201,169,104,0.4) !important; }
+        .gold-btn-premium:active:not(:disabled) { transform: scale(0.98) translateY(0); }
+        .idea-row { transition: transform 0.2s ease; }
+        .idea-row:hover { transform: translateX(3px); }
+        .shimmer-block {
+          background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(201,169,104,0.14) 50%, rgba(255,255,255,0.04) 100%);
+          background-size: 200% 100%;
+          animation: shimmer 1.6s ease-in-out infinite;
+        }
         @keyframes allowanceFill { from { width: 0; } }
         .allowance-fill { animation: allowanceFill 0.8s ease both; }
       `}</style>
@@ -2605,10 +2605,11 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
             <p style={{ fontSize: 12, color: INK_SOFT, margin: '4px 0 0' }}>{t.limitTomorrow}</p>
           </div>
         ) : (
-          <button onClick={handleGenerate} disabled={loading}
+          <button onClick={handleGenerate} disabled={loading} className="gold-btn-premium"
             style={{
               width: '100%', padding: '15px', fontSize: 13, letterSpacing: '0.08em', fontWeight: 500, cursor: 'pointer',
               background: GOLD, color: BG, border: 'none', borderRadius: 2, opacity: loading ? 0.6 : 1,
+              boxShadow: '0 4px 20px rgba(201,169,104,0.25)',
             }}>
             {loading ? t.btnThinking : mode === 'competitor' ? t.btnFindGap : mode === 'photos' ? (t.btnPlanPhotos || 'Plan the week') : t.btnBuildWeek}
           </button>
@@ -2621,6 +2622,18 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
         <div style={{ height: 1, background: LINE, marginTop: 6 }}>
           <div className="allowance-fill" style={{ height: '100%', width: `${(dailyCount / DAILY_LIMIT) * 100}%`, background: GOLD, transition: 'width 0.5s ease' }} />
         </div>
+
+        {loading && (
+          <div style={{ marginTop: 48 }}>
+            {[0, 1, 2, 3, 4].map(i => (
+              <div key={i} style={{ padding: '20px 0', borderTop: `1px solid ${LINE}` }}>
+                <div className="shimmer-block" style={{ width: 90, height: 10, borderRadius: 2, marginBottom: 12 }} />
+                <div className="shimmer-block" style={{ width: '85%', height: 16, borderRadius: 2, marginBottom: 8 }} />
+                <div className="shimmer-block" style={{ width: '55%', height: 12, borderRadius: 2 }} />
+              </div>
+            ))}
+          </div>
+        )}
 
         {result && result.ideas && (
           <div style={{ marginTop: 48 }}>
