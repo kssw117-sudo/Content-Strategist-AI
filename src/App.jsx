@@ -2741,6 +2741,9 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
           ) : (
             <a href="mailto:kssw117@gmail.com" style={{ fontSize: 10.5, color: GOLD }}>kssw117@gmail.com</a>
           )}
+          <p style={{ fontSize: 9.5, color: INK_SOFT, textAlign: 'center', marginTop: 8, opacity: 0.7 }}>
+            Грезина Ксения Викторовна (Ksenia Grezina) &middot; Tax ID (ИНН) 710607167655
+          </p>
         </div>
       </div>
 
