@@ -1,5 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+// Ответ сервера о пробной попытке или дневном лимите (считаются на сервере).
+function guardError(data) {
+  if (data && (data.code === 'trial_used' || data.code === 'limit_reached')) {
+    const e = new Error(data.error || data.code);
+    e.guardMessage = data.error;
+    e.guardCode = data.code;
+    return e;
+  }
+  return null;
+}
+
+
 // Маленький помощник для IndexedDB — используем для фото/кадров видео,
 // т.к. до семи изображений в base64 легко превышают лимит localStorage
 function idbOpen() {
@@ -2124,11 +2136,12 @@ Respond ONLY with valid JSON: {"day": "${oldIdea.day}", "platform": "${oldIdea.p
         body: JSON.stringify({ licenseCode, prompt, trial: false }),
       });
       const data = await res.json();
+      { const ge = guardError(data); if (ge) throw ge; }
       const text = data.content?.map(b => b.text || '').join('') || '';
       const newIdea = JSON.parse(text.replace(/```json|```/g, '').trim());
       setResult(r => { const next = { ...r, ideas: [...r.ideas] }; next.ideas[index] = newIdea; return next; });
     } catch (err) {
-      setError(t.errRegenerate);
+      setError(err.guardMessage || t.errRegenerate);
     } finally {
       setRegeneratingDay(null);
     }
@@ -2193,7 +2206,14 @@ Respond ONLY with valid JSON: {"photoIdeas": [{"photoIndex": 1, "day": "Monday",
           images: isPhotoMode ? uploadedPhotos.map(p => ({ base64: p.base64, mediaType: p.mediaType })) : undefined,
         }),
       });
-      if (res.status === 403) throw new Error(t.errInvalidCode);
+      if (res.status === 403 || res.status === 429) {
+        const ge = guardError(await res.json().catch(() => ({})));
+        if (ge) {
+          if (ge.guardCode === 'trial_used') { localStorage.setItem('cs_free_trial_used', 'true'); setFreeTrialUsed(true); }
+          throw ge;
+        }
+        throw new Error(t.errInvalidCode);
+      }
       const data = await res.json();
       const text = data.content?.map(b => b.text || '').join('') || '';
       const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
